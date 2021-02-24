@@ -165,6 +165,31 @@ class ClientController extends Controller
     }
 
     /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Client  $client
+     * @return \Illuminate\Http\Response
+     */
+    public function createClientStore(Request  $request){
+        Store::updateOrCreate([
+            'id' => $request->id
+        ],[
+            'store_name'        => $request->store_name,
+            'store_address'     => $request->store_address,
+            'area_id'           => $request->area_id,
+            'user_id'           => $request->user_id,
+            'is_deleted'        => 0
+        ]);
+
+        // return response
+        $response = [
+            'success' => true,
+            'message' => 'Client Store successfully submitted.',
+        ];
+        return response()->json($response, 200);
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param  \App\User  $client
@@ -237,8 +262,8 @@ class ClientController extends Controller
                         $btn_type = "activate";
                         $title = "Activate Store";
                     }
-   
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$title.'" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn '.$delete_btn.' btn-sm '.$btn_type.'">'. $btn_label .'</a>';
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Edit Store" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStore">Edit</a> ';
+                    $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$title.'" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn '.$delete_btn.' btn-sm '.$btn_type.'">'. $btn_label .'</a>';
 
                     return $btn;
                 })
@@ -255,5 +280,10 @@ class ClientController extends Controller
         $client = User::find($id);
 
         return response()->json( $client->stores);
+    }
+
+    public function getClientStore(Request $request){
+        $store = Store::find($request->id);
+        return response()->json( $store );
     }
 }

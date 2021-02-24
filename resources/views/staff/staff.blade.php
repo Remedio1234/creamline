@@ -5,7 +5,7 @@
 <div class="container">
     <div class="container-fluid">
         <div class="row">
-            <h4 class="center">Staff</h4>
+            <h4 class="center">Manage Staff</h4>
             <button class="btn btn-info ml-auto" id="createNewStaff">Create Staff</button>
         </div>
     </div>
@@ -18,7 +18,7 @@
             <th>Last Name</th>
             <th>Email</th>
             <th>Contact</th>
-            <th>Assigned Area</th>
+            <th>Area</th>
             <th>Status</th>
             <th width="280px">Action</th>
         </tr>
@@ -34,6 +34,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="staffForm" name="staffForm" class="form-horizontal">
@@ -220,7 +223,7 @@
         $('body').on('click', '.editStaff', function () {
             var staff_id = $(this).data('id');
             $.get("{{ url('staff') }}" + '/' + staff_id + '/edit', function (data) {
-                $('#modelHeading').html("View Staff Profile");
+                $('#modelHeading').html("Edit Staff");
                 $('#saveBtn').html('Update');
                 $('#ajaxModel').modal('show');
                 $('#staff_id').val(data.id);

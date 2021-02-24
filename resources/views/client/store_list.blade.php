@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <div class="row">
             <h4 class="center">{{ $client->fname . " ". $client->lname  }}</h4>
-            <button class="btn btn-info ml-auto" id="addNewstore">Add Store</button>
+            <button class="btn btn-info ml-auto" id="addNewstore">Create Store</button>
         </div>
     </div>
     <br>
@@ -32,31 +32,35 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="storeForm" name="storeForm" class="form-horizontal">
                     <div class="row">
                         <div class="col-md-12">
-                            <input type="hidden" name="client_id" id="client_id" value="{{ $client->id }}">
+                            <input type="hidden" name="id" id="id">
+                            <input type="hidden" name="user_id" id="user_id" value="{{ $client->id }}">
                             <div class="form-group">
                                 <label for="name" class="col-sm-12 control-label">Store Name</label>
                                 <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter Storem Name"
+                                    <input type="text" class="form-control" id="store_name" name="store_name" placeholder="Enter Store Name"
                                            value="" maxlength="50" required="" autocomplete="off" onkeypress="return onlyLetters(event)">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label for="address" class="col-sm-12 control-label">Store Address</label>
                                 <div class="col-sm-12">
-                                    <input type="text" class="form-control" id="address" name="address" placeholder="Enter Address"
+                                    <input type="text" class="form-control" id="store_address" name="store_address" placeholder="Enter Address"
                                            value="" maxlength="50" required="" autocomplete="off" onkeypress="return onlyLetters(event)">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="lname" class="col-sm-12 control-label">Designated Location</label>
+                                <label for="lname" class="col-sm-12 control-label">Area</label>
                                 <div class="col-sm-12">
-                                    <select  class="form-control" id="area" name="area">
-                                        <option value=null disabled selected>Please Select Area</option>
+                                    <select  class="form-control" id="area_id" name="area_id" required>
+                                        <option value='' selected>Please Select Area</option>
                                         @foreach(\App\Area::all() as $area )
                                             <option value="{{$area->id}}">{{ $area->area_name.": ".$area->area_code }}</option>
                                         @endforeach
@@ -78,8 +82,7 @@
 </body>
 <script type="text/javascript">
 
-    $(function () {
-
+    $(document).ready(function(){
         //ajax setup
         $.ajaxSetup({
             headers: {
@@ -180,13 +183,49 @@
                 }
             });
         });
+
+        $('#addNewstore').on('click', () => {
+            $("#id").val('')
+            $("#storeForm").trigger("reset")
+            $('#saveBtn').text("Save")
+            $('#modelHeading').text('Create Store')
+            $('#formModal').modal('show')
+        });  
+        
+        $(document).on('click', ".editStore", function(e){
+            e.preventDefault();
+            var id = $(this).data('id');
+            $.get("{{ url('client/stores/edit') }}" + '/' + id, function (data) {
+                $('#saveBtn').text("Update")
+                $("#id").val(data.id)
+                $('#user_id').val(data.user_id);
+                $('#store_name').val(data.store_name);
+                $('#store_address').val(data.store_address);
+                $('#area_id').val(data.area_id);
+                $('#modelHeading').text('Edit Store')
+                $('#formModal').modal('show')
+            })
+        })
+        
+        $(document).on('submit', '#storeForm', function(e){
+            e.preventDefault();
+            $.ajax({
+                    data: $(this).serialize(),
+                    url: "{{ url('client/stores/add') }}",
+                    type: "POST",
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#storeForm').trigger("reset");
+                        $('#formModal').modal('hide');
+                        table.draw();
+                    },
+                    error: function (data) {
+                        console.log('Error:', data);
+                        $('#saveBtn').html('Save');
+                    }
+                });
+            return
+        })
     });
-
-
-    $('#addNewstore').on('click', () => {
-        $('#formModal').modal('show')
-    })
-
-    
 </script>
 @endsection

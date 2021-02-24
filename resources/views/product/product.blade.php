@@ -5,7 +5,7 @@
 <div class="container">
     <div class="container-fluid">
         <div class="row">
-            <h4 class="center">Product</h4>
+            <h4 class="center">Manage Product</h4>
             <button class="btn btn-info ml-auto" id="createNewProduct">Create Product</button>
         </div>
     </div>
@@ -13,8 +13,8 @@
     <table id="dataTable" class="table table-striped table-bordered">
         <thead class="bg-indigo-1 text-white">
         <tr>
-            <th>Product Image</th>
-            <th>Product ID</th>
+            <th>ID</th>
+            <th>Image</th>
             <th>Name</th>
             <th>Description</th>
             <th>Status</th>
@@ -149,13 +149,13 @@
             ajax: "{{ url('product') }}",
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                {data: 'id', name: 'id'},
                 {   
                     data: 'product_image', name: 'product_image',
                     "render": function (data, type, full, meta) {
                         return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
                     },
                 },
-                {data: 'id', name: 'id'},
                 {data: 'name', name: 'name'},
                 {data: 'description', name: 'description'},
                 {
@@ -165,7 +165,7 @@
                         if(data == 0){
                             output = '<span class="text-success font-weight-bold">Available</span>';
                         }else{
-                            output = '<span class="text-danger font-weight-bold"">Sold-out</span>';
+                            output = '<span class="text-danger font-weight-bold"">Not-Available</span>';
                         }
                         return output;
                     },

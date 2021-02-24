@@ -1,0 +1,21 @@
+Admin Panel
+- Manage Staff
+    - Lists Staff
+    - Add Staff
+    - Edit Staff
+    - Assign Designated Area
+    - Activate / Deactivate Staff
+
+- Manage Client
+    - List Clients  
+    - Add Client
+    - Edit Client
+    - Approve / Disapprove Client
+    - View Store
+        - List of store
+        - Add Store
+        - Edit Store
+        - Activate / Deactivate Store
+
+
+- Manage Product        

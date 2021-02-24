@@ -48,7 +48,7 @@ class StaffController extends Controller
                         $delete_btn = 'btn-danger';
                     }
    
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="View Staff Profile" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStaff">View</a>';
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Edit Staff" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStaff">Edit</a>';
 
                     $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Assign Staff" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Assign" class="btn btn-warning btn-sm assignStaff">Assign</a>';
 
@@ -85,15 +85,19 @@ class StaffController extends Controller
             User::updateOrCreate([
                 'id' => $request->staff_id
             ],[
-                'fname' => $request->fname,
-                'mname' => $request->mname,
-                'lname' => $request->lname,
-                'email' => $request->email,
-                'contact_num' => $request->contact_num,
-                'address' => "NA",
+                'fname'             => $request->fname,
+                'mname'             => $request->mname,
+                'lname'             => $request->lname,
+                'email'             => $request->email,
+                'contact_num'       => $request->contact_num,
+                'address'           => "NA",
                 'email_verified_at' => "2020-06-08 07:57:47",
-                'img' => "NA",
-                'remember_token' => "NA"
+                'img'               => "NA",
+                'remember_token'    => "NA",
+                'user_role'         => 1,
+                'password'          => Hash::make($request->password),
+                'is_active'         => 0,
+                'is_pending'        => 0
             ]);
 
             $message = 'Staff successfully updated.';

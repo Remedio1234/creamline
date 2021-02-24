@@ -55,9 +55,14 @@ Route::resource('order_replacement', 'OrderReplacementController');
 Route::resource('order_damage', 'ProductDamagesController');
 Route::resource('ads', 'AdController');
 Route::resource('quota', 'QuotaController');
+
+#client store
 Route::get('client/{id}/stores', 'ClientController@storeList');
 Route::get('client/{id}/stores/json', 'ClientController@storeListJson');
 Route::post('replacement/set-deliver', 'OrderReplacementController@setDeliveryDate');
+
+Route::post('client/stores/add', 'ClientController@createClientStore');
+Route::get('client/stores/edit/{id}', 'ClientController@getClientStore');
 
 Route::post('update/replacement', 'OrderReplacementController@updateProducts');
 
