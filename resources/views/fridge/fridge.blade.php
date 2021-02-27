@@ -5,7 +5,7 @@
 <div class="container">
     <div class="container-fluid">
         <div class="row">
-            <h4 class="center">Fridge</h4>
+            <h4 class="center">Manage Fridge</h4>
             <button class="btn btn-info ml-auto" id="createNewFridge">Create Fridge</button>
         </div>
     </div>
@@ -174,7 +174,7 @@
                 {data: 'model', name: 'model'},
                 {data: 'assignee', name: 'assignee'},
                 {data: 'description', name: 'description'},
-                {data: 'store_adrs', name: 'store_adrs'},
+                {data: 'store_address', name: 'store_address'},
                 {
                     data: 'status', name: 'status',
                     "render": function (data, type, full, meta) {
@@ -336,6 +336,37 @@
                     $.ajax({
                         type: "DELETE",
                         url: "{{ url('fridge') }}" + '/' + fridge_id,
+                        success: function (data) {
+                            table.draw();
+                            swal(data.message, {
+                                icon: "success",
+                            });
+                        },
+                        error: function (data) {
+                            console.log('Error:', data);
+                        }
+                    });
+                }
+            });
+        });
+
+        // delete fridge
+        $('body').on('click', '.pullOutFridge', function () {
+            var fridge_id = $(this).data("id");
+
+            swal({
+                title: "Are you sure?",
+                text: "Pull out this fridge",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((isTrue) => {
+                if (isTrue) {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ url('pull-out') }}",
+                        data: {id: fridge_id},
                         success: function (data) {
                             table.draw();
                             swal(data.message, {

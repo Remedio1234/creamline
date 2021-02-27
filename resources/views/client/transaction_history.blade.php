@@ -4,7 +4,7 @@
 <div class="container">
     <div class="container-fluid">
         <div class="row">
-            <h4 class="center">Transaction History</h4>
+            <h4 class="center">Orders History</h4>
         </div>
     </div>
     <table id="dataTable" class="table table-striped table-bordered">
@@ -72,7 +72,7 @@
                         data: 'delivery_date', name: 'delivery_date',
                         "render": function (data, type, full, meta) {
                             let output = '';
-                            if(data === '1010-10-10'){
+                            if(data === null){
                                 output = '<span class="text-info font-weight-bold">(Not set)</span>'
                             }else{
                                 output = moment(data).format('MMMM D YYYY, h:mm:ss a');

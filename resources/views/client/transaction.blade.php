@@ -7,11 +7,55 @@
     <div class="container-fluid">
         <div class="row">
             <h4 class="center">Transaction Details</h4>
-            <button class="btn btn-info ml-auto" id="btnSubmit">Submit</button>
         </div>
     </div>
-    <br>
-
+    @if(Auth::user()->user_role == 2)
+    <div class="card mt-3 mb-3">
+        <div class="card-header">
+            Order Information 
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Flavor</th>
+                        <th>Qty</th>
+                        <th>Sub-Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                        $total = 0;   
+                    @endphp
+                    @foreach (session('cart_data') as $cart)
+                    @php
+                        $total += $cart->subtotal;
+                    @endphp
+                    <tr>
+                        <td>{{$cart->id}}</td>
+                        <td>{{$cart->name}}</td>
+                        <td>{{$cart->size}}</td>
+                        <td>{{$cart->flavor}}</td>
+                        <td>{{$cart->quantity}}</td>
+                        <td>{{number_format($cart->subtotal,2)}}</td>
+                    </tr>
+                    @endforeach
+                    <tfoot>
+                        <tr>
+                            <td colspan="4"></td>
+                            <td><strong>Total</strong></td>
+                            <td><strong>{{ number_format($total,2) }}</strong></td>
+                        </tr>
+                    </tfoot>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    @endif
     <div class="card">
         <div class="card-header">
             Customer Information
@@ -110,16 +154,23 @@
         <div class="card-body">
             <label for="select_store" class="control-label">Store:</label>
             <select class="form-control" id="select_store">
-                <option value="99999">Choose a store</option>
+                <option value="99999" data-area="1000000000">Choose a store</option>
 
                 @if( auth()->user()->user_role == 2)
                     @foreach( auth()->user()->stores as $store)
-                        <option value="{{ $store->id }}">{{ $store->store_address.' - '.$store->store_name }}</option>
+                        <option value="{{ $store->id }}" data-area="{{$store->area_id}}">{{ $store->store_address.' - '.$store->store_name }}</option>
                     @endforeach
                 @endif
             </select>
+            @if(Auth::user()->user_role == 2)
+                <div class="form-group mt-3" id="show_assigned_staff" style="display: none;">
+                    <label for="assigned_staff" class="control-label">Assigned Staff</label>
+                    <input type="text" class="form-control" id="assigned_staff" name="assigned_staff" readonly="">
+                </div>
+            @endif
         </div>
     </div>
+
     @if(auth()->user()->user_role == 99)
         <div class="card mt-4">
             <div class="card-header">
@@ -132,6 +183,12 @@
         </div>
     @endif
 
+    <div class="mt-4 mb-4">
+        <button class="btn btn-info ml-auto" style="float:right;" id="btnSubmit">Complete Checkout</button>
+    </div>
+    <br>
+    <br>
+
     <script type="text/javascript">
         $(() => {
 
@@ -140,6 +197,21 @@
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
+            });
+
+            //if dropdown is changed
+            $("#select_store").change(() => {
+                //get the dom values
+                const area_id = $("#select_store option:selected").attr("data-area");
+
+                $.get(`get/staff/assign/${area_id}`, function (data) {
+                    if(Object.keys(data).length != 0){
+                        $("#assigned_staff").val(data.fname + ' ' + data.lname)
+                    } else {
+                        $("#assigned_staff").val('NA');
+                    }
+                    $("#show_assigned_staff").show();
+                })
             });
 
             //if dropdown is changed
@@ -229,7 +301,7 @@
                                     if(isAdmin === true){
                                         window.location = "order#order-tab-tran-his";
                                     }else{
-                                        window.location = "info";
+                                        window.location = "order-success";
                                     }
                                 })
                             },

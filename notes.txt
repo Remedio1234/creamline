@@ -1,4 +1,4 @@
-Admin Panel
+ =========================  Admin Panel =====================================
 - Manage Staff
     - Lists Staff
     - Add Staff
@@ -18,4 +18,53 @@ Admin Panel
         - Activate / Deactivate Store
 
 
-- Manage Product        
+- Manage Product    
+    - List Products
+    - Add Product   
+    - Edit Product
+        - Product Name / Description / Image
+        - Variation / Size / Product Flavor 
+        - Edit Price
+    - Product Stock    
+    - Activate / Deactivate Product
+
+
+- Manage Fridge
+    - List of Fridge
+    - Add Fridge
+    - Edit Fridge   
+    - Activate / Deactivate Store 
+    - Pull Out Fridge
+
+ =========================  Client Panel =====================================
+- Manage Dashboard - in progress
+- Shop Now
+    - List of Products
+        - Add To cart
+- Cart      
+    - List  of Carts
+    - Remove Carts
+    - Checkout
+        - Order info
+        - Client Info
+        - Store List / Dropdown
+
+- Stores
+    - List of Store
+    - Add Store
+    - Edit Store
+    - Activate / Deactivate Store         
+
+- Reports
+    - Transactions    
+        - List Of Transactions
+
+    - File Replacement
+        - List Of File Replacement
+        - Create File Replacement
+=========================== Staff Panel ===========================================
+- Dashboard
+    - List of order Today
+
+- Products
+    - List Of products    

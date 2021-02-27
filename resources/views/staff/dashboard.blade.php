@@ -15,7 +15,7 @@
             <th>Store Name</th>
             <th>Store Address</th>
             <th>Status</th>
-            <th>Action</th>
+            {{-- <th>Action</th> --}}
         </tr>
         </thead>
         <tbody>
@@ -152,7 +152,7 @@
                 {data: 'store_name', name: 'store_name'},
                 {data: 'store_address', name: 'store_address'},
                 {data: 'status', name: 'status'},
-                {data: 'action', name: 'action', orderable: false, searchable: false},
+                // {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
 

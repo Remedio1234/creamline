@@ -42,10 +42,10 @@ class FileReplacementController extends Controller
             return Datatables::of($file_replacement)
                 ->addIndexColumn()
                 ->addColumn('status', function($row){
-                  return $row->is_replaced;
+                  return $row ? $row->is_replaced : '-';
                 })
                 ->addColumn('products', function($row) {
-                    return $row->products;
+                    return $row ? $row->products : '';
                 })
                 ->addColumn('quantity', function($row) {
                    $total = 0;
@@ -55,7 +55,7 @@ class FileReplacementController extends Controller
                     return $total;
                 })
                 ->addColumn('images', function($row) {
-                    return $row->images;
+                    return $row ? $row->images : '';
                 })
                 ->rawColumns(['status', 'quantity', 'images'])
                 ->make(true);

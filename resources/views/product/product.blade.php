@@ -32,7 +32,11 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            
             <div class="modal-body">
                 <form id="productForm" name="productForm" class="form-horizontal" enctype="multipart/form-data">
                     <div class="row">
@@ -97,7 +101,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="modelHeading">Update Product Stock</h4>
+                <h4 class="modal-title" id="modelHeading">Manage Product Stock</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="stockForm" name="stockForm" class="form-horizontal">
@@ -180,7 +187,7 @@
             $('#saveBtn').html("Create");
             $('#product_id').val('');
             $('#productForm').trigger("reset");
-            $('#modelHeading').html("Create New Product");
+            $('#modelHeading').html("Create Product");
             $('#ajaxModel').modal('show');
         });
 
@@ -436,11 +443,11 @@
 
             // container div
             var $container = $('<div class="multipleInput-container" id="container-flavor" />').click(function() {
-              $input2.focus();
+            //   $input2.focus();
             });
 
             // insert elements into DOM
-            $container.append($list2).append($input2).insertAfter($(this));
+            // $container.append($list2).append($input2).insertAfter($(this));
 
             // add onsubmit handler to parent form to copy emails into original input as csv before submitting
             var $orig = $(this);
@@ -452,7 +459,7 @@
                 flavors.push($(this).html());
               });
 
-              flavors.push($input2.val());
+            //   flavors.push($input2.val());
 
               $orig.val(flavors.join());
               $('input[name="flavor"]').val(flavors.join());

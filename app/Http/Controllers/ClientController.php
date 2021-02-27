@@ -286,4 +286,9 @@ class ClientController extends Controller
         $store = Store::find($request->id);
         return response()->json( $store );
     }
+
+    public function getStaffList(Request $request){
+        $staff = User::where(['area_id' => $request->area_id])->first();
+        return response()->json( $staff);
+    }
 }

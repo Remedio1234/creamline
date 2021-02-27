@@ -31,8 +31,8 @@ class CartController extends Controller
         $cart = Cart::latest()
                      ->where('user_id', Auth::user()->id)
                      ->where(function($query){
-                        $query->where('is_checkout', 0)
-                              ->orWhere('is_placed', 0);
+                        $query->where('is_checkout', '0')
+                              ->orWhere('is_placed', '0');
                      })
                      ->get();
 
@@ -124,10 +124,10 @@ class CartController extends Controller
     {
         $carts = Cart::find($request->ids);
 
-        foreach ($carts as $cart) {
-            $cart->is_checkout = 1;
-            $cart->save();
-        }
+        // foreach ($carts as $cart) {
+        //     $cart->is_checkout = 1;
+        //     $cart->save();
+        // }
 
         // clear first the session named cart_data
         session()->forget('cart_data');

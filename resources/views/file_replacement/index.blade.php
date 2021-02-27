@@ -31,6 +31,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="prodReportForm" name="prodReportForm" class="form-horizontal" enctype="multipart/form-data">
@@ -106,6 +109,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Product Report Images</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="row text-center text-lg-left" id="divContentImages"></div>
@@ -120,6 +126,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Products</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body" id="divModalProducts">
                 <div class="row">

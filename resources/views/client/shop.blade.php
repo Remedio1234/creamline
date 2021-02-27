@@ -6,7 +6,7 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
-                <h5 class="text-center">Shop</h5>
+                <h5 class="text-center">Products</h5>
             </div>
             <div class="card-body">
                 <div class="row text-center text-lg-left">
@@ -71,8 +71,9 @@
                                     <span class="sr-only">Next</span>
                                   </a>
                                  </div>
-
+                                 <br> 
                                 <h5 class="card-title" id="div-modal-title">asdfadsf</h5>
+                              
                                 <p class="card-text" id="div-modal-text">adsfadsf</p>
                             </div>
                             <div class="card-body padding-all-10px">
@@ -265,7 +266,7 @@
 
         //create a function that will populate the size dropdown
         function populateSizeDropdown(data){
-
+            console.log(variation_size, variation_price)
             var variation_size = data.variation.size.split(",");
             var variation_price = data.variation.price.split(",");
             var output = '';
@@ -273,7 +274,8 @@
             $("#totalPrice").html("&#8369; " + variation_price[0] + ".00");
 
             for(var i = 0; i < variation_size.length; i++){
-                output += '<option value="'+ variation_size[i] +'" data-price="'+ variation_price[i] +'">'+ variation_size[i] +'</option>';
+                if(variation_size[i])
+                    output += '<option value="'+ variation_size[i] +'" data-price="'+ variation_price[i] +'">'+ variation_size[i] +'</option>';
             }
 
             $("#size_id").html(output);
@@ -287,7 +289,8 @@
             var output = '';
 
             for(var i = 0; i < variation_flavor.length; i++){
-                output += '<option value="'+ variation_flavor[i] +'">'+ variation_flavor[i] +'</option>';
+                if(variation_flavor[i])
+                    output += '<option value="'+ variation_flavor[i] +'">'+ variation_flavor[i] +'</option>';
             }
 
             $("#flavor_id").html(output);

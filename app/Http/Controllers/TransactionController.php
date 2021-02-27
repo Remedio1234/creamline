@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Carbon;
 use DataTables;
+use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
 {
@@ -40,19 +41,29 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
+        $id            = DB::table('order_invoice')->insertGetId(['invoice_no' => null, 'created_at' => date('Y-m-d H:i:s')]);
+        $orderId        = 0;
+        $count_order    = DB::table('order_invoice')->select('id')->whereRaw('DATE(created_at) = DATE("'.date('Y-m-d H:i:s').'")')->limit(1)->first();
+        $orderId        = (int) ($id - $count_order->id) + 1;
+
+        $uId            = sprintf("%04s", $orderId);
+        $invoiceNo      = date('ymd').$uId;
+
+        DB::table('order_invoice')->whereId($id)->update(['invoice_no' => $invoiceNo]);
+
         //get the request inputs
         $client_id = $request->input("client_id");
-        $current_id = $request->input("current_id");
+        // $current_id = $request->input("current_id");
         $store_id = $request->input("store_id");
         $is_replacement = $request->input("is_replacement");
 
         //get the data from our session cart
         $cart_data = session('cart_data');
 
-
         foreach ($cart_data as $session_cart) {
-            $cart = Cart::find($session_cart->id);
-            $cart->is_placed = 1;
+            $cart               = Cart::find($session_cart->id);
+            $cart->is_checkout  = '1';
+            $cart->is_placed    = '1';
             $cart->save();
         }
 
@@ -66,7 +77,7 @@ class TransactionController extends Controller
 
                 $cart_object_array[] = [
                     "client_id" => $client_id,
-                    "delivery_date" => Auth::user()->user_role == 99 ? $request->delivery_date : '101010',
+                    "delivery_date" => Auth::user()->user_role == 99 ? $request->delivery_date : null,
                     "store_id" => $store_id,
                     "product_id" => $cart["product_id"],
                     "size" => $cart["size"],
@@ -113,7 +124,7 @@ class TransactionController extends Controller
     *   Created a function that will redirect the user to information page after the successful order
     */
 
-    public function info()
+    public function thankyou()
     {
         return view("client.info");
     }

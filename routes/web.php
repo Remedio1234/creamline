@@ -43,6 +43,7 @@ Route::get('edit_product/{id}','ProductController@edit_product')->name('edit_pro
 Route::resource('product','ProductController');
 Route::resource('stock','StockController');
 Route::resource('fridge','FridgeController');
+Route::post('pull-out','FridgeController@pullOut');
 Route::post('assign-fridge','FridgeController@assign');
 Route::resource('order', 'OrderController');
 Route::resource('undeliver', 'UndeliveredOrderController');
@@ -65,6 +66,7 @@ Route::post('client/stores/add', 'ClientController@createClientStore');
 Route::get('client/stores/edit/{id}', 'ClientController@getClientStore');
 
 Route::post('update/replacement', 'OrderReplacementController@updateProducts');
+Route::get('get/staff/assign/{area_id}', 'ClientController@getStaffList');
 
 //admin dashboard
 Route::get('display_order_to_deliver_count', 'HomeController@display_order_to_deliver_count')->name('display_order_to_deliver_count');
@@ -87,6 +89,7 @@ Route::resource('main','StaffDashboardController');
 Route::resource('product_list','StaffProductController');
 Route::post('emergency', 'StaffDashboardController@emergency');
 Route::get('get-sizes/{id}', 'ProductController@getSizes');
+Route::get('staff-transaction','StaffDashboardController@staffTransactions');
 
 
 /*---------------------------------------------------------------------------------------
@@ -103,7 +106,7 @@ Route::get('save_cart', 'CartController@save_cart')->name('save_cart');
 Route::resource('cart', 'CartController');
 Route::resource('transaction', 'TransactionController');
 Route::resource('transaction_history', 'TransactionHistoryController');
-Route::get('info', 'TransactionController@info')->name('info');
+Route::get('order-success', 'TransactionController@thankyou')->name('thankyou');
 
 //client dashboard
 Route::get('display_order_to_receive_count_for_client', 'HomeController@display_order_to_receive_count_for_client')->name('display_order_to_receive_count_for_client');

@@ -293,7 +293,7 @@
           return this.each(function() {
 
             // input
-            var $input2 = $('<input name="flavor" class="form-control" value="'+cFlavor[0]+'" />')
+            var $input2 = $('<input name="flavor" class="form-control" value="'+cFlavor+'" placeholder="e.g Mango,Ube"/>')
 
             // container div
             var $container = $('<div class="multipleInput-container" id="container-flavor" />').click(function() {

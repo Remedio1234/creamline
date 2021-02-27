@@ -81,6 +81,61 @@ class StaffDashboardController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function staffTransactions(Request $request)
+    {
+
+        $area = auth()->user()->area;
+
+        $now = date('Y-m-d');
+
+        $order =  $area->orders()->where('delivery_date', '=', null)->get();
+
+        if ($request->ajax()) {
+            return Datatables::of($order)
+                ->addIndexColumn()
+                ->addColumn('name', function($row) {
+                    return $row->client->fname. " " . $row->client->lname;
+                })
+                ->addColumn('store_name', function($row) {
+                    return $row->store->store_name;
+                })
+                ->addColumn('store_address', function($row) {
+                    return $row->store->store_address;
+                })
+                ->addColumn('action', function ($row) {
+
+                    if (!$row->is_completed && !$row->is_cancelled) {
+                        $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" class="btn btn-primary btn-sm editCompleteOrder">Completed</a>&nbsp;';
+
+                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder">Cancel</a>';
+
+                         return $btn;
+                     } else {
+                        return null;
+                     }
+   
+                })
+                ->addColumn('status', function($row) {
+                    if ($row->is_completed) {
+                        return '<span class="text-success font-weight-bold">Completed</span>';
+                    }
+
+                    if ($row->is_cancelled) {
+                        return '<span class="text-danger font-weight-bold">Cancelled</span>';
+                    }
+                })
+                ->rawColumns(['action', 'store_name', 'store_address', 'name', 'status'])
+                ->make(true);
+        }
+
+        return view('staff.dashboard', compact('order'));
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -140,13 +195,13 @@ class StaffDashboardController extends Controller
             $now = date('Y-m-d');
             $order = Order::where('store_id', '=', $store->id)
                           ->where('delivery_date', '=', $now)
-                          ->where('is_completed', '=', 0)
-                          ->where('is_cancelled', '=', 0)
+                          ->where('is_completed', '=', '0')
+                          ->where('is_cancelled', '=', '0')
                           ->first();
             if($order) {
                $order->update([
-                    'cancelled_by' => 2,
-                    'is_cancelled' => 1,
+                    'cancelled_by' => '2',
+                    'is_cancelled' => '1',
                     'reason' => $request->input("reason")
                 ]); 
 

@@ -59,12 +59,12 @@ class FridgeController extends Controller
                     return $btn;
                 })
                 ->addColumn('assignee', function($row) {
-                    return $row->client->fname." ".$row->client->lname;
+                    return $row->client ? $row->client->fname." ".$row->client->lname : '-';
                 })
-                ->addColumn('store_adrs', function($row) {
-                    return $row->store->store_address;
+                ->addColumn('store_address', function($row) {
+                    return $row->store ? $row->store->store_address : '-';
                 })
-                ->rawColumns(['action', 'assignee', 'store_adrs'])
+                ->rawColumns(['action', 'assignee', 'store_address'])
                 ->make(true);
         }
 
@@ -129,6 +129,24 @@ class FridgeController extends Controller
             $output = 'Successfully Activated!';
         }
 
+        // return response
+        $response = [
+            'success', true,
+            'message' => $output,
+        ];
+        return response()->json($response, 200);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\fridge  $fridge
+     * @return \Illuminate\Http\Response
+     */
+    public function pullOut(Request $request)
+    {
+        Fridge::whereId($request->id)->update(["status" => 3]);
+            $output = 'Successfully pullout!';
         // return response
         $response = [
             'success', true,
