@@ -5,7 +5,7 @@
 <div class="container">
     <div class="container-fluid">
         <div class="row">
-            <h4 class="center">Manage Client</h4>
+            <h4 class="center">Manage Clients</h4>
             <button class="btn btn-info ml-auto" id="createNewClient">Create Client</button>
         </div>
     </div>

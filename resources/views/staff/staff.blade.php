@@ -246,6 +246,7 @@
             $.get("{{ url('staff') }}" + '/' + staff_id + '/edit', function (data) {
                 $('#assignModal').modal('show');
                 $('#assign_id').val(data.id);
+                $('#area_id').val(data.area_id);
                 $('#fullname').html(data.fname + " " + data.lname);
             })
         });

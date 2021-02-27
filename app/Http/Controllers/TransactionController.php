@@ -77,6 +77,7 @@ class TransactionController extends Controller
 
                 $cart_object_array[] = [
                     "client_id" => $client_id,
+                    'invoice_id'    => $id,
                     "delivery_date" => Auth::user()->user_role == 99 ? $request->delivery_date : null,
                     "store_id" => $store_id,
                     "product_id" => $cart["product_id"],

@@ -701,7 +701,8 @@
                 {
                     data: 'client', name: 'client',
                     render: function(data, type, full, meta){
-                        return full.client.lname + ', ' + full.client.fname;
+                        var a = JSON.parse(full.client)
+                        return a.lname + ', ' + a.fname;
                     }
                 },
                 {

@@ -72,6 +72,10 @@ class StaffDashboardController extends Controller
                     if ($row->is_cancelled) {
                         return '<span class="text-danger font-weight-bold">Cancelled</span>';
                     }
+
+                    if (!$row->is_completed) {
+                        return '<span class="text-info font-weight-bold">Pending</span>';
+                    }
                 })
                 ->rawColumns(['action', 'store_name', 'store_address', 'name', 'status'])
                 ->make(true);
@@ -128,7 +132,7 @@ class StaffDashboardController extends Controller
                         return '<span class="text-danger font-weight-bold">Cancelled</span>';
                     }
 
-                    if (!$row->is_approved) {
+                    if (!$row->is_completed) {
                         return '<span class="text-info font-weight-bold">Pending</span>';
                     }
                 })

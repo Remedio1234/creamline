@@ -5,9 +5,7 @@
 <div class="container">
     <div class="container-fluid">
         <div class="row">
-            <h4 class="center">
-            {{ auth()->user()->area->area_name }}
-            Branch Client List</h4>
+            <h4 class="center">Manage Client ({{ auth()->user()->area->area_name }} Branch) </h4>
         </div>
     </div>
     <br>

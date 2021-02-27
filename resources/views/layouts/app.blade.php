@@ -267,7 +267,7 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('transaction_history.index') }}">
                                 <span data-feather="bar-chart-2"></span>
-                                Orders
+                                My Orders
                             </a>
                         </li>
                         <li class="nav-item">

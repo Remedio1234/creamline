@@ -97,6 +97,10 @@
                                 output = '<span class="text-danger font-weight-bold">Pending</span>'
                             }
 
+                            if(full.cancelled_by > 0){
+                                output = '<span class="text-danger font-weight-bold">Cancelled</span>'
+                            }
+
                             return output
                         },
                     },

@@ -51,6 +51,7 @@ class StockController extends Controller
         $stockModel = Stock::updateOrCreate([
             'id' => $request->stock_id
         ],[
+            'product_id' => $request->input("stock_product_id"),
             'quantity' => $request->input("stocks"),
             'threshold' => $request->input("threshold"),
         ]);

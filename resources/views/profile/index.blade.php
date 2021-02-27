@@ -12,7 +12,7 @@
         <div class="card-header">User Information</div>
         <div class="card-body">
           <div class="profile">
-            @if(Auth::user()->img !== "NA")
+            @if(Auth::user()->img !== "NA" && Auth::user()->img != "")
               <img src="{{ url('img/profile').'/'.Auth::user()->img }}" class="img-fluid-center avatar circle-img" alt="avatar" id="profile_img" />
             @else
               <img src="{{ asset('img/profile/default.png') }}" class="img-fluid-center avatar text-center circle-img" alt="avatar" id="profile_img" />

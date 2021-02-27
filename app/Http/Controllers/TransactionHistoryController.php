@@ -32,7 +32,7 @@ class TransactionHistoryController extends Controller
         $order = DB::table('orders')
                 ->join('products', 'orders.product_id', '=', 'products.id')
                 ->select('products.name', 'products.product_image', 'orders.quantity_ordered',
-                    'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id')
+                    'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'orders.cancelled_by')
                 ->where('client_id', Auth::user()->id)
                 ->get();
 

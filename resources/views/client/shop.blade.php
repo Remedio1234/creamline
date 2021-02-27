@@ -178,7 +178,7 @@
                 var price = $("#size_id option:selected").attr("data-price");
                 $("#div-modal-text").html("&#8369; " + price + ".00");
                 $("#div-stocks-qty").html(prod_stocks_qty);
-                
+                $("#quantity").val('')
                 // $('#description').val(data.product_description);
                 $('#preOrderModal').modal('show');
             });
@@ -194,7 +194,7 @@
         });
 
         //when the quantity event is blurred
-        $("#quantity").blur(function(){
+        $("#quantity").keyup(function(){
             var current_val = $("#quantity").val();
             if(current_val < 1){
                 $("#quantity").val("1");

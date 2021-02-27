@@ -109,6 +109,8 @@
             <div class="modal-body">
                 <form id="stockForm" name="stockForm" class="form-horizontal">
                     <input type="hidden" name="stock_id" id="stock_id">
+                    <input type="hidden" name="stock_product_id" id="stock_product_id">
+                    
                     <div class="form-group">
                         <label for="stock_product_name" class="col-sm-12 control-label">Product Name</label>
                         <div class="col-sm-12">
@@ -225,6 +227,7 @@
             const prodname = $(this).data('name');
             $.get("{{ url('stock') }}" + '/' + product_id + '/edit', function (data) {
                 $('#stockModal').modal('show');
+                $('#stock_product_id').val(product_id);
                 $('#stock_id').val(data.id);
                 $('#stock_product_name').val(prodname);
                 $('#stocks').val(data.quantity);
