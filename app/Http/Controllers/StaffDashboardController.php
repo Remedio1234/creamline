@@ -60,7 +60,7 @@ class StaffDashboardController extends Controller
 
                          return $btn;
                      } else {
-                        return null;
+                        return 'NA';
                      }
    
                 })
@@ -92,19 +92,19 @@ class StaffDashboardController extends Controller
 
         $now = date('Y-m-d');
 
-        $order =  $area->orders()->where('delivery_date', '=', null)->get();
+        $order =  $area->orders()->get();
 
         if ($request->ajax()) {
             return Datatables::of($order)
                 ->addIndexColumn()
                 ->addColumn('name', function($row) {
-                    return $row->client->fname. " " . $row->client->lname;
+                    return $row->client ? $row->client->fname. " " . $row->client->lname : '-';
                 })
                 ->addColumn('store_name', function($row) {
-                    return $row->store->store_name;
+                    return $row->store ? $row->store->store_name : '-';
                 })
                 ->addColumn('store_address', function($row) {
-                    return $row->store->store_address;
+                    return $row->store ? $row->store->store_address : '-';
                 })
                 ->addColumn('action', function ($row) {
 
@@ -115,7 +115,7 @@ class StaffDashboardController extends Controller
 
                          return $btn;
                      } else {
-                        return null;
+                        return 'NA';
                      }
    
                 })
@@ -127,12 +127,16 @@ class StaffDashboardController extends Controller
                     if ($row->is_cancelled) {
                         return '<span class="text-danger font-weight-bold">Cancelled</span>';
                     }
+
+                    if (!$row->is_approved) {
+                        return '<span class="text-info font-weight-bold">Pending</span>';
+                    }
                 })
                 ->rawColumns(['action', 'store_name', 'store_address', 'name', 'status'])
                 ->make(true);
         }
 
-        return view('staff.dashboard', compact('order'));
+        return view('staff.client_transaction_staff', compact('order'));
     }
 
     /**

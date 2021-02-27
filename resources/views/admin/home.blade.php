@@ -251,12 +251,15 @@
                     $("#lbl-product-of-the-month-1").html(response.data1.name)
                     $("#lbl-product-of-the-month-2").html(response.data2.name)
                     $("#lbl-product-of-the-month-3").html(response.data3.name)
-                    $("#a-product-of-the-month-1").attr("href", "{{ asset('img/product/') }}" + "/" + response.img1.product_image)
-                    $("#a-product-of-the-month-2").attr("href", "{{ asset('img/product/') }}" + "/" + response.img2.product_image)
-                    $("#a-product-of-the-month-3").attr("href", "{{ asset('img/product/') }}" + "/" + response.img3.product_image)
-                    $("#img-product-of-the-month-1").attr("src", "{{ asset('img/product/') }}" + "/" + response.img1.product_image)
-                    $("#img-product-of-the-month-2").attr("src", "{{ asset('img/product/') }}" + "/" + response.img2.product_image)
-                    $("#img-product-of-the-month-3").attr("src", "{{ asset('img/product/') }}" + "/" + response.img3.product_image)
+                    var img1 = response.img1 == "default.jpg" ? response.img1 : response.img1.product_image;
+                    var img2 = response.img2 == "default.jpg" ? response.img2 : response.img2.product_image;
+                    var img3 = response.img3 == "default.jpg" ? response.img3 : response.img3.product_image;
+                    $("#a-product-of-the-month-1").attr("href", "{{ asset('img/product/') }}" + "/" + img1)
+                    $("#a-product-of-the-month-2").attr("href", "{{ asset('img/product/') }}" + "/" + img2)
+                    $("#a-product-of-the-month-3").attr("href", "{{ asset('img/product/') }}" + "/" + img3)
+                    $("#img-product-of-the-month-1").attr("src", "{{ asset('img/product/') }}" + "/" + img1)
+                    $("#img-product-of-the-month-2").attr("src", "{{ asset('img/product/') }}" + "/" + img2)
+                    $("#img-product-of-the-month-3").attr("src", "{{ asset('img/product/') }}" + "/" + img3)
                 },
                 error: function(err){
                     console.log(err)
@@ -305,7 +308,7 @@
                 success: function(response){
                     // console.log(response)
                     //return the response to the DOM
-                    $("#lbl-display-order-to-deliver").html(response.count.data)
+                    $("#lbl-display-order-to-deliver").html((response.count == null ? 0 : response.count.data))
                 },
                 error: function(err){
                     console.log(err)
@@ -408,12 +411,16 @@
                     $("#lbl-product-of-the-month-1").html(response.data1.name)
                     $("#lbl-product-of-the-month-2").html(response.data2.name)
                     $("#lbl-product-of-the-month-3").html(response.data3.name)
-                    $("#a-product-of-the-month-1").attr("href", "{{ asset('img/product/') }}" + "/" + response.img1.product_image)
-                    $("#a-product-of-the-month-2").attr("href", "{{ asset('img/product/') }}" + "/" + response.img2.product_image)
-                    $("#a-product-of-the-month-3").attr("href", "{{ asset('img/product/') }}" + "/" + response.img3.product_image)
-                    $("#img-product-of-the-month-1").attr("src", "{{ asset('img/product/') }}" + "/" + response.img1.product_image)
-                    $("#img-product-of-the-month-2").attr("src", "{{ asset('img/product/') }}" + "/" + response.img2.product_image)
-                    $("#img-product-of-the-month-3").attr("src", "{{ asset('img/product/') }}" + "/" + response.img3.product_image)
+                    var img1 = response.img1 == "default.jpg" ? response.img1 : response.img1.product_image;
+                    var img2 = response.img2 == "default.jpg" ? response.img2 : response.img2.product_image;
+                    var img3 = response.img3 == "default.jpg" ? response.img3 : response.img3.product_image;
+
+                    $("#a-product-of-the-month-1").attr("href", "{{ asset('img/product/') }}" + "/" + img1)
+                    $("#a-product-of-the-month-2").attr("href", "{{ asset('img/product/') }}" + "/" + img2)
+                    $("#a-product-of-the-month-3").attr("href", "{{ asset('img/product/') }}" + "/" + img3)
+                    $("#img-product-of-the-month-1").attr("src", "{{ asset('img/product/') }}" + "/" + img1)
+                    $("#img-product-of-the-month-2").attr("src", "{{ asset('img/product/') }}" + "/" + img2)
+                    $("#img-product-of-the-month-3").attr("src", "{{ asset('img/product/') }}" + "/" + img3)
                 },
                 error: function(err){
                     console.log(err)

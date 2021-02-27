@@ -68,3 +68,6 @@
 
 - Products
     - List Of products    
+
+- Transactions
+    - List Of all Transactions    

@@ -4,7 +4,7 @@
 <div class="container">
     <div class="container-fluid">
         <div class="row mb-3">
-            <h4 class="center">Todays Delivery as of <span id="date_here"></span></h4>
+            <h4 class="center">All Transactions</h4>
         </div>
     </div>
     <table id="dataTable" class="table table-striped table-bordered">
@@ -139,7 +139,7 @@
         var table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ url('main') }}",
+            ajax: "{{ url('staff-transaction') }}",
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {

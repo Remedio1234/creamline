@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Product;
+use App\Order;
 use App\Rules\MatchOldPassword;
 use App\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -129,7 +129,7 @@ class HomeController extends Controller
     */
     public function display_order_to_deliver_count(){
         $getOrderToDeliverCount = Order::where('is_approved', '=' ,'1')
-              ->where('delivery_date', '=', \Carbon::now())
+              ->where('delivery_date', '=', date('Y-m-d'))
               ->count();
 
         return response()->json([
