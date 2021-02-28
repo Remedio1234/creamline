@@ -41,7 +41,10 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $id            = DB::table('order_invoice')->insertGetId(['invoice_no' => null, 'created_at' => date('Y-m-d H:i:s')]);
+        //get the request inputs
+        $client_id      = $request->input("client_id");
+
+        $id             = DB::table('order_invoice')->insertGetId(['invoice_no' => null, 'user_id' => $client_id, 'created_at' => date('Y-m-d H:i:s')]);
         $orderId        = 0;
         $count_order    = DB::table('order_invoice')->select('id')->whereRaw('DATE(created_at) = DATE("'.date('Y-m-d H:i:s').'")')->limit(1)->first();
         $orderId        = (int) ($id - $count_order->id) + 1;
@@ -51,8 +54,7 @@ class TransactionController extends Controller
 
         DB::table('order_invoice')->whereId($id)->update(['invoice_no' => $invoiceNo]);
 
-        //get the request inputs
-        $client_id = $request->input("client_id");
+        
         // $current_id = $request->input("current_id");
         $store_id = $request->input("store_id");
         $is_replacement = $request->input("is_replacement");

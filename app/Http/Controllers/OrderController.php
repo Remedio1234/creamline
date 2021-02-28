@@ -24,18 +24,64 @@ class OrderController extends Controller
     }
 
     /**
+     * @desc get pending orders item
+     */
+
+    public function pendingOrder(Request $request){
+        if ($request->ajax()) {
+            $pending = DB::table('order_invoice')
+                ->join('orders', 'orders.invoice_id', '=', 'order_invoice.id')
+                ->join('products', 'orders.product_id', '=', 'products.id')
+                ->join('users', 'orders.client_id', '=', 'users.id')
+                ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered','orders.size',
+                    'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
+                ->where('orders.is_approved', 0)
+                ->where('orders.invoice_id', $request->invoice_id)
+                ->get();
+
+            return response()->json($pending, 200);
+        }
+    }
+    /**
+     * @desc update quantity order
+     */
+    public function updateQuantityOrder(Request $request){
+        if ($request->ajax()) {
+            $order = Order::find($request->id);
+
+            $product_price = $order->ordered_total_price / $order->quantity_ordered;
+
+            $order->quantity_ordered = $request->quantity_ordered;
+            $order->ordered_total_price = $request->quantity_ordered * $product_price;
+            if($order->save())
+                return response()->json(['response' => 'success'], 200);
+        }
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        $pending = DB::table('orders')
-                ->join('products', 'orders.product_id', '=', 'products.id')
+        // $pending = DB::table('orders')
+        //         ->join('products', 'orders.product_id', '=', 'products.id')
+        //         ->join('users', 'orders.client_id', '=', 'users.id')
+        //         ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',
+        //             'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
+        //         ->where('is_approved', 0)
+        //         ->get();
+
+        $pending = DB::table('order_invoice')
+                ->join('orders', 'orders.invoice_id', '=', 'order_invoice.id')
                 ->join('users', 'orders.client_id', '=', 'users.id')
-                ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',
-                    'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
+                // ->selectRaw("order_invoice.id, order_invoice.created_at as date_ordered, order_invoice.invoice_no, SUM(orders.ordered_total_price) as , CONCAT(users.fname, ' ', users.lname) as fullname, users.email")
+                ->selectRaw("order_invoice.id, order_invoice.created_at as date_ordered, order_invoice.invoice_no, SUM(orders.ordered_total_price) as total_price, CONCAT(users.fname, ' ', users.lname) as fullname, users.email, orders.delivery_date")
+                // ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',
+                //     'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
                 ->where('is_approved', 0)
+                ->groupBy('orders.invoice_id')
                 ->get();
 
         if ($request->ajax()) {
@@ -43,11 +89,13 @@ class OrderController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
    
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-id="'.$row->id.'" data-prodid="'.$row->prodID.'" data-num="'.$row->contact_num.'" data-prodname="'.$row->name.'" data-qty="'.$row->quantity_ordered.'"  data-total="'.$row->ordered_total_price.'"  data-client="'.$row->client_id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
-
-                     return $btn;
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
+                    return $btn;
                 })
-                ->rawColumns(['action'])
+                ->addColumn('total_price', function($row){
+                    return '<strong>'.number_format($row->total_price,2).'</strong>';
+                  })
+                ->rawColumns(['action', 'total_price'])
                 ->make(true);
         }
 
