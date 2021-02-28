@@ -443,7 +443,7 @@
                 $.each(data, function( index, row ) {
                     total += row.ordered_total_price
                     htmlData += `<tr>
-                        <td>${row.id}</td>
+                        <td>${row.id}<input type='hidden' name='id[${row.id}]'></td>
                         <td>${row.name}</td>
                         <td>${row.size}</td>
                         <td><a data-fancybox='' href='/img/product/${row.product_image}'><img src='/img/product/${row.product_image}' height='20'></a></td>
