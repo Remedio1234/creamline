@@ -42,6 +42,37 @@ class OrderController extends Controller
             return response()->json($pending, 200);
         }
     }
+
+    /**
+     * @desc get orders item
+     */
+
+    public function completedOrder(Request $request){
+        if ($request->ajax()) {
+            $order_history = DB::table('order_invoice')
+                ->join('orders', 'orders.invoice_id', '=', 'order_invoice.id')
+                ->join('products', 'orders.product_id', '=', 'products.id')
+                ->join('users', 'orders.client_id', '=', 'users.id')
+                ->select('products.id AS prodID',
+                    'products.name', 'products.product_image',
+                    'orders.quantity_ordered','orders.size',
+                    'orders.ordered_total_price',
+                    'orders.created_at',
+                    'orders.is_approved',
+                    'orders.is_completed',
+                    'orders.delivery_date',
+                    'orders.id',
+                    'users.fname',
+                    'users.lname',
+                    'users.contact_num',
+                    'orders.client_id')
+                ->where('orders.invoice_id', $request->invoice_id)
+                ->get();
+
+            return response()->json($order_history, 200);
+        }
+    }
+
     /**
      * @desc update quantity order
      */

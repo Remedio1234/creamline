@@ -47,6 +47,8 @@ Route::post('pull-out','FridgeController@pullOut');
 Route::post('assign-fridge','FridgeController@assign');
 Route::resource('order', 'OrderController');
 Route::get('order/pending/{invoice_id}', 'OrderController@pendingOrder');
+Route::get('order/completed/{invoice_id}', 'OrderController@completedOrder');
+
 Route::post('order/update/quantity', 'OrderController@updateQuantityOrder');
 Route::resource('undeliver', 'UndeliveredOrderController');
 Route::resource('history', 'TransactionHistoryOrderController');

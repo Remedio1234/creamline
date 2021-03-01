@@ -150,7 +150,7 @@
                         </tbody>
                         <tfoot>
                             <tr>  
-                                <td colspan="3">&nbsp;</td>  
+                                <td colspan="4">&nbsp;</td>  
                                 <td>Total:</td>
                                 <td><strong id="get_modal_total">0</strong></td>
                             </tr>
@@ -203,6 +203,46 @@
                         <button type="submit" class="btn btn-primary" id="btnConfirmPendingOrder">Confirm</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{{-- update pending modal--}}
+<div class="modal fade" id="HistoryModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Order History</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{-- <form id="frmPendingOrder" name="frmPendingOrder" class="form-horizontal"> --}}
+                    <table class="table table-stripped" id="completed_orders">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product</th>
+                                <th>Size</th>
+                                <th>Image</th>
+                                <th>Qty</th>
+                                <th>Sub Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                            <tr>  
+                                <td colspan="4">&nbsp;</td>  
+                                <td>Total:</td>
+                                <td><strong id="history_total">0</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                {{-- </form> --}}
             </div>
         </div>
     </div>
@@ -442,7 +482,6 @@
         });
 
         // edit pending order
-
         function getPendingOrders(invoice_id){
             $.getJSON( "{{ url('order/pending') }}" + '/'+ invoice_id, function( data ) {
                 var htmlData = ''
@@ -495,6 +534,34 @@
             // $("#txt_pending_qty").val(qty);
             // $("#txt_pending_amount").val(total);
             // $("#pending_client_id").val(client_id);
+        });
+
+        function getCompletedOrders(invoice_id){
+            $.getJSON( "{{ url('order/completed') }}" + '/'+ invoice_id, function( data ) {
+                var htmlData = ''
+                var total = 0;
+                var i = 0
+                $.each(data, function( index, row ) {
+                    total += row.ordered_total_price
+                    htmlData += `<tr>
+                        <td>${row.id}</td>
+                        <td>${row.name}</td>
+                        <td>${row.size}</td>
+                        <td><a data-fancybox='' href='/img/product/${row.product_image}'><img src='/img/product/${row.product_image}' height='20'></a></td>
+                        <td>${row.quantity_ordered}</td>
+                        <td>${row.ordered_total_price}</td>
+                    </tr>`
+                    i++
+                });
+                $("#completed_orders").find('tbody').html("").append(htmlData) 
+                $("#history_total").text(total.toFixed(2)) 
+                $('#HistoryModal').modal('show');
+            });
+        }
+        $('body').on('click', '.viewCompletedOrder', function () {
+            //get the data
+            const invoice_id = $(this).attr("data-id");
+            getCompletedOrders(invoice_id)
         });
 
         

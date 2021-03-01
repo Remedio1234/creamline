@@ -48,7 +48,6 @@ class TransactionHistoryOrderController extends Controller
                 orders.is_completed,
                 orders.is_cancelled,
                 orders.delivery_date,
-                orders.id,
                 users.id as client_id,
                 users.lname,
                 users.contact_num,
