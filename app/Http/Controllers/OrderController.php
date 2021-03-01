@@ -77,7 +77,15 @@ class OrderController extends Controller
                 ->join('orders', 'orders.invoice_id', '=', 'order_invoice.id')
                 ->join('users', 'orders.client_id', '=', 'users.id')
                 // ->selectRaw("order_invoice.id, order_invoice.created_at as date_ordered, order_invoice.invoice_no, SUM(orders.ordered_total_price) as , CONCAT(users.fname, ' ', users.lname) as fullname, users.email")
-                ->selectRaw("order_invoice.id, order_invoice.created_at as date_ordered, order_invoice.invoice_no, SUM(orders.ordered_total_price) as total_price, CONCAT(users.fname, ' ', users.lname) as fullname, users.email, orders.delivery_date")
+                ->selectRaw("order_invoice.id, 
+                order_invoice.created_at as date_ordered, 
+                order_invoice.invoice_no, 
+                SUM(orders.ordered_total_price) as total_price, 
+                CONCAT(users.fname, ' ', users.lname) as fullname, 
+                users.email, 
+                orders.delivery_date,
+                users.id as client_id,
+                users.contact_num as num")
                 // ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',
                 //     'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
                 ->where('is_approved', 0)
@@ -89,7 +97,7 @@ class OrderController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
    
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
+                    $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->num.'" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
                     return $btn;
                 })
                 ->addColumn('total_price', function($row){
@@ -110,33 +118,44 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
+        $contact_num        = $request->input("pending_contact");
+        $client_id          = $request->input("pending_client_id");
+        $date_to_display    = $request->input("pending_date_to_display");
+        $delivery_date      = $request->input("delivery_date");
+        $invoice_no         = $request->pending_invoice;
 
-        $order_id = $request->input("pending_order_id");
-        $product_id = $request->input("pending_product_id");
-        $product_qty = $request->input("pending_product_qty");
-        $amount = $request->input("pending_amount");
-        $date_to_display = $request->input("pending_date_to_display");
-        $delivery_date = $request->input("delivery_date");
-        $contact_num = $request->input("pending_contact");
-        $client_id = $request->input("pending_client_id");
+        foreach ($request->order as $key => $value) {
+            if($stock = Stock::where('product_id', $value['product_id'])->first()){
+                $quantity = $stock->quantity - $value['quantity'];
+                Stock::where('product_id', $value['product_id'])->update([ 'quantity' => $quantity]);
+            }
+            Order::where('id', $value['order_id'])->update(['is_approved' => 1, 'delivery_date' => $delivery_date]);
+        }
+        // exit;
+        // $order_id = $request->input("pending_order_id");
+        // $product_id = $request->input("pending_product_id");
+        // $product_qty = $request->input("pending_product_qty");
+        $amount             = $request->input("pending_amount");
+        
+       
         // $contact_num = '09232415169';
 
-        $text_message = 'Thank you for ordering Creamline Products. Your Order # '.$order_id.' has been accepted. Total amount purchased of PHP '.$amount.'. Please expect it to be delivered on '.$date_to_display.'.';
+        $text_message = 'Thank you for ordering Creamline Products. Your Invoice # '.$invoice_no.' has been accepted. Total amount purchased of PHP '.$amount.'. Please expect it to be delivered on '.$date_to_display.'.';
 
-        if(env("DB_CONNECTION") == "pgsql"){
-            $current_quantity = DB::table('stocks')
-                ->where('id', $product_id)
-                ->select('*')
-                ->get();
+        // if(env("DB_CONNECTION") == "pgsql"){
+        //     $current_quantity = DB::table('stocks')
+        //         ->where('id', $product_id)
+        //         ->select('*')
+        //         ->get();
 
-            $deducted_qty = intval($current_quantity[0]->quantity) - intval($product_qty);
+        //     $deducted_qty = intval($current_quantity[0]->quantity) - intval($product_qty);
 
-            Stock::where('id', $product_id)->update([ 'quantity' => $deducted_qty]);
-        }else{
-            Stock::where('id', $product_id)->update([ 'quantity' => DB::raw('quantity - "'.$product_qty.'"')]);
-        }
-        Order::where('id', $order_id)->update(['is_approved' => 1]);
-        Order::where('id', $order_id)->update(['delivery_date' => $delivery_date]);
+        //     Stock::where('id', $product_id)->update([ 'quantity' => $deducted_qty]);
+        // }else{
+        //     Stock::where('id', $product_id)->update([ 'quantity' => DB::raw('quantity - "'.$product_qty.'"')]);
+        // }
+        // Order::where('id', $order_id)->update(['is_approved' => 1]);
+        // Order::where('id', $order_id)->update(['delivery_date' => $delivery_date]);
 
         //call the global function for setting the notification
         $this->set_notification("approved_customer_order", $text_message, $client_id);
@@ -156,8 +175,9 @@ class OrderController extends Controller
 
         // return response
         $response = [
-            'success' => true,
-            'message' => 'Order successfully approved.',
+            'success'   => true,
+            'message'   => 'Order successfully approved.',
+            'test'      => $text_message
         ];
         return response()->json($response, 200);
 

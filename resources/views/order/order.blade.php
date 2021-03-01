@@ -100,19 +100,18 @@
                     <div class="tab-pane fade show" id="order-tab-tran-his" role="tabpanel">
                         <table style="width: 100%;" id="historyTable" class="table table-striped table-bordered">
                             <thead class="bg-indigo-1 text-white">
-                            <tr>
-                                <th>ID</th>
-                                <th>Customer</th>
-                                <th>Product</th>
-                                <th>Image</th>
-                                <th>Qty</th>
-                                <th>Amount</th>
-                                <th>Date Ordered</th>
-                                <th>Delivery Date</th>
-                                <th>Attempt</th>
-                                <th>Reason</th>
-                                <th>Status</th>
-                            </tr>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Invoice #</th>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Date Ordered</th>
+                                    <th>Delivery Date</th>
+                                    <th>Attempt</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
                             </thead>
                             <tbody>
                             </tbody>
@@ -157,11 +156,17 @@
                             </tr>
                         </tfoot>
                     </table>
+                    <input type="hidden" name="pending_date_to_display" id="pending_date_to_display">
+                    {{-- <input type="hidden" name="pending_order_id" id="pending_order_id"> --}}
+                    <input type="hidden" name="pending_contact" id="pending_contact">
+                    <input type="hidden" name="pending_client_id" id="pending_client_id">
+                    <input type="hidden" name="pending_invoice" id="pending_invoice">
+                    <input type="hidden" name="pending_amount" id="pending_amount">
                     {{-- <input type="hidden" name="pending_order_id" id="pending_order_id">
                     <input type="hidden" name="pending_product_id" id="pending_product_id">
                     <input type="hidden" name="pending_product_qty" id="pending_product_qty">
                     <input type="hidden" name="pending_contact" id="pending_contact">
-                    <input type="hidden" name="pending_date_to_display" id="pending_date_to_display">
+                    
                     <input type="hidden" name="pending_amount" id="pending_amount">
                     <input type="hidden" name="pending_client_id" id="pending_client_id">
                     <div class="form-group">
@@ -255,6 +260,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Failed Delivery Report</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -371,7 +379,7 @@
         /* -------------------------------------------------------------------------------
                                         PENDING ORDER LIST
         -------------------------------------------------------------------------------- */
-
+        
         // datatable
         var table = $('#dataTable').DataTable({
             processing: true,
@@ -443,16 +451,20 @@
                 $.each(data, function( index, row ) {
                     total += row.ordered_total_price
                     htmlData += `<tr>
-                        <td>${row.id}<input type='hidden' name='id[${row.id}]'></td>
+                        <td>${row.id}</td>
                         <td>${row.name}</td>
                         <td>${row.size}</td>
                         <td><a data-fancybox='' href='/img/product/${row.product_image}'><img src='/img/product/${row.product_image}' height='20'></a></td>
-                        <td><input type='number' value='${row.quantity_ordered}' data-iid='${invoice_id}' data-id='${row.id}' class="modal_qty" name='quantity[${i}]' style='width:60px;' placeholder='0'></td>
-                        <td>${row.ordered_total_price}</td>
+                        <td><input type='number' name='order[${i}][quantity]' value='${row.quantity_ordered}' data-iid='${invoice_id}' data-id='${row.id}' class="modal_qty" style='width:60px;' placeholder='0'></td>
+                        <td>${row.ordered_total_price}
+                            <input type='hidden' name='order[${i}][product_id]' value='${row.prodID}'>
+                            <input type='hidden' name='order[${i}][order_id]' value='${row.id}'>
+                            <input type='hidden' name='order[${i}][amount]' value='${row.ordered_total_price}'></td>
                     </tr>`
                     i++
                 });
                $("#get_modal_total").text(total.toFixed(2)) 
+               $("#pending_amount").val(total.toFixed(2)) 
                $("#pending_orders").find('tbody').html("").append(htmlData) 
                $('#updatePendingModal').modal('show');
             });
@@ -462,15 +474,19 @@
             //get the data
             const invoice_id = $(this).attr("data-id");
             getPendingOrders(invoice_id)
+
+            var invoice_no = $(this).data('invoice');
+            $("#pending_invoice").val(invoice_no);
             // const product_id = $(this).attr("data-prodid");
-            // const contact = $(this).attr("data-num");
+            const contact = $(this).attr("data-num");
             // const prodname = $(this).attr("data-prodname");
             // const qty = $(this).attr("data-qty");
-            // const total = $(this).attr("data-total");
-            // const client_id = $(this).attr("data-client");
-
+            const total = $(this).attr("data-total");
+            const client_id = $(this).attr("data-client");
+            $("#pending_client_id").val(client_id);
             // //set the data
             // $("#pending_order_id").val(order_id);
+            $("#pending_contact").val(contact);
             // $("#pending_product_id").val(product_id);
             // $("#pending_product_qty").val(qty);
             // $("#pending_contact").val(contact);
@@ -1133,34 +1149,67 @@
             ajax: "{{ url('history') }}",
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                // {data: 'id', name: 'id'},
+                // {
+                //     data: 'fullname', name: 'fullname',
+                //     "render": function(data, type, full, meta){
+                //         return data.fullname
+                //     }
+                // },
+                // {data: 'name', name: 'name'},
+                // {   
+                //     data: 'product_image', name: 'product_image',
+                //     "render": function (data, type, full, meta) {
+                //         return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
+                //     },
+                // },
+                // {
+                //     data: 'quantity_ordered', name: 'quantity_ordered',
+                //     "render": function(data, type, full, meta){
+                //         return data + " pcs"
+                //     }
+                // },
+                // {
+                //     data: 'ordered_total_price', name: 'ordered_total_price',
+                //     "render": function(data, type, full, meta){
+                //         return "&#x20b1; " + data
+                //     }
+                // },
+                // {
+                //     data: 'created_at', name: 'created_at',
+                //     "render": function (data, type, full, meta) {
+                //         return moment(data).format('MMMM D YYYY');
+                //     },
+                // },
+                // {
+                //     data: 'delivery_date', name: 'delivery_date',
+                //     "render": function (data, type, full, meta) {
+                //         let output = '';
+                //         if(data === '1010-10-10'){
+                //             output = '<span class="text-info font-weight-bold">(Not set)</span>'
+                //         }else{
+                //             if(full.is_cancelled == 1){
+                //                 output = '<span class="text-danger font-weight-bold">(To be reschedule)</span>'
+                //             }else{
+                //                 output = moment(data).format('MMMM D YYYY');
+                //             }
+                //         }
+
+
+                //         return output
+                //     },
+                // },
                 {data: 'id', name: 'id'},
+                {data: 'invoice_no', name: 'invoice_no'},
                 {
-                    data: 'fname', name: 'fname',
+                    data: 'fullname', name: 'fullname',
                     "render": function(data, type, full, meta){
-                        return full.lname + ', ' + full.fname
+                        return full.fullname
                     }
                 },
-                {data: 'name', name: 'name'},
-                {   
-                    data: 'product_image', name: 'product_image',
-                    "render": function (data, type, full, meta) {
-                        return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
-                    },
-                },
+                {data: 'total_price', name: 'total_price'},
                 {
-                    data: 'quantity_ordered', name: 'quantity_ordered',
-                    "render": function(data, type, full, meta){
-                        return data + " pcs"
-                    }
-                },
-                {
-                    data: 'ordered_total_price', name: 'ordered_total_price',
-                    "render": function(data, type, full, meta){
-                        return "&#x20b1; " + data
-                    }
-                },
-                {
-                    data: 'created_at', name: 'created_at',
+                    data: 'date_ordered', name: 'date_ordered',
                     "render": function (data, type, full, meta) {
                         return moment(data).format('MMMM D YYYY');
                     },
@@ -1169,16 +1218,11 @@
                     data: 'delivery_date', name: 'delivery_date',
                     "render": function (data, type, full, meta) {
                         let output = '';
-                        if(data === '1010-10-10'){
+                        if(full.delivery_date == null){
                             output = '<span class="text-info font-weight-bold">(Not set)</span>'
                         }else{
-                            if(full.is_cancelled == 1){
-                                output = '<span class="text-danger font-weight-bold">(To be reschedule)</span>'
-                            }else{
-                                output = moment(data).format('MMMM D YYYY');
-                            }
+                            output = moment(data).format('MMMM D YYYY');
                         }
-
 
                         return output
                     },
@@ -1193,14 +1237,15 @@
                         return output + " " + times
                     }
                 },
+                
+                
                 {
                     data: 'reason', name: 'reason',
                     render: function(data, type, full, meta){
                         let output = ''
                         if(data != ""){
-                            output = "<a href='#' class='btnDisplayReason' data-reason='"+data+"'>...</a>"
+                            output = "<a href='#' class='btnDisplayReason' data-reason='"+data+"'>View</a>"
                         }
-
                         return output
                     }
                 },
@@ -1222,6 +1267,7 @@
                         return output
                     }
                 },
+                {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
 
