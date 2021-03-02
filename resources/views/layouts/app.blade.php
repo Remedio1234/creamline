@@ -316,15 +316,15 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('file_replacement.index') }}">
                                 <span data-feather="file"></span>
-                                File Replacement
+                                Damage Report
                             </a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" href="{{ route('file_damage.index') }}">
                                 <span data-feather="file-minus"></span>
                                 File Damage
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
                     @endif
                 @endif

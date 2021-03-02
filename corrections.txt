@@ -1,8 +1,4 @@
 Staff
-    - Manage Client
-        - Show List of stores
-
-
     - File Replacement
         - Product Dropdown - Label    
         - Size Dropdown - Label  
@@ -11,6 +7,6 @@ Staff
 
     - File Damage / File Replacement change to(Damage Report)
 
-
-Admin Panel
-    - Manage Orders    
+    Report Type
+    Damage
+    Replacement

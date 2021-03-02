@@ -5,8 +5,8 @@
 <div class="container">
     <div class="container-fluid">
         <div class="row">
-            <h4 class="center">File Replacement</h4>
-            <button class="btn btn-info ml-auto" id="createNewProdReport">Create File Replacement</button>
+            <h4 class="center">Manage Damage Report</h4>
+            <button class="btn btn-info ml-auto" id="createNewProdReport">Create Damage Report</button>
         </div>
     </div>
     <br>
@@ -14,8 +14,9 @@
         <thead class="bg-indigo-1 text-white">
         <tr>
             <th>ID</th>
-            <th>Product Name</th>
-            <th>Images</th>
+            <th>Report Type</th>
+            <th>Products</th>
+            <th>Attached File</th>
             <th>Quantity</th>
             <th>Status</th>
         </tr>
@@ -41,18 +42,26 @@
                         <div class="form-group">
                             <input type="hidden" id="fileCount" name="fileCount">
                             <label>Client:</label>
-                            <select class="form-control" id="client_id" name="client_id">
+                            <select class="form-control" id="client_id" name="client_id" required>
                                 <option value="">Please select a client</option>
                                 @foreach(\App\User::where('user_role', 2)->get() as $user)
                                     <option value="{{ $user->id }}">{{ $user->fname }} {{ $user->lname }}</option>
                                 @endforeach
                             </select>
                         </div>
+
+                        <div class="form-group">
+                            <label>Report Type:</label>
+                            <select class="form-control" id="report_type" name="report_type">
+                                <option value="Replacement">Replacement</option>
+                                <option value="Damage">Damage</option>
+                            </select>
+                        </div>
                     @endif
                     <div class="form-group">
                         <input type="hidden" id="fileCount" name="fileCount">
                         <label>Store :</label>
-                        <select class="form-control" id="store_list" name="store">
+                        <select class="form-control" id="store_list" name="store" required>
                             <option value="">Please select a Store</option>
                             @if(Auth::user()->user_role == 2)
                                 @foreach(Auth::user()->stores as $store)
@@ -63,7 +72,7 @@
                     </div>
                     <div class="form-group" id="product_list">
                         <div class="row" id="row-1">
-                            <div class="col-lg-3">
+                            <div class="col-lg-5">
                                 <select class="form-control" id="product" name="product[0]">
                                     <option value="" disabled="" selected>Select Product</option>
                                     @foreach(\App\Product::all() as $product)
@@ -71,21 +80,23 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-lg-3">
-                                <select class="form-control" id="size-1" name="size[0]">
-                                    <option value="test" disabled>Please Select Size</option>
+                            <div class="col-lg-4">
+                                <select class="form-control" id="size-1" name="size[0]" required>
+                                    <option value="">Select Size</option>
                                 </select>
                             </div>
                             <div class="col-lg-3">
-                                <input type="number" class="form-control"  name="quantity[0]">
+                                <input type="number" class="form-control"  name="quantity[0]" placeholder="Qty" required>
                             </div>
                             <div class="col-lg-3 pl-3 pt-1">
                                
                             </div>
                         </div>
                     </div>
+                    <div id="appendhere">
+                    </div>
                     <div class="d-flex form-group justify-content-center">
-                        <button class="btn btn-success" id="addProduct">
+                        <button type="button" class="btn btn-success" id="addProduct">
                             Add another Product
                         </button>
                     </div>
@@ -160,26 +171,26 @@
 
     $('#addProduct').on('click', function(){
         var newProduct = `<div class="row mt-2" id="row-${productsNum+1}">
-                            <div class="col-lg-3">
-                                <select class="form-control" id="product" name="product[${productsNum+1}]">
-                                   <option value="" disabled="" selected>Select Product</option>
-                                    ${displayOptions()}
-                                </select>
-                            </div>
-                            <div class="col-lg-3">
-                                <select class="form-control" id="size-${productsNum+1}" name="size[${productsNum+1}]">
-                                    <option value="" disabled>Please Select a Size</option>
-                                </select>
-                            </div>
-                            <div class="col-lg-3">
-                                <input type="number" class="form-control"  name="quantity[${productsNum+1}]">
-                            </div>
-                            <div class="col-lg-3 pl-3 pt-1">
-                                <button class="btn btn-sm btn-danger removeRow" row-id="row-${productsNum+1}">remove</button>
-                            </div>
-                        </div>`;
+            <div class="col-lg-5">
+                <select class="form-control" id="product" name="product[${productsNum+1}]" required>
+                    <option value="" disabled="" selected>Select Product</option>
+                    ${displayOptions()}
+                </select>
+            </div>
+            <div class="col-lg-4">
+                <select class="form-control" id="size-${productsNum+1}" name="size[${productsNum+1}]" required>
+                    <option value="">Select Size</option>
+                </select>
+            </div>
+            <div class="col-lg-3">
+                <input type="number" class="form-control"  name="quantity[${productsNum+1}]" required placeholder="Qty">
+            </div>
+            <div class="col-lg-4 pl-3 pt-1">
+                <button class="btn btn-sm btn-danger removeRow" row-id="row-${productsNum+1}">remove</button>
+            </div>
+        </div>`;
         productsNum++;
-        $('#product_list').append(newProduct);
+        $('#appendhere').append(newProduct);
     });
 
     $(document).on('click', '.removeRow', function(e) {
@@ -278,6 +289,7 @@
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
+                {data: 'report_type', name: 'report_type'},
                 {
                     data: 'products', 
                     name: 'products',
@@ -320,7 +332,7 @@
             $('#saveBtn').html("Create");
             $('#prodReport_id').val('');
             $('#prodReportForm').trigger("reset");
-            $('#modelHeading').html("Create New File Replacement");
+            $('#modelHeading').html("Create Damage Report");
             $('#ajaxModel').modal('show');
         });
 
@@ -337,11 +349,11 @@
                 cache: false,
                 processData: false,
                 success: function (data) {
+                    $("#appendhere").html("")
                     $('#prodReportForm').trigger("reset");
                     $('#ajaxModel').modal('hide');
                     table.draw();
                     $('#saveBtn').html('Save');
-                    // console.log(data)
                 },
                 error: function (data) {
                     console.log('Error:', data);
