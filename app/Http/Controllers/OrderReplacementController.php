@@ -42,8 +42,8 @@ class OrderReplacementController extends Controller
             return Datatables::of($file_replacement)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    if ($row->delivery_date != "0000-00-00") {
-                        return null;
+                    if ($row->delivery_date != "") {
+                        return "--";
                     }
                     if ($row->is_replaced == 1) {
                         $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Replace Order" data-id="'.$row->id.'" data-clientid="'.$row->client_id.'" data-original-title="Edit" class="btn btn-success btn-sm setDeliver">Set Delivery</a>&nbsp;';
