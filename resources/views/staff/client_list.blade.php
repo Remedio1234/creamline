@@ -17,6 +17,7 @@
             <th>Last Name</th>
             <th>Email</th>
             <th>Contact</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
@@ -93,6 +94,36 @@
     </div>
 </div>
 
+{{-- update pending modal--}}
+<div class="modal fade" id="storeListModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Store List</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="frmPendingOrder" name="frmPendingOrder" class="form-horizontal">
+                    <table class="table table-stripped" id="store_list_html">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Address</th>
+                                <th>Date Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 
 <script type="text/javascript">
@@ -118,8 +149,27 @@
                 {data: 'lname', name: 'lname'},
                 {data: 'email', name: 'email'},
                 {data: 'contact_num', name: 'contact_num'},
+                {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
+
+        $(document).on('click', '.viewStore', function(e){
+            e.preventDefault();
+            var user_id = $(this).data('id')
+            $.getJSON( "/client/"+user_id+"/stores/json", function( data ) {
+                var htmlData = ''
+                $.each(data, function( index, row ) {
+                    htmlData += `<tr>
+                        <td>${row.id}</td>
+                        <td>${row.store_name}</td>
+                        <td>${row.store_address}</td>
+                        <td>${moment(row.created_at).format('MMMM D YYYY')}</td>
+                    </tr>`
+                });
+               $("#store_list_html").find('tbody').html("").append(htmlData) 
+               $('#storeListModal').modal('show');
+            });
+        })
     });
 </script>
 @endsection

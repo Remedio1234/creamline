@@ -37,6 +37,11 @@ class ClientListController extends Controller
         if ($request->ajax()) {
             return Datatables::of($clients)
                 ->addIndexColumn()
+                ->addColumn('action', function ($row) {
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="View Store" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm viewStore">View Stores</a> ';
+                    return $btn;
+                })
+                ->rawColumns(['action'])
                 ->make(true);
         }
 
