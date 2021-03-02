@@ -4,7 +4,7 @@
 <div class="container">
     <div class="container-fluid">
         <div class="row">
-            <h4 class="center">Orders History</h4>
+            <h4 class="center">Order History</h4>
         </div>
     </div>
     {{-- <table id="dataTable" class="table table-striped table-bordered">
