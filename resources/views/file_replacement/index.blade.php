@@ -186,7 +186,7 @@
                 <input type="number" class="form-control"  name="quantity[${productsNum+1}]" required placeholder="Qty">
             </div>
             <div class="col-lg-4 pl-3 pt-1">
-                <button class="btn btn-sm btn-danger removeRow" row-id="row-${productsNum+1}">remove</button>
+                <button class="btn btn-sm btn-danger removeRow" row-id="row-${productsNum+1}">X</button>
             </div>
         </div>`;
         productsNum++;
