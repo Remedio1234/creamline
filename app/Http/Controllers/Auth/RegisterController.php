@@ -9,12 +9,13 @@ use App\Store;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
-
+use App\Helpers\Mail\SenderHelper as MailDispatch;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
-
+use App\Traits\GlobalFunction;
 class RegisterController extends Controller
 {
+    use GlobalFunction;
     /*
     |--------------------------------------------------------------------------
     | Register Controller
@@ -90,12 +91,29 @@ class RegisterController extends Controller
             'user_role' => $user_role,
             'is_pending' => $is_pending,
         ]);
+
+        //set text message
+        $text_message = 'Hi, '. $data['fname'] . `
+        \n\nThank you for registering as one of our retailers. \n
+            Your details are going to be reviewed along with
+            your submitted requirements. \n
+                Please wait for the updates and we will be back at you as soon as possible.`;
+
+        //send it to customer
+        $this->global_itexmo($data['contact_num'], $text_message." \n\n\n\n","ST-CREAM343228_LGZPB", '#5pcg2mpi]');
+
+        new MailDispatch('registration', trim($data['email']), array(
+            'subject'   => 'Welcome to Charpling Square Enterprise',
+            'title'     => 'Welcome to Charpling Square Enterprise', 
+            "site"      => '',
+            "name"      => trim($data['fname'])
+        ));
         
         return Store::create([
-            'store_name' => $data['store_name'],
-            'store_address' => $data['store_address'],
-            'user_id' => $data_inserted_id->id,
-            'area_id' => $data['area_id'],
+            'store_name'        => $data['store_name'],
+            'store_address'     => $data['store_address'],
+            'user_id'           => $data_inserted_id->id,
+            'area_id'           => $data['area_id'],
         ]);
     }
 

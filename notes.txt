@@ -72,19 +72,19 @@
 - Transactions
     - List Of all Transactions    
 
-
-
-
-
-
-
-
-
-
-
-
-
+    steps:
+    1 -> composer dump-autoload
+    2. -> composer install --optimize-autoloader --no-dev
+    3.
     php artisan cache:clear
     php artisan route:clear
     php artisan config:clear
     php artisan view:clear
+
+
+    Gmail Account
+        enterprisecharpling@gmail.com
+        charplingenterprise@gmail.com
+        !qaz@wsx#edc
+
+        - less secure apps

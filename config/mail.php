@@ -1,4 +1,12 @@
 <?php
+$mail_driver        = 'smtp';
+$mail_host          = 'smtp.googlemail.com';
+$mail_port          = 465;
+$mail_username      = 'enterprisecharpling@gmail.com';
+$mail_password      = 'passwordinvalid';
+$mail_encryption    = 'ssl';
+$mail_from_address  = 'charplingenterprise@gmail.com';
+$mail_from_name     = 'Charpling Square Enterprise';
 
 return [
 
@@ -13,7 +21,7 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'smtp'),
+    'default' =>  $mail_driver,//env('MAIL_MAILER', 'smtp'),
 
     /*
     |--------------------------------------------------------------------------
@@ -35,40 +43,43 @@ return [
 
     'mailers' => [
         'smtp' => [
-            'transport' => 'smtp',
-            'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
-            'port' => env('MAIL_PORT', 587),
-            'encryption' => env('MAIL_ENCRYPTION', 'tls'),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
-            'timeout' => null,
-            'auth_mode' => null,
+            'transport'     => 'smtp',
+            'host'          => $mail_host, //env('MAIL_HOST', 'smtp.mailgun.org'),
+            'port'          => $mail_port, //env('MAIL_PORT', 587),
+            'encryption'    => $mail_encryption, //env('MAIL_ENCRYPTION', 'tls'),
+            'username'      => $mail_username, //env('MAIL_USERNAME'),
+            'password'      => $mail_password, //env('MAIL_PASSWORD'),
+            'timeout'       => null,
+            'auth_mode'     => null,
         ],
 
-        'ses' => [
-            'transport' => 'ses',
+        'ses'               => [
+            'transport'     => 'ses',
+            'host'          => 'smtp.mailgun.org',
+            'port'          => 'tls',
+            'encryption'    => '587',
         ],
 
-        'mailgun' => [
-            'transport' => 'mailgun',
+        'mailgun'           => [
+            'transport'     => 'mailgun',
         ],
 
-        'postmark' => [
-            'transport' => 'postmark',
+        'postmark'          => [
+            'transport'     => 'postmark',
         ],
 
-        'sendmail' => [
-            'transport' => 'sendmail',
-            'path' => '/usr/sbin/sendmail -bs',
+        'sendmail'          => [
+            'transport'     => 'sendmail',
+            'path'          => '/usr/sbin/sendmail -bs',
         ],
 
-        'log' => [
-            'transport' => 'log',
-            'channel' => env('MAIL_LOG_CHANNEL'),
+        'log'               => [
+            'transport'     => 'log',
+            'channel'       => env('MAIL_LOG_CHANNEL'),
         ],
 
-        'array' => [
-            'transport' => 'array',
+        'array'             => [
+            'transport'     => 'array',
         ],
     ],
 
@@ -84,9 +95,11 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address'   => $mail_from_address, //env('MAIL_FROM_ADDRESS', 'hello@gmail.com'),
+        'name'      => $mail_from_name //env('MAIL_FROM_NAME', 'SingaPrinting'),
     ],
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -99,7 +112,7 @@ return [
     |
     */
 
-    'markdown' => [
+    'markdown'  => [
         'theme' => 'default',
 
         'paths' => [
