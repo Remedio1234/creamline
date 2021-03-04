@@ -31,6 +31,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="storeForm" name="storeForm" class="form-horizontal">
@@ -137,6 +140,7 @@
                 $('#saveBtn').html('Update');
                 $('#ajaxModel').modal('show');
                 $('#store_id').val(data.id);
+                $('#area_id').val(data.area_id);
                 $('#store_name').val(data.store_name);
                 $('#store_address').val(data.store_address);
             })

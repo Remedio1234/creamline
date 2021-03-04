@@ -282,6 +282,19 @@ class ClientController extends Controller
         return response()->json( $client->stores);
     }
 
+    public function staffClientStore(Request $request)
+    {
+        $client = User::join('stores', ['users.id' => 'stores.user_id'])
+                        ->selectRaw('stores.*')
+                        ->where([
+                            'stores.user_id' => $request->user_id,
+                            'stores.area_id' => $request->area_id
+                        ])
+                        ->get();
+
+        return response()->json( $client );
+    }
+
     public function getClientStore(Request $request){
         $store = Store::find($request->id);
         return response()->json( $store );

@@ -64,6 +64,7 @@ Route::resource('quota', 'QuotaController');
 #client store
 Route::get('client/{id}/stores', 'ClientController@storeList');
 Route::get('client/{id}/stores/json', 'ClientController@storeListJson');
+Route::get('client/stores/{user_id}/{area_id}/json', 'ClientController@staffClientStore');
 Route::post('replacement/set-deliver', 'OrderReplacementController@setDeliveryDate');
 
 Route::post('client/stores/add', 'ClientController@createClientStore');

@@ -47,12 +47,16 @@ class StaffController extends Controller
                         $delete_status = 'Deactivate';
                         $delete_btn = 'btn-danger';
                     }
+
+                    $store = Store::where(['area_id' => $row->area_id])->first();
    
                     $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Edit Staff" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStaff">Edit</a>';
 
-                    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Assign Staff" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Assign" class="btn btn-warning btn-sm assignStaff">Assign</a>';
+                    $btn .=' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Assign Staff" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Assign" class="btn btn-warning btn-sm assignStaff">Assign</a>';
+                    
+                    $btn .=' <button type="button" data-toggle="tooltip" data-placement="top" '.(!$store ? 'disabled' : '').' title="Assigned Staff" data-toggle="tooltip" data-area="'.$row->area_id.'" data-id="'.($store ? $store->user_id : 0).'" data-original-title="Assigned Store" class="btn btn-success btn-sm viewStore">Assigned Store</button>';
 
-                    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Staff" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteStaff">'.$delete_status.'</a>';
+                    $btn .= ' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Staff" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteStaff">'.$delete_status.'</a>';
 
                      return $btn;
                 })
