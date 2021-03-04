@@ -20,6 +20,18 @@
                         @csrf
                         <div class="row d-flex align-items-center justify-content-center">
                             <div class="col-md-8">
+                                <div>
+                                    <p>
+                                        <strong>Note:</strong> Once you register, please
+                                        make sure you can
+                                        submit your requirements
+                                        within 3 days to the
+                                        assigned staff in your
+                                        area. Click <a href="javascript://;" id="client_area_modal">here</a> for more
+                                        details.
+                                        
+                                    </p>
+                                </div>
                                 {{-- user account --}}
                                 <div class="card-header bg-secondary mb-4">
                                     <div class="row">
@@ -201,4 +213,58 @@
         </div>
     </div>
 </div>
+{{-- update pending modal--}}
+<div class="modal fade" id="storeListModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Staff / Requirements</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <h3>Please submit photocopies of these documents:</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item">Barangay Business Permit</li>
+                        <li class="list-group-item">BIR Certification (Form 2303)</li>
+                        <li class="list-group-item">2 valid IDs</li>
+                        <li class="list-group-item">Birth Certificate</li>
+                    </ul>
+                    <br/>
+                    <h3>Sales Agent list with their contact numbers:</h3>
+                    @if (count($areas->getStaff()) > 0)
+                    <ul class="list-group">
+                        @foreach ($areas->getStaff() as $data)
+                        <li class="list-group-item">
+                            {{$data->area_name}} <br>
+                            {{$data->fullname}}<br>
+                            {{$data->contact}}
+                        </li>
+                        @endforeach
+                    </ul>
+                    @else
+                    <p>No records found.</p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+
+    $(function () {
+        $(document).on('click', '#client_area_modal', function(){
+            $("#storeListModal").modal('show')
+        })
+        //ajax setup
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });  
+    });
+</script>
 @endsection
+

@@ -34,4 +34,10 @@ class Area extends Model
     {
         return $this->hasManyThrough(Order::class, Store::class);
     }
+
+    public function getStaff(){
+        return User::join('areas', ['areas.id' => 'users.area_id'])
+                ->selectRaw("users.contact_num as contact,  CONCAT(users.fname, ' ', users.lname) as fullname,areas.area_name")
+                    ->where(['user_role' => 1, 'is_active' => 1])->get();
+    }
 }
