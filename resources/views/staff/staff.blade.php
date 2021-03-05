@@ -6,7 +6,6 @@
     <div class="container-fluid">
         <div class="row">
             <h4 class="center">Manage Staff</h4>
-                
         </div>
         <div class="row">
             <div class="col-md-6" style="padding:0px;">
@@ -137,7 +136,10 @@
                         <div class="col-md-12">
                             <select class="form-control" id="area_id" name="area_id">
                                 @foreach($areas->all() as $area)
-                                  <option value="{{ $area->id }}">{{ $area->area_name." : ".$area->area_code }}</option>
+                                    @if (!in_array($area->id, $areas->getNoAvailableArea()))
+                                    <option value="{{ $area->id }}">{{ $area->area_name." : ".$area->area_code }}</option>
+                                    @endif
+                                  
                                 @endforeach
                             </select>
                         </div>

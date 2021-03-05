@@ -36,8 +36,15 @@ class Area extends Model
     }
 
     public function getStaff(){
-        return User::join('areas', ['areas.id' => 'users.area_id'])
-                ->selectRaw("users.contact_num as contact,  CONCAT(users.fname, ' ', users.lname) as fullname,areas.area_name")
-                    ->where(['user_role' => 1, 'is_active' => 1])->get();
+        return User::join('areas', ['areas.id' => 'users.area_id'])->selectRaw("users.contact_num as contact,  CONCAT(users.fname, ' ', users.lname) as fullname,areas.area_name")->where(['user_role' => 1, 'is_active' => 1])->get();
+    }
+
+    public function getNoAvailableArea(){
+        $areas = User::select('area_id')->where('user_role', "1")->where('is_active', '1') ->get();
+        $data = array();
+        foreach ($areas as $key => $value) {
+            $data[] = $value->area_id;
+        }
+        return $data;
     }
 }
