@@ -287,7 +287,7 @@ class ClientController extends Controller
         $client = User::join('stores', ['users.id' => 'stores.user_id'])
                         ->selectRaw('stores.*')
                         ->where([
-                            'stores.user_id' => $request->user_id,
+                            // 'stores.user_id' => $request->user_id,
                             'stores.area_id' => $request->area_id
                         ])
                         ->get();

@@ -6,7 +6,19 @@
     <div class="container-fluid">
         <div class="row">
             <h4 class="center">Manage Staff</h4>
-            <button class="btn btn-info ml-auto" id="createNewStaff">Create Staff</button>
+                
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="padding:0px;">
+                <select class="form-control float-left" id="filter_status" style="width: 300px;">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="padding:0px;">
+                <button class="btn btn-info ml-auto float-right" id="createNewStaff">Create Staff</button>
+            </div>
         </div>
     </div>
     <br>
@@ -206,7 +218,12 @@
         var table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ url('staff') }}",
+            ajax: {
+                url: "{{ url('staff') }}",
+                data: function(e){
+                    e.filter_status = $('#filter_status').val();
+                }
+            },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
@@ -230,6 +247,11 @@
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
+
+        $(document).on('change', '#filter_status', function(e){
+            e.preventDefault();
+            table.ajax.reload();
+        })
 
         // create new staff
         $('#createNewStaff').click(function () {

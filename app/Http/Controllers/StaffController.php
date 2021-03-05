@@ -28,7 +28,12 @@ class StaffController extends Controller
      */
     public function index(Request $request)
     {
-        $staff = User::latest()->where('user_role', "1")->get();
+        if($request->filter_status != 'all'){
+            $staff = User::latest()->where('is_active', $request->filter_status)->where('user_role', "1")->get();
+        } else {
+            $staff = User::latest()->where('user_role', "1")->get();
+        }
+        
 
         if ($request->ajax()) {
             return Datatables::of($staff)
