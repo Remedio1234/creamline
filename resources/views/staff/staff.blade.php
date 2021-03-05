@@ -112,7 +112,7 @@
 
 {{-- assign staff modal--}}
 <div class="modal fade" id="assignModal" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Assign Staff</h4>
@@ -145,9 +145,22 @@
                         </div>
                     </div>
                     
-                    <div class="col-sm-offset-12 col-sm-10">
+                    <div class="col-sm-offset-12 col-sm-10 mb-4">
                         <button type="submit" class="btn btn-primary">Save</button>
                     </div>
+                    
+                    <h4>Re-Assignment Records</h4>
+                    <table class="table table-stripped" id="assigned_area_list">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Area</th>
+                                <th>Date Assigned</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </form>
             </div>
         </div>
@@ -317,10 +330,21 @@
         $('body').on('click', '.assignStaff', function () {
             var staff_id = $(this).data('id');
             $.get("{{ url('staff') }}" + '/' + staff_id + '/edit', function (data) {
+                $('#assign_id').val(data.staff.id);
+                $('#area_id').val(data.staff.area_id);
+                $('#fullname').html(data.staff.fname + " " + data.staff.lname);
+
+                var htmlData = ''
+                $.each(data.areas, function( index, row ) {
+                    htmlData += `<tr>
+                        <td>${row.id}</td>
+                        <td>${row.area_name + '(' + row.area_code + ')'}</td>
+                        <td>${moment(row.date_assigned).format('MMMM D YYYY')}</td>
+                    </tr>`
+                });
+               $("#assigned_area_list").find('tbody').html("").append(htmlData) 
+
                 $('#assignModal').modal('show');
-                $('#assign_id').val(data.id);
-                $('#area_id').val(data.area_id);
-                $('#fullname').html(data.fname + " " + data.lname);
             })
         });
 
@@ -337,7 +361,10 @@
                     $('#assignModal').modal('hide');
                     table.draw();
                     $('#saveBtn').html('Save');
-                    swal("Information", data.message);
+                    // swal("Information", data.message);
+                    swal("Information", data.message, "success").then(function(){
+                        window.location.reload();
+                    });
                 },
                 error: function (data) {
                     console.log('Error:', data);

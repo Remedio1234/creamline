@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Store;
+use App\AssignedArea;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -84,6 +85,11 @@ class StaffController extends Controller
     public function store(Request $request)
     {
         if($request->action == 'assign_staff'){
+            $assigned = new AssignedArea;
+            $assigned->user_id = $request->assign_id;
+            $assigned->area_id = $request->area_id;
+            $assigned->save();
+
             $user = User::find($request->assign_id);
             $user->area_id = $request->area_id;
             $user->save();
@@ -129,7 +135,9 @@ class StaffController extends Controller
     public function edit($id)
     {
         $staff = User::find($id);
-        return response()->json($staff);
+        $assigned = AssignedArea::selectRaw('assigned_areas.id, 
+        assigned_areas.created_at as date_assigned, areas.area_name, areas.area_code')->join('areas', ['areas.id' => 'assigned_areas.area_id'])->where('user_id', $id)->get();
+        return response()->json(['staff' => $staff, 'areas' => $assigned]);
     }
 
     /**
