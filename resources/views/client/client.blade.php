@@ -3,10 +3,28 @@
 
 @section('content')
 <div class="container">
-    <div class="container-fluid">
+    {{-- <div class="container-fluid">
         <div class="row">
             <h4 class="center">Manage Clients</h4>
             <button class="btn btn-info ml-auto" id="createNewClient">Create Client</button>
+        </div>
+    </div> --}}
+    <div class="container-fluid">
+        <div class="row">
+            <h4 class="center">Manage Clients</h4>
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="padding:0px;">
+                <select class="form-control float-left" id="filter_status" style="width: 300px;">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                    <option value="2">Pending</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="padding:0px;">
+                <button class="btn btn-info ml-auto float-right" id="createNewClient">Create Client</button>
+            </div>
         </div>
     </div>
     <br>
@@ -98,46 +116,15 @@
         </div>
     </div>
 </div>
-
-{{-- assign client modal--}}
-<!-- <div class="modal fade" id="assignModal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Assign Client</h4>
-            </div>
-            <div class="modal-body">
-                <form id="assignForm" name="assignForm" class="form-horizontal">
-                    <input type="hidden" name="assign_id" id="assign_id">
-                    <input type="hidden" name="action" id="action">
-                    <div class="form-group">
-                        <label for="fullname" class="col-sm-12 control-label">Client Full Name:</label>
-                        <div class="col-sm-12">
-                            <h5 id="fullname"></h5>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="area_id" class="col-md-12 col-form-label">Designated Location:</label>
-
-                        <div class="col-md-12">
-                            <select class="form-control" id="area_id" name="area_id">
-                                @foreach($areas->all() as $area)
-                                  <option value="{{ $area->id }}">{{ $area->area_name." : ".$area->area_code }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="col-sm-offset-12 col-sm-10">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div> -->
-
-</body>
+<style>
+.dropbtn {background-color: #4CAF50;color: white;padding: 5px;font-size: 12px;border: none;cursor: pointer;border-radius: 3px;margin-left: 3px;}
+.dropdown {position: relative;display: inline-block;}
+.dropdown-content {display: none;position: absolute;background-color: #f9f9f9;box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);min-width: 100px;z-index: 1;}
+.dropdown-content a {color: black;padding: 12px 16px;text-decoration: none;display: block;}
+.dropdown-content a:hover {background-color: #f1f1f1}
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropbtn { background-color: #3e8e41;}
+</style>
 
 <script type="text/javascript">
 
@@ -154,7 +141,13 @@
         var table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ url('client') }}",
+            // ajax: "{{ url('client') }}",
+            ajax: {
+                url: "{{ url('client') }}",
+                data: function(e){
+                    e.filter_status = $('#filter_status').val();
+                }
+            },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
@@ -183,6 +176,11 @@
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
+
+        $(document).on('change', '#filter_status', function(e){
+            e.preventDefault();
+            table.ajax.reload();
+        })
 
         // create new client
         $('#createNewClient').click(function () {
@@ -238,38 +236,42 @@
             })
         });
 
-        // // assign client
-        // $('body').on('click', '.assignClient', function () {
-        //     var client_id = $(this).data('id');
-        //     $.get("{{ url('client') }}" + '/' + client_id + '/edit', function (data) {
-        //         $('#assignModal').modal('show');
-        //         $('#assign_id').val(data.id);
-        //         $('#fullname').html(data.fname + " " + data.lname);
-        //         $("#action").val("assign_client");
-        //     })
-        // });
+        // status_update
+        $('body').on('click', '.status_update', function () {
+            var client_id = $(this).data("id");
+            var status = $(this).data("status");
+            var swal_text = ''
+            if(status == 'decline'){
+                swal_text = 'Once declined, this user will be deleted!';
+            }else if(status == 'accept'){
+                swal_text = 'Once accepted, this user will be able to login!';
+            }
 
-        // // assign client
-        // $('body').on('submit', '#assignForm', function (e) {
-        //     e.preventDefault();
-        //     $.ajax({
-        //         data: $('#assignForm').serialize(),
-        //         url: "{{ url('client') }}",
-        //         type: "POST",
-        //         dataType: 'json',
-        //         success: function (data) {
-        //             $('#assignForm').trigger("reset");
-        //             $('#assignModal').modal('hide');
-        //             table.draw();
-        //             $('#saveBtn').html('Save');
-        //             swal("Information", data.message);
-        //         },
-        //         error: function (data) {
-        //             console.log('Error:', data);
-        //             $('#saveBtn').html('Save');
-        //         }
-        //     });
-        // });
+            swal({
+                title: "Are you sure?",
+                text: swal_text,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((isTrue) => {
+                if (isTrue) {
+                    $.ajax({
+                        type: "GET",
+                        url: "{{ url('client/modified') }}" + '/' + client_id +'/'+status,
+                        success: function (data) {
+                            table.draw();
+                            swal(data.message, {
+                                icon: "success",
+                            });
+                        },
+                        error: function (data) {
+                            console.log('Error:', data);
+                        }
+                    });
+                }
+            });
+        });
 
         // delete client
         $('body').on('click', '.deleteClient', function () {
@@ -311,8 +313,6 @@
                 }
             });
         });
-
-
 
         //--------------------------FUNCTION----------------------------------//
         function randomPassword(length) {

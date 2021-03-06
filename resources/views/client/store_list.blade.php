@@ -3,10 +3,29 @@
 
 @section('content')
 <div class="container">
-    <div class="container-fluid">
+    {{-- <div class="container-fluid">
         <div class="row">
             <h4 class="center">{{ $client->fname . " ". $client->lname  }}</h4>
             <button class="btn btn-info ml-auto" id="addNewstore">Create Store</button>
+        </div>
+    </div>
+    <br> --}}
+    <div class="container-fluid">
+        <div class="row">
+            <h4 class="center">{{ $client->fname . " ". $client->lname  }}</h4>
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="padding:0px;">
+                <select class="form-control float-left" id="filter_status" style="width: 300px;">
+                    <option value="1">Active</option>
+                    <option value="0">Inactive</option>
+                    <option value="2">Pending</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="padding:0px;">
+                <button class="btn btn-info ml-auto float-right" id="addNewstore">Create Store</button>
+            </div>
         </div>
     </div>
     <br>
@@ -17,6 +36,7 @@
             <th>Name</th>
             <th>Address</th>
             <th>Area</th>
+            <th>Staff Assigned</th>
             <th>Status</th>
             <th width="280px">Action</th>
         </tr>   
@@ -101,6 +121,20 @@
                 {data: 'store_name', name: 'store_name'},
                 {data: 'store_address', name: 'store_address'},
                 {data: 'area', name: 'area'},
+                {
+                    data: 'fullname', name: 'fullname',
+                    "render": function (data, type, full, meta) {
+                        var output = '';
+
+                        if(full.fullname){
+                            output = full.fullname;
+                        }else{
+                            output = 'NA';
+                        }
+
+                        return output;
+                    },
+                },
                 {
                     data: 'is_deleted', name: 'is_deleted',
                     "render": function (data, type, full, meta) {

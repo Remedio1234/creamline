@@ -62,7 +62,7 @@ class StaffController extends Controller
                     
                     $btn .=' <button type="button" data-toggle="tooltip" data-placement="top" '.(!$store ? 'disabled' : '').' title="Assigned Staff" data-toggle="tooltip" data-area="'.$row->area_id.'" data-id="'.($store ? $store->user_id : 0).'" data-original-title="Assigned Store" class="btn btn-success btn-sm viewStore">Assigned Store</button>';
 
-                    $btn .= ' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Staff" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteStaff">'.$delete_status.'</a>';
+                    $btn .= ' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Staff" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteStaff mt-2">'.$delete_status.'</a>';
 
                      return $btn;
                 })

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use DataTables;
+use App\Helpers\Mail\SenderHelper as MailDispatch;
 use App\Traits\GlobalFunction;
 
 class ClientController extends Controller
@@ -30,7 +31,20 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-        $client = User::latest()->where('user_role', "2")->get();
+        
+
+        if($request->filter_status != 'all'){
+            if($request->filter_status == 1){
+                $where = ['is_active' => $request->filter_status, 'is_pending' => 0];
+            } else if($request->filter_status == 0){
+                $where = ['is_active' => $request->filter_status, 'is_pending' => 0];
+            } else {
+                $where = ['is_active' => 0, 'is_pending' => 1];
+            }
+            $client = User::latest()->where($where)->where('user_role', "2")->get();
+        } else {
+            $client = User::latest()->where('user_role', "2")->get();
+        }
 
         // echo "<pre>";
         // var_dump($client);
@@ -55,19 +69,28 @@ class ClientController extends Controller
                         $delete_btn = 'btn-danger';
                     }
 
-                    if($row->is_pending == 1){
-                        $status = 2;
-                        $delete_status = 'Approve';
-                        $delete_btn = 'btn-outline-info';
-                    }
+                    // if($row->is_pending == 1){
+                    //     $status = 2;
+                    //     $delete_status = 'Pending';
+                    //     $delete_btn = 'btn-outline-info';
+                    // }
    
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Edit Client Profile" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editClient">Edit</a>';
+                    $btn = '<a href="javascript:void(0)"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editClient">Edit</a>';
 
-                    // $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Assign Client" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Assign" class="btn btn-warning btn-sm assignClient">Assign</a>';
-
-                    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Client" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteClient">'.$delete_status.'</a>';
-
-                    $btn = $btn.' <a href="/client/'.$row->id.'/stores" title="Client Store" class="btn btn-info btn-sm">'.'View Store'.'</a>';
+                    if($row->is_pending == 0){
+                        $btn .= ' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteClient">'.$delete_status.'</a>';
+                        $btn .=' <a href="/client/'.$row->id.'/stores" class="btn btn-warning btn-sm">'.'Store'.'</a>';
+                        $btn .=' <a href="javascript:void(0)"  class="btn btn-info btn-sm">Profile</a>';
+                    }
+                    if($row->is_pending == 1){
+                        $btn .= '<div class="dropdown">
+                            <button class="dropbtn">Status</button>
+                            <div class="dropdown-content">
+                                <a href="javascript://;" data-id="'.$row->id.'" class="status_update" data-status="accept">Accept</a>
+                                <a href="javascript://;" data-id="'.$row->id.'" class="status_update" data-status="decline">Decline</a>
+                            </div>
+                        </div>';
+                    }
 
                     return $btn;
                 })
@@ -227,13 +250,75 @@ class ClientController extends Controller
         return response()->json($response, 200);
     }
 
+
+    /**
+     * Update Status Accept/ Decline
+     *
+     * @param  \App\User  $client
+     * @return \Illuminate\Http\Response
+     */
+    public function acceptDeclineUserStatus(Request $request)
+    {
+        $output = '';
+        $user = User::find($request->client_id);     
+        new MailDispatch('client_approval', trim($user->email), array(
+            'subject'   => 'Creamline Registration Update',
+            'title'     => 'Creamline Registration Update', 
+            "status"    => $request->status,
+            "name"      => trim($user->fname)
+        ));
+        
+        if($request->status == 'accept'){
+            User::where('id', $user->id)->update(["is_pending" => 0, "is_active" => 1]);
+
+            $text_message = 'Hi, '. $user->fname . `
+                \n\nWelcome to Creamline! We are glad
+                to inform you that you are now one of
+                our retailers. \n you can now login <a href="/login">here</a>.`;
+
+            $output = 'Successfully Accepted!';
+        } else {
+
+            $text_message = 'Hi, '. $user->fname . `
+                \n\n We are sorry to inform you that you
+                did not passed the qualification as our
+                retailer based on the documents you
+                submitted. 
+                \n Please contact your sales
+                agent or the administration for more
+                details. 
+                \n 
+                You can still register in our
+                website once you finalized the
+                requirements we needed.`;
+
+            $output = 'Successfully Declined!';            
+        }
+
+        $this->global_itexmo($user->contact_num, $text_message." \n\n\n\n","ST-CREAM343228_LGZPB", '#5pcg2mpi]');
+        
+        if($request->status != 'accept')
+            User::where('id', $user->id)->delete();
+        
+        return response()->json([
+            'success', true,
+            'message' => $output,
+            'user'  => $user
+        ], 200);
+    }
+
     public function storeList($id, Request $request)
     {
         $client = User::find($id);
 
 
        if ($request->ajax()) {
-            $stores = $client->stores;
+            // $stores = $client->stores;
+
+            $stores = Store::leftJoin('users', ['users.area_id' => 'stores.area_id'])
+                            ->selectRaw("stores.*, CONCAT(users.fname, ' ', users.lname) as fullname")
+                                ->where('stores.user_id', $id)
+                                    ->get();
 
             return Datatables::of($stores)
                 ->addIndexColumn()
@@ -264,7 +349,9 @@ class ClientController extends Controller
                     }
                     $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Edit Store" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStore">Edit</a> ';
                     $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$title.'" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn '.$delete_btn.' btn-sm '.$btn_type.'">'. $btn_label .'</a>';
-
+                    
+                    // $store = User::where(['area_id' => $row->area_id])->first();
+                    // $btn .=' <button type="button" data-toggle="tooltip" data-placement="top" '.(!$store ? 'disabled' : '').' title="Assigned Staff" data-toggle="tooltip" data-area="'.$row->area_id.'" data-id="'.($store ? $store->user_id : 0).'" data-original-title="Assigned Store" class="btn btn-success btn-sm viewStore">Assigned Staff</button>';
                     return $btn;
                 })
                 ->rawColumns(['action'])
