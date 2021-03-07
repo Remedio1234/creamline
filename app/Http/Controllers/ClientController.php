@@ -84,7 +84,7 @@ class ClientController extends Controller
                     }
                     if($row->is_pending == 1){
                         $btn .= '<div class="dropdown">
-                            <button class="dropbtn">Status</button>
+                            <button class="dropbtn" id="status_update_'.$row->id.'">Status</button>
                             <div class="dropdown-content">
                                 <a href="javascript://;" data-id="'.$row->id.'" class="status_update" data-status="accept">Accept</a>
                                 <a href="javascript://;" data-id="'.$row->id.'" class="status_update" data-status="decline">Decline</a>
@@ -149,7 +149,8 @@ class ClientController extends Controller
             ];
             return response()->json($response, 200);
         }else{
-            User::updateOrCreate([
+            
+            $user = User::updateOrCreate([
                 'id' => $request->client_id
             ],[
                 'fname' => $request->fname,
@@ -158,7 +159,8 @@ class ClientController extends Controller
                 'email' => $request->email,
                 'contact_num' => $request->contact_num,
                 'user_role' => 2,   //2 for client
-                'is_pending' => 1,   //0 means not pending
+                'is_pending' => 0,   //0 means not pending
+                'is_active'  => 1,   //1 means not active
                 'password' => Hash::make($request->password),
                 'address' => "NA",
                 'email_verified_at' => "2020-06-08 07:57:47",
@@ -166,10 +168,35 @@ class ClientController extends Controller
                 'remember_token' => "NA"
             ]);
 
+            if(!$request->client_id){
+
+                new MailDispatch('client_approval', trim($request->email), array(
+                    'subject'   => 'Welcome to Charpling Square Enterprise',
+                    'title'     => 'Welcome to Charpling Square Enterprise', 
+                    "status"    => 'admin_approve',
+                    "name"      => trim($request->fname),
+                    "password"  => $request->password
+                ));
+                
+                $text_message = 'Hi, '. $request->fname . `
+                    \n\nWelcome to Creamline! We are glad
+                    to inform you that you are now one of
+                    our retailers. \n Please click this link for
+                    account confirmation and to change
+                    your password: 
+                    ` . $request->password . `Best regards,\n
+                    Charpling Square Enterprise\n
+                    Creamline Authorized Distributor`;
+                
+                //send it to customer
+                $this->global_itexmo($request->contact_num, $text_message." \n\n\n\n","ST-CREAM343228_LGZPB", '#5pcg2mpi]');
+            }
+
             // return response
             $response = [
                 'success' => true,
                 'message' => 'Client successfully saved.',
+                $user
             ];
             return response()->json($response, 200);
         }
@@ -274,7 +301,9 @@ class ClientController extends Controller
             $text_message = 'Hi, '. $user->fname . `
                 \n\nWelcome to Creamline! We are glad
                 to inform you that you are now one of
-                our retailers. \n you can now login <a href="/login">here</a>.`;
+                our retailers. \n you can now login <a href="/login">here</a>. \n\n Best regards,\n
+                Charpling Square Enterprise\n
+                Creamline Authorized Distributor`;
 
             $output = 'Successfully Accepted!';
         } else {
@@ -290,7 +319,9 @@ class ClientController extends Controller
                 \n 
                 You can still register in our
                 website once you finalized the
-                requirements we needed.`;
+                requirements we needed. \n\n Best regards,\n
+                Charpling Square Enterprise\n
+                Creamline Authorized Distributor`;
 
             $output = 'Successfully Declined!';            
         }
@@ -307,6 +338,64 @@ class ClientController extends Controller
         ], 200);
     }
 
+
+    /**
+     * Update Status Accept/ Decline
+     *
+     * @param  \App\User  $client
+     * @return \Illuminate\Http\Response
+     */
+    public function acceptDeclineUserStoreStatus(Request $request)
+    {
+        $output     = '';
+        $user   = User::find($request->client_id);
+        $store  = Store::find($request->store_id);    
+
+        new MailDispatch('store_approval', trim($user->email), array(
+            'subject'       => 'Creamline Store Update',
+            'title'         => 'Creamline Store Update', 
+            "status"        => $request->status,
+            "name"          => trim($user->fname),
+            "store_name"    => $store->store_name,
+            "store_address" => $store->store_address
+        ));
+        
+        if($request->status == 'accept'){
+            $text_message = 'Hi, '. $user->fname . `
+                \n\nYour new store named ` .$store->store_name. ` located
+            in ` .$store->store_address. ` has been approved. 
+            <br>
+            Please visit your
+            account for more info.`;
+            $output = 'Successfully Accepted!';
+        } else {
+
+            $text_message = 'Hi, '. $user->fname . `
+                \n\nYour new store named ` .$store->store_name. ` located
+            in ` .$store->store_address. ` has been declined. 
+            \n Please contact us or
+            your sales agent to discuss the problem. 
+            <br>
+            Please visit your
+            account for more info.`;
+
+            $output = 'Successfully Declined!';            
+        }
+
+        $this->global_itexmo($user->contact_num, $text_message." \n\n\n\n","ST-CREAM343228_LGZPB", '#5pcg2mpi]');
+        
+        if($request->status != 'accept'){
+            Store::where('id', $request->store_id)->delete();
+        } else {
+            Store::where('id', $request->store_id)->update(['is_deleted' => 1]);
+        }
+        
+        return response()->json([
+            'success', true,
+            'message' => $output
+        ], 200);
+    }
+
     public function storeList($id, Request $request)
     {
         $client = User::find($id);
@@ -315,9 +404,16 @@ class ClientController extends Controller
        if ($request->ajax()) {
             // $stores = $client->stores;
 
+            if($request->filter_status != 'all'){
+                $where = ['stores.user_id' => $id, 'is_deleted' => $request->filter_status];
+            } else {
+                // $client = User::latest()->where('user_role', "2")->get();
+                $where = ['stores.user_id' => $id];
+            }
+
             $stores = Store::leftJoin('users', ['users.area_id' => 'stores.area_id'])
                             ->selectRaw("stores.*, CONCAT(users.fname, ' ', users.lname) as fullname")
-                                ->where('stores.user_id', $id)
+                                ->where($where)
                                     ->get();
 
             return Datatables::of($stores)
@@ -332,7 +428,7 @@ class ClientController extends Controller
                     $btn_label = '';
                     $title = '';
 
-                    if($row->is_deleted == 0){
+                    if($row->is_deleted == 1){
                         $status = 0;
                         $delete_status = 'Active';
                         $delete_btn = 'btn-danger';
@@ -347,9 +443,20 @@ class ClientController extends Controller
                         $btn_type = "activate";
                         $title = "Activate Store";
                     }
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Edit Store" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStore">Edit</a> ';
-                    $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$title.'" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn '.$delete_btn.' btn-sm '.$btn_type.'">'. $btn_label .'</a>';
+
                     
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Edit Store" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStore">Edit</a> ';
+                    if($row->is_deleted == 0){
+                        $btn .= '<div class="dropdown">
+                            <button class="dropbtn" id="status_update_'.$row->id.'">Status</button>
+                            <div class="dropdown-content">
+                                <a href="javascript://;" data-store_id="'.$row->id.'" data-id="'.$row->user_id.'" class="status_update" data-status="accept">Accept</a>
+                                <a href="javascript://;" data-store_id="'.$row->id.'" data-id="'.$row->user_id.'" class="status_update" data-status="decline">Decline</a>
+                            </div>
+                        </div>';
+                    } else {
+                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$title.'" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn '.$delete_btn.' btn-sm '.$btn_type.'">'. $btn_label .'</a>';
+                    }
                     // $store = User::where(['area_id' => $row->area_id])->first();
                     // $btn .=' <button type="button" data-toggle="tooltip" data-placement="top" '.(!$store ? 'disabled' : '').' title="Assigned Staff" data-toggle="tooltip" data-area="'.$row->area_id.'" data-id="'.($store ? $store->user_id : 0).'" data-original-title="Assigned Store" class="btn btn-success btn-sm viewStore">Assigned Staff</button>';
                     return $btn;

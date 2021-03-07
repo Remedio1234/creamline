@@ -197,7 +197,7 @@
         // create or update client
         $('#saveBtn').click(function (e) {
             e.preventDefault();
-            $(this).html('Saving..');
+            $(this).html('Saving..').attr('disabled',true);
 
             $.ajax({
                 data: $('#clientForm').serialize(),
@@ -208,7 +208,7 @@
                     $('#clientForm').trigger("reset");
                     $('#ajaxModel').modal('hide');
                     table.draw();
-                    $('#saveBtn').html('Save');
+                    $('#saveBtn').html('Save').attr('disabled',false);
                     swal("Information", data.message);
                 },
                 error: function (data) {
@@ -242,9 +242,9 @@
             var status = $(this).data("status");
             var swal_text = ''
             if(status == 'decline'){
-                swal_text = 'Once declined, this user will be deleted!';
+                swal_text = 'Once declined, this store will be deleted!';
             }else if(status == 'accept'){
-                swal_text = 'Once accepted, this user will be able to login!';
+                swal_text = 'Once accepted, this store will be able to login!';
             }
 
             swal({
@@ -256,6 +256,7 @@
             })
             .then((isTrue) => {
                 if (isTrue) {
+                    $("#status_update_"+client_id).text("Sending");
                     $.ajax({
                         type: "GET",
                         url: "{{ url('client/modified') }}" + '/' + client_id +'/'+status,
@@ -280,9 +281,9 @@
 
             var swal_text = '';
 
-            if(stat == 0){
+            if(stat == 1){
                 swal_text = 'Once deactivated, this user cannot be able to login!';
-            }else if(stat == 1){
+            }else if(stat == 2){
                 swal_text = 'Once activated, this user will be able to login!';
             }else{
                 swal_text = 'Once activated, this user will be approved and able to login!';

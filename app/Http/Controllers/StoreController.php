@@ -26,30 +26,31 @@ class StoreController extends Controller
      */
     public function index(Request $request)
     {
-        $store = Store::where("user_id", Auth::user()->id)->latest()->get();
+        $store = Store::join('areas', ['areas.id' => 'stores.area_id'])
+                        ->selectRaw('stores.*, areas.area_name')->where("user_id", Auth::user()->id)->latest()->get();
 
         if ($request->ajax()) {
             return Datatables::of($store)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
 
-                    $status = '';
-                    $delete_status = '';
-                    $delete_btn = '';
+                    // $status = '';
+                    // $delete_status = '';
+                    // $delete_btn = '';
 
-                    if($row->is_deleted == 0){
-                        $status = 0;
-                        $delete_status = 'Delete';
-                        $delete_btn = 'btn-danger';
-                    }else{
-                        $status = 1;
-                        $delete_status = 'Activate';
-                        $delete_btn = 'btn-success';
-                    }
+                    // if($row->is_deleted == 0){
+                    //     $status = 0;
+                    //     $delete_status = 'Delete';
+                    //     $delete_btn = 'btn-danger';
+                    // }else{
+                    //     $status = 1;
+                    //     $delete_status = 'Activate';
+                    //     $delete_btn = 'btn-success';
+                    // }
    
                     $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Store" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStore">Edit</a>';
 
-                    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Store" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteStore">'.$delete_status.'</a>';
+                    // $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Store" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteStore">'.$delete_status.'</a>';
 
                     return $btn;
                 })
@@ -108,11 +109,11 @@ class StoreController extends Controller
         $output = '';
 
         // $store->delete();
-        if($store->is_deleted == 0){
-            Store::where('id', $store->id)->update(["is_deleted" => 1]);
+        if($store->is_deleted == 1){
+            Store::where('id', $store->id)->update(["is_deleted" => 2]);
             $output = 'Successfully Deactivated!';
         }else{
-            Store::where('id', $store->id)->update(["is_deleted" => 0]);
+            Store::where('id', $store->id)->update(["is_deleted" => 1]);
             $output = 'Successfully Activated!';
         }
 

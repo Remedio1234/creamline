@@ -17,9 +17,9 @@
         <div class="row">
             <div class="col-md-6" style="padding:0px;">
                 <select class="form-control float-left" id="filter_status" style="width: 300px;">
+                    <option value="0">Pending</option>
                     <option value="1">Active</option>
-                    <option value="0">Inactive</option>
-                    <option value="2">Pending</option>
+                    <option value="2">Inactive</option>
                     <option value="all">All</option>
                 </select>
             </div>
@@ -98,8 +98,15 @@
         </div>
     </div>
 </div>
-
-</body>
+<style>
+.dropbtn {background-color: #4CAF50;color: white;padding: 5px;font-size: 12px;border: none;cursor: pointer;border-radius: 3px;margin-left: 3px;}
+.dropdown {position: relative;display: inline-block;}
+.dropdown-content {display: none;position: absolute;background-color: #f9f9f9;box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);min-width: 100px;z-index: 1;}
+.dropdown-content a {color: black;padding: 12px 16px;text-decoration: none;display: block;}
+.dropdown-content a:hover {background-color: #f1f1f1}
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropbtn { background-color: #3e8e41;}
+</style>
 <script type="text/javascript">
 
     $(document).ready(function(){
@@ -114,7 +121,12 @@
         var table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: `/client/${id}/stores`,
+            ajax: {
+                url: `/client/${id}/stores`,
+                data: function(e){
+                    e.filter_status = $('#filter_status').val();
+                }
+            },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
@@ -139,18 +151,24 @@
                     data: 'is_deleted', name: 'is_deleted',
                     "render": function (data, type, full, meta) {
                         var output = '';
-                        if(!full.is_deleted){
+                        if(full.is_deleted == 0){
+                            output = '<span class="text-warning font-weight-bold"">Pending</span>';
+                        }else if(full.is_deleted == 1){
                             output = '<span class="text-success font-weight-bold">Active</span>';
-                        }else{
+                        } else {
                             output = '<span class="text-danger font-weight-bold"">In-Active</span>';
                         }
-
                         return output;
                     },
                 },
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
+
+        $(document).on('change', '#filter_status', function(e){
+            e.preventDefault();
+            table.ajax.reload();
+        })
 
         // deacttivate store
          $('body').on('click', '.deactivate', function () {
@@ -225,6 +243,45 @@
             $('#modelHeading').text('Create Store')
             $('#formModal').modal('show')
         });  
+
+        // status_update
+        $('body').on('click', '.status_update', function () {
+            var client_id = $(this).data("id");
+            var store_id = $(this).data("store_id");
+            var status = $(this).data("status");
+            var swal_text = ''
+            if(status == 'decline'){
+                swal_text = 'Are you sure you want to decline this store?';
+            }else if(status == 'accept'){
+                swal_text = 'Are you sure you want to accept this store?';
+            }
+
+            swal({
+                title: "Are you sure?",
+                text: swal_text,
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+            .then((isTrue) => {
+                if (isTrue) {
+                    $("#status_update_"+store_id).text("Sending");
+                    $.ajax({
+                        type: "GET",
+                        url: "{{ url('client/stores/modified') }}" + '/' + client_id +'/'+status+'/'+store_id,
+                        success: function (data) {
+                            table.draw();
+                            swal(data.message, {
+                                icon: "success",
+                            });
+                        },
+                        error: function (data) {
+                            console.log('Error:', data);
+                        }
+                    });
+                }
+            });
+        });
         
         $(document).on('click', ".editStore", function(e){
             e.preventDefault();

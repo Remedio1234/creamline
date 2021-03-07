@@ -17,7 +17,8 @@
             <th>Store Name</th>
             <th>Store Address</th>
             <th>Area</th>
-            <th width="280px">Action</th>
+            <th>Status</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
@@ -95,7 +96,21 @@
                 {data: 'id', name: 'id'},
                 {data: 'store_name', name: 'store_name'},
                 {data: 'store_address', name: 'store_address'},
-                {data: 'area_id', name: 'area_id'},
+                {data: 'area_name', name: 'area_name'},
+                {
+                    data: 'is_deleted', name: 'is_deleted',
+                    "render": function (data, type, full, meta) {
+                        var output = '';
+                        if(full.is_deleted == 0){
+                            output = '<span class="text-warning font-weight-bold"">Pending</span>';
+                        }else if(full.is_deleted == 1){
+                            output = '<span class="text-success font-weight-bold">Active</span>';
+                        } else {
+                            output = '<span class="text-danger font-weight-bold"">In-Active</span>';
+                        }
+                        return output;
+                    },
+                },
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });

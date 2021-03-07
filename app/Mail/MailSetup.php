@@ -45,6 +45,9 @@ class MailSetup extends Mailable
             case 'client_approval':
                 $page = "emails.client_approval";
             break;
+            case 'store_approval':
+                $page = "emails.store_approval";
+            break;
             default:
                 $page = "emails.register";
             break;

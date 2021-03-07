@@ -7,7 +7,7 @@
     <title>Register</title>
 </head>
 <body>
-    <p>Hi, {{ @$details['name'] }}!</p>
+    <p>Hi, {{ $details['name'] }}!</p>
     <p>
     Thank you for registering as one of our retailers. <br>
     Your details are going to be reviewed along with
