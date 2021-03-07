@@ -13,7 +13,7 @@
                     @foreach($prod->all() as $product)
                         @if($product->is_deleted == 1)
                         <div class="col-lg-3 col-md-4 col-6 pointer div-prod item">
-                            <span class="notify-badge">Sold Out</span>
+                            <span class="notify-badge">Phased out</span>
                             <img class="img-fluid img-thumbnail card-img-top shop-img" style="height:200px" src="{{ asset('img/product').'/'.$product->product_image}}" alt="">
                             <div class="padding-all-10px">
                                 <h5>{{ $product->name }}</h5>
@@ -176,7 +176,13 @@
                 populateFlavorDropdown(data);
 
                 var price = $("#size_id option:selected").attr("data-price");
-                $("#div-modal-text").html("&#8369; " + price + ".00");
+                var promo = $("#size_id option:selected").attr("data-promo");
+                if(parseInt(promo) > 0){
+                    $("#div-modal-text").html("<span style='text-decoration: line-through;color:red;'>&#8369; " + price + ".00</span> &nbsp; &nbsp;<span>&#8369; " + promo + ".00</span>");
+                } else {
+                    $("#div-modal-text").html("<span>&#8369; " + price + ".00</span>");
+                }
+                
                 $("#div-stocks-qty").html(prod_stocks_qty);
                 $("#quantity").val('')
                 // $('#description').val(data.product_description);
@@ -187,9 +193,19 @@
         //when size is changed
         $("#size_id").change(() =>{
             var price = $("#size_id option:selected").attr("data-price");
-            var qty = $("#quantity").val();
+            var promo = $("#size_id option:selected").attr("data-promo");
+            
 
-            $("#div-modal-text").html("&#8369; " + price + ".00");
+            var qty = $("#quantity").val();
+            if(parseInt(promo) > 0){
+                $("#div-modal-text").html("<span style='text-decoration: line-through;color:red;'>&#8369; " + price + ".00</span> &nbsp; &nbsp;<span>&#8369; " + promo + ".00</span>");
+            } else {
+                $("#div-modal-text").html("<span>&#8369; " + price + ".00</span>");
+            }
+            if(parseInt(promo) > 0){
+                price = promo
+            }
+            // $("#div-modal-text").html("&#8369; " + price + ".00");
             $("#totalPrice").html("&#8369; " + price * qty + ".00");
         });
 
@@ -200,6 +216,10 @@
                 $("#quantity").val("1");
             }else{
                 var price = $("#size_id option:selected").attr("data-price");
+                var promo = $("#size_id option:selected").attr("data-promo");
+                if(parseInt(promo) > 0){
+                    price = promo
+                }
                 const totalPrice = price * current_val;
                 $("#totalPrice").html("&#8369; " + totalPrice + ".00");
             }
@@ -222,6 +242,7 @@
                     //get all the values
                     var size = $("#size_id option:selected").val();
                     var price = $("#size_id option:selected").attr("data-price");
+                    var promo = $("#size_id option:selected").attr("data-promo");
                     var flavor = $("#flavor_id option:selected").val();
                     var quantity = $("#quantity").val();
 
@@ -230,6 +251,13 @@
                         return swal("Error", "Sorry, this product is currently out of stocks!");
                     }
 
+                    if(!size || !price || !flavor || !quantity){
+                        return swal("Error", "Sorry, There was an error adding this product to your cart. ");
+                    }
+
+                    if(parseInt(promo) > 0){
+                        price = promo
+                    }
                     //declare a parameters to be stored in session
                     var params = {};
 
@@ -269,13 +297,14 @@
             console.log(variation_size, variation_price)
             var variation_size = data.variation.size.split(",");
             var variation_price = data.variation.price.split(",");
+            var variation_promo = data.variation.promo.split(",");
             var output = '';
 
-            $("#totalPrice").html("&#8369; " + variation_price[0] + ".00");
+            $("#totalPrice").html("&#8369; " + (variation_promo[0] > 0 ? variation_promo[0] : variation_price[0]) + ".00");
 
             for(var i = 0; i < variation_size.length; i++){
                 if(variation_size[i])
-                    output += '<option value="'+ variation_size[i] +'" data-price="'+ variation_price[i] +'">'+ variation_size[i] +'</option>';
+                    output += '<option value="'+ variation_size[i] +'" data-price="'+ variation_price[i] +'" data-promo="'+ variation_promo[i] +'">'+ variation_size[i] +'</option>';
             }
 
             $("#size_id").html(output);

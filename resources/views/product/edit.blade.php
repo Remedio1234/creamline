@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container">
+    <h3>{{ $product->name}}</h3>
     <div class="row">
         <div class="col-md-4 padding-2px">
             <div class="card">
@@ -66,6 +67,7 @@
                             <tr>
                                 <th>Size</th>
                                 <th>Price</th>
+                                <th>Promo</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,11 +75,13 @@
                                 //get the value for variation size and price
                                 $var_size = explode(",", $variation->size);
                                 $var_price = explode(",", $variation->price);
+                                $var_promo = explode(",", $variation->promo);
                                 $size_count = count($var_price) - 1;
                                 for($i = 0; $i < $size_count; $i++){
                                     echo "<tr>";
                                     echo    "<td>".$var_size[$i]."</td>";
-                                    echo    "<td>&#8369;&nbsp;&nbsp;<input class='names' value='".$var_price[$i]."'</td>";
+                                    echo    "<td>&#8369;&nbsp;&nbsp;<input type='number' class='names' style='width:100px;' placeholder='0' value='".$var_price[$i]."'</td>";
+                                    echo    "<td>&#8369;&nbsp;&nbsp;<input type='number' class='promo' style='width:100px;' placeholder='0' value='".$var_promo[$i]."'</td>";
                                     echo "</tr>";
                                 }
                              ?>
@@ -174,17 +178,21 @@
 
             //get the DOM values for price
             var price = $(".names");
+            var promo = $(".promo");
             var price_values = '';
+            var promo_values = '';
 
             //get the value of product id
             var product_id = $("#product_id").val();
 
             for(var i = 0; i < price.length; i++){
                 price_values += $(price[i]).val()+",";
+                promo_values += $(promo[i]).val()+",";
             }
 
             //clear all spaces and whitespaces
             price_values.replace(/\s/g,'');
+            promo_values.replace(/\s/g,'');
 
             //declare parameters
             var params = {};
@@ -192,6 +200,7 @@
             //set parameters
             params.product_id = product_id;
             params.price = price_values;
+            params.promo = promo_values;
             params.action = "update_price";
 
             $.ajax({

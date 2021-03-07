@@ -20,7 +20,7 @@
             <th>Flavor</th>
             <th>Quantity</th>
             <th>Total</th>
-            <th width="280px">Action</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>

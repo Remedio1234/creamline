@@ -30,8 +30,35 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $product = Product::latest()->get();
-
+        $product = Product::leftJoin('stocks', ['stocks.product_id' => 'products.id'])
+                    ->selectRaw('products.*,stocks.quantity, stocks.threshold')
+                        ->latest()
+                            ->get();
+        if($request->filter_status != 'all'){
+            if(in_array($request->filter_status, [0,1])){ //available
+                $where = ['is_deleted' => $request->filter_status];
+                $product = Product::leftJoin('stocks', ['stocks.product_id' => 'products.id'])
+                    ->selectRaw('products.*,stocks.quantity, stocks.threshold')
+                        ->where($where)
+                            ->whereRaw('stocks.quantity > stocks.threshold')
+                                ->latest()
+                                    ->get();
+            } else if($request->filter_status == 3){
+                $product = Product::leftJoin('stocks', ['stocks.product_id' => 'products.id'])
+                    ->selectRaw('products.*,stocks.quantity, stocks.threshold')
+                        ->where('stocks.quantity',0)
+                            ->latest()
+                                ->get();
+            } 
+            else if($request->filter_status == 2){
+                $product = Product::leftJoin('stocks', ['stocks.product_id' => 'products.id'])
+                    ->selectRaw('products.*,stocks.quantity, stocks.threshold')
+                        ->whereRaw('stocks.quantity <= stocks.threshold')
+                            ->where('stocks.quantity','>', 0)
+                                ->latest()
+                                    ->get();
+            } 
+        }
         if ($request->ajax()) {
             return Datatables::of($product)
                 ->addIndexColumn()
@@ -43,21 +70,39 @@ class ProductController extends Controller
 
                     if($row->is_deleted == 0){
                         $status = 0;
-                        $delete_status = 'Not Available';
+                        $delete_status = 'Phased out';
                         $delete_btn = 'btn-danger';
                     }else{
                         $status = 1;
                         $delete_status = 'Available';
                         $delete_btn = 'btn-success';
                     }
-   
+
                     $btn = '<a href="product/'.$row->id.'/edit" data-toggle="tooltip" data-placement="top" title="Update Product" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
                     $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Stock" data-toggle="tooltip" data-id="'.$row->id.'" data-name="'.$row->name.'" data-original-title="Stock" class="btn btn-warning btn-sm StockProduct">Stock</a>';
                     $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Product" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteProduct">'.$delete_status.'</a>';
 
                     return $btn;
                 })
-                ->rawColumns(['action'])
+                ->editColumn('is_deleted', function ($row) {
+                    $status = '';
+                    if($row->is_deleted == 0){
+                        $status = '<span class="text-success font-weight-bold">Available</span>';
+                    } 
+                    else if($row->is_deleted == 1){
+                        $status = '<span class="text-danger font-weight-bold">Phased out </span>';
+                    } 
+                     
+                    if($row->quantity == 0){
+                        $status = '<span class="text-danger font-weight-bold"">Out of Stock</span>';
+                    } 
+                    else if($row->quantity <= $row->threshold){
+                        $status = '<span class="text-warning font-weight-bold">Running Low</span>';
+                    }
+
+                    return $status;
+                })
+                ->rawColumns(['action', 'is_deleted'])
                 ->make(true);
         }
 
@@ -122,7 +167,7 @@ class ProductController extends Controller
                 //-------------get the value for price----------------//
                 $price_value = '';
                 $size_value = explode(",", $request->size);
-                $price_value = ProductController::return_price_value($size_value);
+                $price_value = $this->return_price_value($size_value);
 
                 //insert to variation table
                 Variation::updateOrCreate([
@@ -153,7 +198,8 @@ class ProductController extends Controller
             if($request->action == "update_price"){
                 //insert to variation table
                 Variation::where("product_id", $request->product_id)->update([
-                    'price' => $request->price
+                    'price' => $request->price,
+                    'promo' => $request->promo
                 ]);
 
                 // return response
@@ -174,7 +220,7 @@ class ProductController extends Controller
                     return $value != '';
                 });
 
-                $price_value = ProductController::return_price_value($size_value);
+                $price_value = $this->return_price_value($size_value);
 
                 //insert to variation table
                 Variation::where("product_id", $request->product_id)->update([

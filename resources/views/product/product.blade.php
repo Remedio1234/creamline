@@ -3,10 +3,30 @@
 
 @section('content')
 <div class="container">
-    <div class="container-fluid">
+    {{-- <div class="container-fluid">
         <div class="row">
             <h4 class="center">Manage Product</h4>
             <button class="btn btn-info ml-auto" id="createNewProduct">Create Product</button>
+        </div>
+    </div>
+    <br> --}}
+    <div class="container-fluid">
+        <div class="row">
+            <h4 class="center">Manage Product</h4>
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="padding:0px;">
+                <select class="form-control float-left" id="filter_status" style="width: 300px;">
+                    <option value="0">Available</option>
+                    <option value="1">Phased out</option>
+                    <option value="2">Running Low</option>
+                    <option value="3">Out of Stocks</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="padding:0px;">
+                <button class="btn btn-info ml-auto float-right" id="createNewProduct">Create Product</button>
+            </div>
         </div>
     </div>
     <br>
@@ -17,6 +37,8 @@
             <th>Image</th>
             <th>Name</th>
             <th>Description</th>
+            <th>Stocks</th>
+            <th>Threshold</th>
             <th>Status</th>
             <th width="280px">Action</th>
         </tr>
@@ -76,7 +98,7 @@
                                            value="" maxlength="255" autocomplete="off">
                                 </div>
                             </div>
-                            <div class="form-group">
+                            <div class="form-group" hidden>
                                 <label class="col-sm-12 control-label">Flavor</label>
                                 <div class="col-sm-12">
                                     <input for="flavor" type="text" class="form-control" id="flavor"
@@ -155,36 +177,51 @@
         var table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ url('product') }}",
+            // ajax: "{{ url('product') }}",
+            ajax: {
+                url: "{{ url('product') }}",
+                data: function(e){
+                    e.filter_status = $('#filter_status').val();
+                }
+            },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
                 {   
                     data: 'product_image', name: 'product_image',
                     "render": function (data, type, full, meta) {
-                        return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
+                        return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='40' width='40'></a>";
                     },
                 },
                 {data: 'name', name: 'name'},
                 {data: 'description', name: 'description'},
-                {
-                    data: 'is_deleted', name: 'is_deleted',
-                    "render": function (data, type, full, meta) {
-                        var output = '';
-                        if(data == 0){
-                            output = '<span class="text-success font-weight-bold">Available</span>';
-                        }else{
-                            output = '<span class="text-danger font-weight-bold"">Not-Available</span>';
-                        }
-                        return output;
-                    },
-                },
+                {data: 'quantity', name: 'quantity'},
+                {data: 'threshold', name: 'threshold'},
+                {data: 'is_deleted', name: 'is_deleted'},
+                // {
+                //     data: 'is_deleted', name: 'is_deleted',
+                //     "render": function (data, type, full, meta) {
+                //         var output = '';
+                //         if(data == 0){
+                //             output = '<span class="text-success font-weight-bold">Available</span>';
+                //         }else{
+                //             output = '<span class="text-danger font-weight-bold"">Phased out</span>';
+                //         }
+                //         return output;
+                //     },
+                // },
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
 
+        $(document).on('change', '#filter_status', function(e){
+            e.preventDefault();
+            table.ajax.reload();
+        })
+
         // create new product
         $('#createNewProduct').click(function () {
+            $(".list-group-flush").html("")
             $('#product_image').attr("required", "");
             $('#saveBtn').html("Create");
             $('#product_id').val('');
@@ -249,8 +286,7 @@
                 cache: false,
                 processData: false,
                 success: function (data) {
-                    // console.log("printing data");
-                    // console.log(data);
+                    table.draw();
                     $('#stockModal').modal('hide');
                     swal("Information", data.message);
                 },
@@ -356,24 +392,42 @@
               );
             }
 
-            // input
-            var $input = $('<input name="size" class="form-control" placeholder="Press semicolon (;) to add sizes" />').keyup(function(event) {
+            var listing = [];
 
+            // input
+            var $input = $('<input name="size" id="size_input" required class="form-control" placeholder="Press semicolon (;) to add sizes" />').keyup(function(event) {
               if(event.which == 186) {
                 // key press is space or comma
                 var val = $(this).val().slice(0, -1); // remove space/comma from value
-
+                if(listing.indexOf(val) !== -1){
+                    return false
+                }
+                listing.push(val)
+                if(listing.length == 0){
+                    $("#size_input").prop('required', true)
+                } else {
+                    $("#size_input").prop('required', false)
+                }
                 // append to list of emails with remove button
                 $list.append($('<li class="list-group-item multipleInput-size"><span> ' + val + '</span></li>')
-                  .append($('<a href="#" class="multipleInput-close" title="Remove">x</a>')
+                  .append($('<a href="#" class="multipleInput-close" data-val='+val+' title="Remove">x</a>')
                     .click(function(e) {
-                      $(this).parent().remove();
                       e.preventDefault();
+                      $(this).parent().remove();
+                      const index = listing.indexOf(val);
+                        if (index > -1) {
+                            listing.splice(index, 1);
+                        }
+                        if(listing.length == 0){
+                            $("#size_input").prop('required', true)
+                        } else {
+                            $("#size_input").prop('required', false)
+                        }
                     })
                   )
                 );
 
-                $(this).attr('placeholder', '');
+                // $(this).attr('placeholder', '');
                 // empty input
                 $(this).val('');
               }
