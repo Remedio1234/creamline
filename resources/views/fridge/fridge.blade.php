@@ -53,29 +53,19 @@
                             <input name="description" placeholder="Enter Description" class="form-control"required/>
                         </div>
                     </div>
-                    <input type="hidden" name="status" value=1>
+                    {{-- <input type="hidden" name="status" value=1> --}}
                     <input type="hidden" name="cmb_user">
                     <input type="hidden" name="location">
                     <div class="form-group">
                         <label class="col-sm-12 control-label">Status</label>
                         <div class="col-sm-12">
-                            <select name="status" class="form-control">
+                            <select name="status" id="status" class="form-control">
                                 @foreach(config('fridge.status') as $key => $label)
                                     <option value="{{ $key  }}"> {{ $label }}</option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
-<!--                     <div class="form-group">
-                        <label class="col-sm-12 control-label">Status</label>
-                        <div class="col-sm-12">
-                            <select name="status" class="form-control">
-                                @foreach(config('fridge.status') as $key => $label)
-                                    <option value="{{ $key  }}"> {{ $label }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div> -->
 <!--                     <div class="form-group">
                         <label class="col-sm-12 control-label">Client</label>
                         <div class="col-sm-12">
@@ -101,7 +91,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title" id="modelHeading"></h4>
+                <h4 class="modal-title">Assign Client</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -147,11 +137,11 @@
                     </div>
 
                      <div class="form-group">
-                        <label class="col-sm-12 control-label">Location</label>
+                        <label class="col-sm-12 control-label">Address</label>
                         <div class="col-sm-12">
                             <input 
                                 name="location" 
-                                placeholder="Enter Description" 
+                                placeholder="Address" 
                                 class="form-control" 
                                 id="store-location"
                                 disabled
@@ -168,7 +158,22 @@
     </div>
 </div>
 
-</body>
+{{-- Fridget History Modal--}}
+<div class="modal fade" id="fridge_history_modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modelHeading">Fridge History</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4>No Records Found.!</h4>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
     $(function () {
@@ -178,6 +183,11 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+        $(document).on('click', '.fridge_history', function(e){
+            e.preventDefault();
+            $("#fridge_history_modal").modal('show')
+        })
 
         // datatable
         var table = $('#dataTable').DataTable({
@@ -195,17 +205,22 @@
                     data: 'status', name: 'status',
                     "render": function (data, type, full, meta) {
                         var output = '';
-                        if(full.is_deleted == 1){
-                            output = '<span class="text-danger font-weight-bold"">Deleted</span>';
-                        }else{
-                            if(data == 1){
-                                output = '<span class="text-success font-weight-bold">Available</span>';
-                            }else if(data == 2){
-                                output = '<span class="text-info font-weight-bold">In Use</span>';
-                            }else{
-                                output = '<span class="text-danger font-weight-bold"">For pull out</span>';
-                            }
+                        if(data == 1){
+                            output = '<span class="text-success font-weight-bold">Available</span>';
+                        } else if(data == 2){
+                            output = '<span class="text-danger font-weight-bold"">UnAvailable</span>';
                         }
+                        // if(full.is_deleted == 1){
+                        //     output = '<span class="text-danger font-weight-bold"">Deleted</span>';
+                        // }else{
+                        //     if(data == 1){
+                        //         output = '<span class="text-success font-weight-bold">Available</span>';
+                        //     }else if(data == 2){
+                        //         output = '<span class="text-info font-weight-bold">In Use</span>';
+                        //     }else{
+                        //         output = '<span class="text-danger font-weight-bold"">For pull out</span>';
+                        //     }
+                        // }
                         
                         return output;
                     },
@@ -267,6 +282,7 @@
                 $('input[name="cmb_user"]').val(data.user_id);
                 $('input[name="location"]').val(data.location);
                 $('#location').val(data.location);
+                $('#status').val(data.status);
             })
         });
 

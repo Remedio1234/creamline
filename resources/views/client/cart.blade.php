@@ -27,7 +27,7 @@
         </tbody>
     </table>
 </div>
-{{-- create/update fridge modal--}}
+{{-- Message Modal--}}
 <div class="modal fade" id="messageCart" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

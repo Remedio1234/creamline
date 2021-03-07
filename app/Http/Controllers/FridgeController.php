@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Fridge;
 use App\Store;
+use App\UserFridge;
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,9 +53,12 @@ class FridgeController extends Controller
 
                     if ($row->status == 1) {
                         $btn = $btn.' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Assign" class="btn btn-warning btn-sm assignFridge">Assign</a>';
-                    } elseif ($row->status == 2) {
-                        $btn = $btn.' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Pull Out" class="btn btn-warning btn-sm pullOutFridge">Pull Out</a>';
-                    }
+                    } 
+                    // elseif ($row->status == 2) {
+                    //     $btn = $btn.' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Pull Out" class="btn btn-warning btn-sm pullOutFridge">Pull Out</a>';
+                    // }
+
+                    $btn = $btn.' <a href="javascript:void(0)" data-id="'.$row->id.'"class="btn btn-success btn-sm fridge_history">History</a>';
 
                     return $btn;
                 })
@@ -82,11 +86,11 @@ class FridgeController extends Controller
         Fridge::updateOrCreate([
             'id' => $request->fridge_id
         ],[
-            'user_id' => $request->cmb_user,
-            'model' => $request->model,
-            'description' => $request->description,
-            'location' => $request->location,
-            'status' => $request->status ? $request->status : 1,
+            'user_id'       => $request->cmb_user,
+            'model'         => $request->model,
+            'description'   => $request->description,
+            // 'location'      => $request->location,
+            'status'        => $request->status ? $request->status : 1,
         ]);
 
         // return response
@@ -160,9 +164,13 @@ class FridgeController extends Controller
     {
         $fridge = Fridge::find($request->fridge_id);
         $fridge->user_id = $request->client_id;
-        $fridge->location = Store::find($request->store_id)->area_id;
+        // $fridge->location = Store::find($request->store_id)->area_id;
         $fridge->status = 2;
         $fridge->save();
+
+        if(UserFridge::where(['user_id' => $request->client_id, 'store_id' => $request->store_id])->first() === null){
+            UserFridge::create(['user_id' => $request->client_id, 'store_id' => $request->store_id]);
+        }
 
         $response = [
             'success', true,
