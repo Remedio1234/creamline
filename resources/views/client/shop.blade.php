@@ -10,17 +10,16 @@
             </div>
             <div class="card-body">
                 <div class="row text-center text-lg-left">
-                    @foreach($prod->all() as $product)
-                        @if($product->is_deleted == 1)
+                    @foreach($prod->getProduct() as $product)
+                        @if($product->quantity == 0)
                         <div class="col-lg-3 col-md-4 col-6 pointer div-prod item">
-                            <span class="notify-badge">Phased out</span>
+                            <span class="notify-badge">Sold Out</span>
                             <img class="img-fluid img-thumbnail card-img-top shop-img" style="height:200px" src="{{ asset('img/product').'/'.$product->product_image}}" alt="">
                             <div class="padding-all-10px">
                                 <h5>{{ $product->name }}</h5>
                             </div>
                         </div>
-                        @endif
-                        @if($product->is_deleted == 0)
+                        @else
                         <div class="col-lg-3 col-md-4 col-6 pointer div-prod item" data-val="{{ $product->id }}">
                             <img class="img-fluid img-thumbnail card-img-top shop-img" style="height:200px" src="{{ asset('img/product').'/'.$product->product_image}}" alt="">
                             <div class="padding-all-10px">
@@ -88,7 +87,7 @@
                                 <select class="form-control" id="size_id" name="size_id"></select>
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" hidden>
                             <label for="flavor_id" class="col-md-12 col-form-label">Flavor:</label>
                             <div class="col-md-12">
                                 <select class="form-control" id="flavor_id" name="flavor_id"></select>
@@ -248,7 +247,7 @@
 
                     //check if the current quantity selected is greater than the current stocks
                     if(quantity > prod_stocks_qty){
-                        return swal("Error", "Sorry, this product is currently out of stocks!");
+                        return swal("Error", "Sorry! You’ve reached the stock limit. Please enter a lesser quantity.");
                     }
 
                     if(!size || !price || !flavor || !quantity){

@@ -21,7 +21,7 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Size</th>
-                        <th>Flavor</th>
+                        {{-- <th>Flavor</th> --}}
                         <th>Qty</th>
                         <th>Sub-Total</th>
                     </tr>
@@ -38,7 +38,7 @@
                         <td>{{$cart->id}}</td>
                         <td>{{$cart->name}}</td>
                         <td>{{$cart->size}}</td>
-                        <td>{{$cart->flavor}}</td>
+                        {{-- <td>{{$cart->flavor}}</td> --}}
                         <td>{{$cart->quantity}}</td>
                         <td>{{number_format($cart->subtotal,2)}}</td>
                     </tr>

@@ -15,9 +15,9 @@
         <tr>
             <th>Fridge ID</th>
             <th>Model</th>
-            <th>Client</th>
             <th>Description</th>
-            <th>Location</th>
+            <th>Client</th>
+            {{-- <th>Location</th> --}}
             <th>Status</th>
             <th width="200px">Action</th>
         </tr>
@@ -33,6 +33,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="fridgeForm" name="fridgeForm" class="form-horizontal">
@@ -53,6 +56,16 @@
                     <input type="hidden" name="status" value=1>
                     <input type="hidden" name="cmb_user">
                     <input type="hidden" name="location">
+                    <div class="form-group">
+                        <label class="col-sm-12 control-label">Status</label>
+                        <div class="col-sm-12">
+                            <select name="status" class="form-control">
+                                @foreach(config('fridge.status') as $key => $label)
+                                    <option value="{{ $key  }}"> {{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
 <!--                     <div class="form-group">
                         <label class="col-sm-12 control-label">Status</label>
                         <div class="col-sm-12">
@@ -89,6 +102,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading"></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="assignForm" name="fridgeForm" class="form-horizontal">
@@ -172,9 +188,9 @@
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
                 {data: 'model', name: 'model'},
-                {data: 'assignee', name: 'assignee'},
                 {data: 'description', name: 'description'},
-                {data: 'store_address', name: 'store_address'},
+                {data: 'assignee', name: 'assignee'},
+                // {data: 'store_address', name: 'store_address'},
                 {
                     data: 'status', name: 'status',
                     "render": function (data, type, full, meta) {

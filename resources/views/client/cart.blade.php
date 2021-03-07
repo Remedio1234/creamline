@@ -14,10 +14,10 @@
         <tr>
             <th></th>
             <th>Cart ID</th>
-            <th>Image</th>
+            <th width='40'>Image</th>
             <th>Name</th>
             <th>Size</th>
-            <th>Flavor</th>
+            {{-- <th>Flavor</th> --}}
             <th>Quantity</th>
             <th>Total</th>
             <th>Action</th>
@@ -27,9 +27,22 @@
         </tbody>
     </table>
 </div>
-
-</body>
-
+{{-- create/update fridge modal--}}
+<div class="modal fade" id="messageCart" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modelHeading">Message</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h4 style="color:red;">Please check item and checkout!</h4>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
     $(function () {
         //ajax setup
@@ -59,12 +72,12 @@
                     data: 'product_image', name: 'product_image',
                     "render": function (data, type, full, meta) {
                         var url  = "{{ asset('img/product') }}" +"/"+ data
-                        return "<a data-fancybox='' href='"+ url +"'><img src='"+ url +"' height='20'></a>";
+                        return "<a data-fancybox='' href='"+ url +"' align='center'><img src='"+ url +"' height='40' width='40'></a>";
                     },
                 },
                 {data: 'product_name', name: 'product_name'},
                 {data: 'size', name: 'size'},
-                {data: 'flavor', name: 'flavor'},
+                // {data: 'flavor', name: 'flavor'},
                 {data: 'quantity', name: 'quantity'},
                 {
                     data: 'subtotal', name: 'subtotal',
@@ -83,7 +96,7 @@
             }).get();
 
             if (!ids.length) {
-                alert('Please Select Orders To Checkout')
+                $("#messageCart").modal('show')
                 return;
             }
 

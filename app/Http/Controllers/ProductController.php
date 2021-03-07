@@ -30,28 +30,28 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $product = Product::leftJoin('stocks', ['stocks.product_id' => 'products.id'])
+        $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
                     ->selectRaw('products.*,stocks.quantity, stocks.threshold')
                         ->latest()
                             ->get();
         if($request->filter_status != 'all'){
             if(in_array($request->filter_status, [0,1])){ //available
                 $where = ['is_deleted' => $request->filter_status];
-                $product = Product::leftJoin('stocks', ['stocks.product_id' => 'products.id'])
+                $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
                     ->selectRaw('products.*,stocks.quantity, stocks.threshold')
                         ->where($where)
                             ->whereRaw('stocks.quantity > stocks.threshold')
                                 ->latest()
                                     ->get();
             } else if($request->filter_status == 3){
-                $product = Product::leftJoin('stocks', ['stocks.product_id' => 'products.id'])
+                $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
                     ->selectRaw('products.*,stocks.quantity, stocks.threshold')
                         ->where('stocks.quantity',0)
                             ->latest()
                                 ->get();
             } 
             else if($request->filter_status == 2){
-                $product = Product::leftJoin('stocks', ['stocks.product_id' => 'products.id'])
+                $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
                     ->selectRaw('products.*,stocks.quantity, stocks.threshold')
                         ->whereRaw('stocks.quantity <= stocks.threshold')
                             ->where('stocks.quantity','>', 0)

@@ -38,7 +38,7 @@ class FridgeController extends Controller
                     $delete_btn = '';
                     if($row->is_deleted == 0){
                         $status = 0;
-                        $delete_status = 'Delete';
+                        $delete_status = 'De-Activate';
                         $delete_btn = 'btn-danger';
                     }else{
                         $status = 1;
@@ -48,12 +48,12 @@ class FridgeController extends Controller
    
                     $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Fridge" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editFridge">Edit</a>';
 
-                    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Fridge" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteFridge">'.$delete_status.'</a>';
+                    // $btn = $btn.' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" class="btn '.$delete_btn.' btn-sm deleteFridge">'.$delete_status.'</a>';
 
                     if ($row->status == 1) {
-                        $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Assign Fridge" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Assign" class="btn btn-warning btn-sm assignFridge">Assign</a>';
+                        $btn = $btn.' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Assign" class="btn btn-warning btn-sm assignFridge">Assign</a>';
                     } elseif ($row->status == 2) {
-                        $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Pull out Fridge" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Pull Out" class="btn btn-warning btn-sm pullOutFridge">Pull Out</a>';
+                        $btn = $btn.' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Pull Out" class="btn btn-warning btn-sm pullOutFridge">Pull Out</a>';
                     }
 
                     return $btn;
