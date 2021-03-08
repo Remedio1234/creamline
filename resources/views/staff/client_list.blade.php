@@ -164,8 +164,8 @@
                                 <br> 
                                 <strong>Description:</strong> ${row.description} </p>
                                 <select name='fridge_status' id='fridge_status_${row.id}'>
-                                    <option value='3'>Pull-Out</option>
-                                    <option value='4'>Deployed</option>
+                                    <option value='3' ${row.status == 3 ? 'selected' : ''}>Pull-Out</option>
+                                    <option value='4' ${row.status == 4 ? 'selected' : ''}>Deployed</option>
                                 </select>
                                 <button type='button' data-id='${row.id}' id='confirm_fridge' class='btn btn-primary' style='padding: 2px;'>Confirm</button>
                         </div>

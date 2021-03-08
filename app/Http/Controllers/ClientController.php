@@ -480,7 +480,7 @@ class ClientController extends Controller
                     ->where(['user_id' => $id])->get()
                     ->map(function($item){
                         $item->fridges = UserFridge::join('fridges', ['user_fridges.fridge_id' => 'fridges.id'])
-                                        ->selectRaw('fridges.id, fridges.model, fridges.description')
+                                        ->selectRaw('fridges.id, fridges.model, fridges.description, fridges.status')
                                         ->where(['store_id' => $item->id, 'user_fridges.status' => 'available'])
                                         ->get();
                         return $item;
