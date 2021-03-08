@@ -160,7 +160,7 @@
 
 {{-- Fridget History Modal--}}
 <div class="modal fade" id="fridge_history_modal" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="modelHeading">Fridge History</h4>
@@ -169,7 +169,19 @@
                 </button>
             </div>
             <div class="modal-body">
-                <h4>No Records Found.!</h4>
+                <table class="table table-stripped" id="store_list_html">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Store</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Date Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -186,8 +198,40 @@
 
         $(document).on('click', '.fridge_history', function(e){
             e.preventDefault();
-            $("#fridge_history_modal").modal('show')
+            var fridge_id = $(this).data('id')
+            $.getJSON( "/fridge/history/"+fridge_id, function( data ) {
+                var htmlData = ''
+                var status = ``
+                $.each(data, function( index, row ) {
+                    htmlData += '<tr>'
+                        htmlData +='<td>'+ row.id + '</td>'
+                        htmlData += '<td>'+ row.store_name + '</td>'
+                        htmlData += '<td>'+row.store_address+'</td>'
+                        htmlData += '<td>'
+                        htmlData += '<select id="fridge_status" width="60">'
+                        htmlData += '<option value="available" data-id='+ row.id +' ' + (row.status == 'available' ? 'selected' : row.status) + '>Available</option>'
+                        htmlData += '<option value="unavailable" data-id='+ row.id +' ' + (row.status == 'unavailable' ? 'selected' : row.status) + '>UnAvailable</option>'
+                        htmlData += '</select>'
+                        htmlData += '</td>'
+                        htmlData += '<td>' + moment(row.created_at).format('MMMM D YYYY') + '</td>'
+                        htmlData += '</tr>'
+                });
+               $("#store_list_html").find('tbody').html("").append(htmlData) 
+               $("#fridge_history_modal").modal('show')
+            });
         })
+
+        $(document).on('change', '#fridge_status', function(e){
+            e.preventDefault();
+            var status = $(this).val()
+            var id = $("#fridge_status option:selected").attr("data-id");
+            $.get( "/fridge/edit/history/"+status+'/'+id+'/'+'setA', function( data ) {
+                swal('Status has been changed.', {
+                                icon: "success",
+                            });
+            });
+        })
+
 
         // datatable
         var table = $('#dataTable').DataTable({
@@ -209,6 +253,12 @@
                             output = '<span class="text-success font-weight-bold">Available</span>';
                         } else if(data == 2){
                             output = '<span class="text-danger font-weight-bold"">UnAvailable</span>';
+                        }
+                        else if(data == 3){
+                            output = '<span class="text-warning font-weight-bold"">Pull Out</span>';
+                        }
+                        else if(data == 4){
+                            output = '<span class="text-primary font-weight-bold"">Deployed</span>';
                         }
                         // if(full.is_deleted == 1){
                         //     output = '<span class="text-danger font-weight-bold"">Deleted</span>';

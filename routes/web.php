@@ -45,6 +45,8 @@ Route::resource('stock',                                                'StockCo
 Route::resource('fridge',                                               'FridgeController');
 Route::post('pull-out',                                                 'FridgeController@pullOut');
 Route::post('assign-fridge',                                            'FridgeController@assign');
+Route::get('fridge/history/{fridge_id}',                                'FridgeController@fridgeHistory');
+Route::get('fridge/edit/history/{status}/{id}/{type}',                    'FridgeController@editHistoryFridge');
 Route::resource('order',                                                'OrderController');
 Route::get('order/pending/{invoice_id}',                                'OrderController@pendingOrder');
 Route::get('order/completed/{invoice_id}',                              'OrderController@completedOrder');
@@ -70,9 +72,9 @@ Route::get('client/modified/{client_id}/{status}',                      'ClientC
 Route::get('client/stores/modified/{client_id}/{status}/{store_id}',    'ClientController@acceptDeclineUserStoreStatus');
 Route::post('client/stores/add',                                        'ClientController@createClientStore');
 Route::get('client/stores/edit/{id}',                                   'ClientController@getClientStore');
-
+Route::get('client/stores/edit/{id}',                                   'ClientController@getClientStore');
 Route::post('update/replacement',                                       'OrderReplacementController@updateProducts');
-Route::get('get/staff/assign/{area_id}',                                'ClientController@getStaffList');
+Route::get('client/stores/fridge/{store_id}',                           'StoreController@getClientFridge');
 
 //admin dashboard
 Route::get('display_order_to_deliver_count',                            'HomeController@display_order_to_deliver_count')->name('display_order_to_deliver_count');

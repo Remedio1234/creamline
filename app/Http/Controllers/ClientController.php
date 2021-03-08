@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Store;
+use App\{User, Store,UserFridge};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -471,9 +470,22 @@ class ClientController extends Controller
 
     public function storeListJson($id)
     {
-        $client = User::find($id);
+        // $client = User::find($id);
 
-        return response()->json( $client->stores);
+        // return response()->json( $client->stores);
+
+        $stores = Store::selectRaw('stores.*')
+                    // ->leftJoin('user_fridges', ['user_fridges.store_id' => 'stores.id'])
+                    // ->leftJoin('fridges', ['user_fridges.fridge_id' => 'fridges.id'])
+                    ->where(['user_id' => $id])->get()
+                    ->map(function($item){
+                        $item->fridges = UserFridge::join('fridges', ['user_fridges.fridge_id' => 'fridges.id'])
+                                        ->selectRaw('fridges.id, fridges.model, fridges.description')
+                                        ->where(['store_id' => $item->id, 'user_fridges.status' => 'available'])
+                                        ->get();
+                        return $item;
+                    });
+        return response()->json( $stores);
     }
 
     public function staffClientStore(Request $request)

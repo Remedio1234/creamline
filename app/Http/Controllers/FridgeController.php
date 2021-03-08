@@ -159,6 +159,35 @@ class FridgeController extends Controller
         return response()->json($response, 200);
     }
 
+    public function fridgeHistory(Request $request){
+        $history = UserFridge::join('stores', ['stores.id' => 'user_fridges.store_id'])
+                    ->selectRaw('user_fridges.id, 
+                    user_fridges.status, 
+                    user_fridges.created_at,
+                    stores.store_name, 
+                    stores.store_address')
+                    ->where(['user_fridges.fridge_id' => $request->fridge_id])
+                    ->get();
+        return response()->json($history);
+    }
+
+    public function editHistoryFridge(Request $request)
+    {
+        if($request->type == 'setA'){
+            UserFridge::whereId($request->id)->update(["status" => $request->status]);
+            $a = 0;
+        } else {
+            $a = 1;
+            Fridge::find($request->id)->update(["status" => $request->status]);
+        }
+        $response = [
+            'success', true,
+            'message' => 'Successfully updated!',
+            'result' => $a,
+            $request->status
+        ];
+        return response()->json($response, 200);
+    }
 
     public function assign(Request $request)
     {
@@ -168,8 +197,8 @@ class FridgeController extends Controller
         $fridge->status = 2;
         $fridge->save();
 
-        if(UserFridge::where(['user_id' => $request->client_id, 'store_id' => $request->store_id])->first() === null){
-            UserFridge::create(['user_id' => $request->client_id, 'store_id' => $request->store_id]);
+        if(UserFridge::where(['user_id' => $request->client_id, 'store_id' => $request->store_id, 'fridge_id' => $request->fridge_id])->first() === null){
+            UserFridge::create(['user_id' => $request->client_id, 'store_id' => $request->store_id, 'fridge_id' => $request->fridge_id]);
         }
 
         $response = [

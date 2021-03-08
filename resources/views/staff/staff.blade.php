@@ -178,20 +178,18 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="frmPendingOrder" name="frmPendingOrder" class="form-horizontal">
-                    <table class="table table-stripped" id="store_list_html">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Address</th>
-                                <th>Date Created</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </form>
+                <table class="table table-stripped" id="store_list_html">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Address</th>
+                            <th>Date Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

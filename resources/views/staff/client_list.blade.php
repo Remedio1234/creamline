@@ -94,7 +94,7 @@
     </div>
 </div>
 
-{{-- update pending modal--}}
+{{-- update store list modal--}}
 <div class="modal fade" id="storeListModal" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -113,6 +113,7 @@
                                 <th>Name</th>
                                 <th>Address</th>
                                 <th>Date Created</th>
+                                <th>Fridges</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -123,9 +124,6 @@
         </div>
     </div>
 </div>
-
-</body>
-
 <script type="text/javascript">
 
     $(function () {
@@ -153,6 +151,31 @@
             ]
         });
 
+        function fridgesRaw(fridges){
+            if(fridges.length == 0){
+                return 'No fridge available.'
+            } else {
+                var htmlData = ''
+                $.each(fridges, function( x, row ) {
+                    htmlData += `<div class="card mt-2">
+                        <div class="card-body" style="padding: 2px;">
+                            <p class="card-text">
+                                <strong>Fridge Model:</strong> ${row.model} 
+                                <br> 
+                                <strong>Description:</strong> ${row.description} </p>
+                                <select name='fridge_status' id='fridge_status_${row.id}'>
+                                    <option value='3'>Pull-Out</option>
+                                    <option value='4'>Deployed</option>
+                                </select>
+                                <button type='button' data-id='${row.id}' id='confirm_fridge' class='btn btn-primary' style='padding: 2px;'>Confirm</button>
+                        </div>
+                    </div>`
+                }); 
+            }
+            
+            return htmlData;
+        }
+
         $(document).on('click', '.viewStore', function(e){
             e.preventDefault();
             var user_id = $(this).data('id')
@@ -164,10 +187,21 @@
                         <td>${row.store_name}</td>
                         <td>${row.store_address}</td>
                         <td>${moment(row.created_at).format('MMMM D YYYY')}</td>
-                    </tr>`
+                        <td>${fridgesRaw(row.fridges)}</td></tr>`
                 });
                $("#store_list_html").find('tbody').html("").append(htmlData) 
                $('#storeListModal').modal('show');
+            });
+        })
+
+        $(document).on('click', '#confirm_fridge', function(e){
+            e.preventDefault()
+            var id = $(this).data('id')
+            var status = $('#fridge_status_'+id).val()
+            $.get( "/fridge/edit/history/"+status+'/'+id+'/'+'setB', function( data ) {
+                swal('Status has been changed.', {
+                                icon: "success",
+                            });
             });
         })
     });

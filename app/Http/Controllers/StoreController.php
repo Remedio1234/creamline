@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Store;
+use App\{Store,UserFridge};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DataTables;
@@ -48,7 +48,8 @@ class StoreController extends Controller
                     //     $delete_btn = 'btn-success';
                     // }
    
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Store" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStore">Edit</a>';
+                    $btn = '<a href="javascript:void(0)" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editStore">Edit</a>';
+                    $btn .= ' <a href="javascript:void(0)" data-id="'.$row->id.'" data-original-title="View" class="edit btn btn-success btn-sm viewFridge">Fridges</a>';
 
                     // $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Store" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteStore">'.$delete_status.'</a>';
 
@@ -123,5 +124,28 @@ class StoreController extends Controller
             'message' => $output,
         ];
         return response()->json($response, 200);
+    }
+
+    public function getClientFridge(Request $request){
+        $fridges = UserFridge::join('fridges', ['user_fridges.fridge_id' => 'fridges.id'])
+                    ->selectRaw('fridges.id, fridges.model, fridges.description, fridges.status as stat')
+                    ->where(['store_id' => $request->store_id])
+                    ->get()
+                    ->map(function($item){
+                        if($item->stat == 1){
+                            $item->status = '<span class="text-success font-weight-bold">Available</span>';
+                        } 
+                        else if($item->stat == 2){
+                            $item->status = '<span class="text-danger font-weight-bold"">UnAvailable</span>';
+                        }
+                        else if($item->stat == 3){
+                            $item->status = '<span class="text-warning font-weight-bold"">Pull Out</span>';
+                        }
+                        else if($item->stat == 4){
+                            $item->status = '<span class="text-primary font-weight-bold"">Deployed</span>';
+                        }
+                        return $item;
+                    });
+        return response()->json( $fridges);                    
     }
 }

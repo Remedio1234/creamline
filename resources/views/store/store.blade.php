@@ -74,9 +74,36 @@
         </div>
     </div>
 </div>
-
-</body>
-
+{{-- update fridge modal--}}
+<div class="modal fade" id="fridgeListModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Fridge List</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="frmPendingOrder" name="frmPendingOrder" class="form-horizontal">
+                    <table class="table table-stripped" id="store_list_html">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Model</th>
+                                <th>Description</th>
+                                <th>Status</th>
+                                <th>Date Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript">
     $(function () {
         //ajax setup
@@ -199,6 +226,24 @@
                 }
             });
         });
+
+        $(document).on('click', '.viewFridge', function(e){
+            e.preventDefault()
+            var store_id = $(this).data('id')
+            $.getJSON( "/client/stores/fridge/"+store_id, function( data ) {
+                var htmlData = ''
+                $.each(data, function( index, row ) {
+                    htmlData += `<tr>
+                        <td>${row.id}</td>
+                        <td>${row.model}</td>
+                        <td>${row.description}</td>
+                        <td>${row.status}</td>
+                        <td>${moment(row.created_at).format('MMMM D YYYY')}</td></tr>`
+                });
+               $("#store_list_html").find('tbody').html("").append(htmlData) 
+               $('#fridgeListModal').modal('show');
+            });
+        })
 
     });
 </script>
