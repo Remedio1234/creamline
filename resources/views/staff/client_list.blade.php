@@ -165,9 +165,14 @@
                                 <strong>Description:</strong> ${row.description} </p>
                                 <select name='fridge_status' id='fridge_status_${row.id}'>
                                     <option value='3' ${row.status == 3 ? 'selected' : ''}>Pull-Out</option>
-                                    <option value='4' ${row.status == 4 ? 'selected' : ''}>Deployed</option>
-                                </select>
-                                <button type='button' data-id='${row.id}' id='confirm_fridge' class='btn btn-primary' style='padding: 2px;'>Confirm</button>
+                                    <option value='4' ${row.status == 4 ? 'selected' : ''}>Deployed</option>`
+                                    if(row.status == 1) {
+                    htmlData += ` <option value='1' selected>Available</option>`
+                                    }else if(row.status == 2) {
+                    htmlData += ` <option value='2' selected>UnAvailable</option>`
+                                    }
+                    htmlData += `</select>
+                                <button type='button' ${ ([3,4].indexOf(row.status) !== 1 ? 'disabled' : '') } data-id='${row.id}' id='confirm_fridge' class='btn btn-primary' style='padding: 2px;'>Confirm</button>
                         </div>
                     </div>`
                 }); 
