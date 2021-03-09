@@ -360,17 +360,28 @@ class ProductController extends Controller
 
     public function getSizes($id)
     {
+        // $variation =  Variation::where('product_id', $id)->first();
+
+        // $sizes = explode(',', $variation->size);
+
+        // $formatted = array_map(function($size) {
+        //     $size = $size;
+        //     if ($size) {
+        //         return (int) $size;
+        //     }
+        // }, $sizes);
+
+        // return response()->json($formatted);
+
         $variation =  Variation::where('product_id', $id)->first();
 
         $sizes = explode(',', $variation->size);
-
-        $formatted = array_map(function($size) {
-            $size = $size;
-            if ($size) {
-                return (int) $size;
-            }
-        }, $sizes);
-
-        return response()->json($formatted);
+        $prices = explode(',', $variation->price);
+        $data = array();
+        foreach ($sizes as $key => $value) {
+            if($value)
+                $data[$prices[$key]] = $value;
+        }
+        return response()->json($data);
     }
 }

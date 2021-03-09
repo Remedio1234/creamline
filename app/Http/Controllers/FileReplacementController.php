@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\ProductFileReport;
 use App\Product_Report;
 use App\ReplacementProduct;
-use App\Store;
+use App\{Store, User};
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +35,29 @@ class FileReplacementController extends Controller
             $file_replacement = Product_Report::where('client_id', Auth::user()->id)
                                     ->get();
         } else {
-            $file_replacement = Product_Report::all();
+
+            if(Auth::user()->user_role == 1){ //staff
+                $file_replacement = Product_Report::where(['issued_by' => Auth::user()->id])
+                            ->get()
+                            ->map(function($item){
+                                $item->full_name  = 'NA';
+                                if($user = User::find($item->client_id)){
+                                    $item->full_name  = $user->fname . ' '. $user->lname;
+                                }
+                                return $item;
+                            });
+            } else { //client
+                $file_replacement = Product_Report::where(['client_id' => Auth::user()->id])
+                        ->get()
+                        ->map(function($item){
+                            $item->full_name  = 'NA';
+                            if($user = User::find($item->issued_by)){
+                                $item->full_name  = $user->fname . ' '. $user->lname;
+                            }
+                            return $item;
+                        });
+            }
+            
         }
 
         if ($request->ajax()) {
@@ -88,21 +110,24 @@ class FileReplacementController extends Controller
             $files = $request->file('file_report_image');
 
             $items = Product_Report::create([
+                'report_type'       => $request->report_type,
                 'product_id'        => null,
                 'store_id'          => $request->store,
-                'report_type'       => $request->report_type,
                 'size'              => null,
                 'flavor'            => null,
-                'quantity'          => null,
-                'client_id'         => Auth::user()->id,
+                'client_id'         => $request->client_id,
+                'issued_by'         => Auth::user()->id,
                 'is_replaced'       => 0,
+                'reason'            => $request->reason,
             ]);
 
             foreach ($prodIds as $key => $product) {
+                $data = explode('-',$size[$key]);
                 ReplacementProduct::create([
                   'product_report_id'   => $items->id,
                   'product_id'          => $product,
-                  'size'                => $size[$key],
+                  'size'                => $data[0],
+                  'price'               => $data[1],
                   'quantity'            => $quantity[$key]
                 ]);
             }

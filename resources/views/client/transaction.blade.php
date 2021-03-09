@@ -98,8 +98,8 @@
                     <div class="form-group">
                         <label for="fname" class="col-sm-12 control-label">First Name</label>
                         <div class="col-sm-12">
-                            <input type="hidden" name="id" id="id" value="{{ Auth::user()->id }}" >
-                            <input type="text" value="{{ Auth::user()->fname }}" class="form-control" id="fname" name="fname"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
+                            <input type="hidden" name="id" id="id" value="{{  auth()->user()->user_role == 99 ? '' : Auth::user()->id }}" >
+                            <input type="text" placeholder="Firstname" value="{{ auth()->user()->user_role == 99 ? '' : Auth::user()->fname }}" class="form-control" id="fname" name="fname"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -107,7 +107,7 @@
                     <div class="form-group">
                         <label for="mname" class="col-sm-12 control-label">Middle Name</label>
                         <div class="col-sm-12">
-                            <input type="text" value="{{ Auth::user()->mname }}" class="form-control" id="mname" name="mname"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
+                            <input type="text" placeholder="Middlename" value="{{  auth()->user()->user_role == 99 ? '' : Auth::user()->mname }}" class="form-control" id="mname" name="mname"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -115,7 +115,7 @@
                     <div class="form-group">
                         <label for="lname" class="col-sm-12 control-label">Last Name</label>
                         <div class="col-sm-12">
-                            <input type="text" value="{{ Auth::user()->lname }}" class="form-control" id="lname" name="lname"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
+                            <input type="text" placeholder="Lastname" value="{{  auth()->user()->user_role == 99 ? '' : Auth::user()->lname }}" class="form-control" id="lname" name="lname"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                     <div class="form-group">
                         <label for="address" class="col-sm-12 control-label">Address</label>
                         <div class="col-sm-12">
-                            <input type="text" value="{{ Auth::user()->address }}" class="form-control" id="address" name="address"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
+                            <input type="text" placeholder="Address" value="{{  auth()->user()->user_role == 99 ? '' : Auth::user()->address }}" class="form-control" id="address" name="address"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                     <div class="form-group">
                         <label for="contact" class="col-sm-12 control-label">Contact Number</label>
                         <div class="col-sm-12">
-                            <input type="text" value="{{ Auth::user()->contact_num }}" class="form-control" id="contact" name="contact"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
+                            <input type="text" placeholder="Contact #" value="{{  auth()->user()->user_role == 99 ? '' : Auth::user()->contact_num }}" class="form-control" id="contact" name="contact"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@
                     <div class="form-group">
                         <label for="email" class="col-sm-12 control-label">Email</label>
                         <div class="col-sm-12">
-                            <input type="text" value="{{ Auth::user()->email }}" class="form-control" id="email" name="email"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
+                            <input type="text" placeholder="Email" value="{{  auth()->user()->user_role == 99 ? '' : Auth::user()->email }}" class="form-control" id="email" name="email"value="" maxlength="50" disabled="" readonly="" autocomplete="off">
                         </div>
                     </div>
                 </div>

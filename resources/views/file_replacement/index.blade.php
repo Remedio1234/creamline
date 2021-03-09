@@ -13,12 +13,14 @@
     <table id="dataTable" class="table table-striped table-bordered">
         <thead class="bg-indigo-1 text-white">
         <tr>
-            <th>ID</th>
+            <th>Rep ID</th>
             <th>Report Type</th>
+            <th> {{ Auth::user()->user_role == 1 ? 'Client' : 'Issued By'}}</th>
             <th>Products</th>
             <th>Attached File</th>
-            <th>Quantity</th>
+            {{-- <th>Quantity</th> --}}
             <th>Status</th>
+            <th>Reason</th>
         </tr>
         </thead>
         <tbody>
@@ -38,6 +40,17 @@
             </div>
             <div class="modal-body">
                 <form id="prodReportForm" name="prodReportForm" class="form-horizontal" enctype="multipart/form-data">
+                    
+                    <div class="form-group">
+                        <label>Report Type:</label>
+                        <select class="form-control" id="report_type" name="report_type">
+                            <option value="Replacement">Replacement</option>
+                            @if (Auth::user()->user_role != 2)
+                            <option value="Delivery Issues">Delivery Issues</option>
+                            @endif
+                        </select>
+                    </div>
+
                     @if(Auth::user()->user_role != 2)
                         <div class="form-group">
                             <input type="hidden" id="fileCount" name="fileCount">
@@ -49,15 +62,9 @@
                                 @endforeach
                             </select>
                         </div>
-
-                        <div class="form-group">
-                            <label>Report Type:</label>
-                            <select class="form-control" id="report_type" name="report_type">
-                                <option value="Replacement">Replacement</option>
-                                <option value="Damage">Damage</option>
-                            </select>
-                        </div>
                     @endif
+                    
+                    
                     <div class="form-group">
                         <input type="hidden" id="fileCount" name="fileCount">
                         <label>Store :</label>
@@ -106,6 +113,10 @@
                         </label>
                     </div>
                     <div class="form-group">
+                        <label>Reason:</label>
+                        <textarea class="form-control" id="reason" rows="5" placeholder="Reason.." name="reason" required></textarea>
+                    </div>
+                    <div class="form-group">
                         <button style="width: 100%;" type="submit" class="btn btn-primary" id="saveBtn">Save</button>
                     </div>
                 </form>
@@ -133,7 +144,7 @@
 
 {{-- display Products --}}
 <div class="modal fade" id="displayProductsModal" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Products</h4>
@@ -143,9 +154,10 @@
             </div>
             <div class="modal-body" id="divModalProducts">
                 <div class="row">
-                    <div class="col-4"><b> Product Name </b></div>
-                    <div class="col-4"><b> Size </b></div>
-                    <div class="col-4"><b> Quantity </b></div>
+                    <div class="col-5"><b> Product (size) </b></div>
+                    <div class="col-2"><b> Price </b></div>
+                    <div class="col-3"><b> Quantity </b></div>
+                    <div class="col-2"><b> Total </b></div>
                 </div>
             </div>
         </div>
@@ -198,6 +210,17 @@
       $(`#${id}`).remove();
     });
 
+    $(document).on('click', '#report_type', function(e){
+        e.preventDefault();
+        if($(this).val() == 'Delivery Issues'){
+            $('#client_id').attr('disabled', true).val('')
+            $('#store_list').attr('disabled', true).val('')
+        } else {
+            $('#client_id').attr('disabled', false)
+            $('#store_list').attr('disabled', false)
+        }
+    })
+
      $(document).on('change', '#product', function(){
         const id = $(this).val();
         const sizeSelect = $(this).parent().siblings()[0].children[0].id
@@ -207,11 +230,15 @@
          $.get("{{ url('get-sizes') }}" + '/' + id, function (data) {
             let sizeOptions = '';
 
-            data.map(size => {
-                if(size != null){
-                    $(`#${sizeSelect}`).append(`<option value="${size}">${size}</option>`)
-                }
-            });
+            $.each(data, function(price, size){
+                $(`#${sizeSelect}`).append(`<option data-price="${price}" value="${size +'-'+ price }" value="${size}">${size}</option>`)
+            })
+
+            // data.map(size => {
+            //     if(size != null){
+            //         $(`#${sizeSelect}`).append(`<option value="${size}">${size}</option>`)
+            //     }
+            // });
          });
      })
 
@@ -233,26 +260,35 @@
 
     $(document).on('click', '.displayProducts', function(){
         const products =JSON.parse($(this).attr("data-val"));
-
         $('#divContentImages').empty()
-
+        $('#divModalProducts').empty();
         $('#displayProductsModal').modal('show');
-
+        var total = 0;
+        var jsx = ''
         products.map(product => {
-            var jsx =`
+            
+            total += (product.quantity * product.price)
+            jsx  +=`
                 <div class="row">
-                    <div class="col-4">
-                        ${product.name}
+                    <div class="col-5">
+                        ${product.name}  ( ${product.size} )
                     </div>
-                     <div class="col-4">
-                        ${product.size}
+                    <div class="col-2">
+                        ${product.price.toFixed(2)}
                     </div>
-                     <div class="col-4">
+                    <div class="col-3">
                         ${product.quantity}
                     </div>
-                </div>`;
-            $('#divModalProducts').append(jsx)
+                    <div class="col-2">
+                        ${(product.quantity * product.price).toFixed(2)}
+                    </div>
+                </div>`;     
         })
+        jsx += `<div class="row">
+                    <div class="col-10">&nbsp;</div>
+                        <div class="col-2"><strong>${total.toFixed(2)}</strong></div>
+                    </div>`
+        $('#divModalProducts').append(jsx)
     });
 
     $(document).on('click', '.btnDisplayImages', function(){
@@ -290,11 +326,12 @@
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
                 {data: 'report_type', name: 'report_type'},
+                {data: 'full_name', name: 'full_name'},
                 {
                     data: 'products', 
                     name: 'products',
                     render: function(data, type, full, meta) {
-                        return "<a href='#' class='displayProducts' data-val='"+full.products+"'>View Products</a>"
+                        return "<a href='#' class='displayProducts' data-val='"+full.products+"'>View Lists</a>"
                     }
                 },
                 {
@@ -302,13 +339,13 @@
                     render: function(data, type, full, meta){
                         let output = ''
                         if(data != ""){
-                            output = "<a href='#' class='btnDisplayImages' data-val='"+full.images+"'>View Images</a>"
+                            output = "<a href='#' class='btnDisplayImages' data-val='"+full.images+"'>View Files</a>"
                         }
 
                         return output
                     }
                 },
-                {data: 'quantity', name: 'quantity'},
+                // {data: 'quantity', name: 'quantity'},
                 {
                     data: 'is_replaced', name: 'is_replaced',
                     "render": function (data, type, full, meta) {
@@ -323,6 +360,7 @@
                         return output;
                     }
                 },
+                {data: 'reason', name: 'reason'},
                 // {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });

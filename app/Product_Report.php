@@ -11,9 +11,9 @@ class Product_Report extends Model
 {
     protected $table = "product_reports";
 
-    // protected $fillable = [
-    //     'report_type','product_id', 'size', 'flavor', 'store_id', 'client_id', 'reports_images', 'is_replaced'
-    // ];
+    protected $fillable = [
+        'report_type','product_id', 'store_id',  'size', 'flavor', 'client_id', 'issued_by', 'is_replaced', 'reason'
+    ];
 
     public function products()
     {
