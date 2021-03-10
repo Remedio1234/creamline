@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 09, 2021 at 02:58 PM
+-- Generation Time: Mar 10, 2021 at 03:03 PM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.3.2
 
@@ -38,6 +38,7 @@ CREATE TABLE `product_reports` (
   `client_id` int(11) DEFAULT NULL,
   `issued_by` int(11) DEFAULT NULL,
   `is_replaced` int(11) DEFAULT NULL,
+  `delivery_date` varchar(55) COLLATE utf8_unicode_ci DEFAULT NULL,
   `reason` text COLLATE utf8_unicode_ci,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
@@ -47,8 +48,8 @@ CREATE TABLE `product_reports` (
 -- Dumping data for table `product_reports`
 --
 
-INSERT INTO `product_reports` (`id`, `product_id`, `report_type`, `size`, `flavor`, `store_id`, `client_id`, `issued_by`, `is_replaced`, `reason`, `created_at`, `updated_at`) VALUES
-(13, NULL, 'Replacement', NULL, NULL, 1, 3, 2, 0, 'this is staff issue', '2021-03-09 04:56:14', '2021-03-09 04:56:14');
+INSERT INTO `product_reports` (`id`, `product_id`, `report_type`, `size`, `flavor`, `store_id`, `client_id`, `issued_by`, `is_replaced`, `delivery_date`, `reason`, `created_at`, `updated_at`) VALUES
+(13, NULL, 'Replacement', NULL, NULL, 1, 3, 2, 0, NULL, 'this is staff issue', '2021-03-09 04:56:14', '2021-03-10 05:57:58');
 
 --
 -- Indexes for dumped tables

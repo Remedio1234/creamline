@@ -33,7 +33,20 @@ class FileReplacementController extends Controller
     {
         if(Auth::user()->user_role == 99) {
             $file_replacement = Product_Report::where('client_id', Auth::user()->id)
-                                    ->get();
+                                    ->get()
+                                    ->map(function($item){
+                                        $item->issued_by  = 'NA';
+                                        if($user = User::find($item->client_id)){
+                                            $item->issued_by  = $user->fname . ' '. $user->lname;
+                                        }
+
+                                        $item->client_name  = 'NA';
+                                        if($user = User::find($item->issued_by)){
+                                            $item->client_name  = $user->fname . ' '. $user->lname;
+                                        }
+
+                                        return $item;
+                                    });
         } else {
 
             if(Auth::user()->user_role == 1){ //staff

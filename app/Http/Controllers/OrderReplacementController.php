@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\ProductFileReport;
-use App\Product_Report;
+use App\{Product_Report, User};
 use App\ReplacementProduct;
 use App\Traits\GlobalFunction;
 use DataTables;
@@ -33,7 +33,22 @@ class OrderReplacementController extends Controller
     public function index(Request $request)
     {
         if(Auth::user()->user_role == 99) {
-            $file_replacement = Product_Report::all();
+            // $file_replacement = Product_Report::all();
+            $file_replacement = Product_Report::orderBy('id', 'desc')
+            ->get()
+            ->map(function($item){
+                $item->client_name  = 'NA';
+                if($user = User::find($item->client_id)){
+                    $item->client_name  = $user->fname . ' '. $user->lname;
+                }
+
+                $item->issued_name  = 'NA';
+                if($user = User::find($item->issued_by)){
+                    $item->issued_name  = $user->fname . ' '. $user->lname;
+                }
+
+                return $item;
+            });
         } else {
             $file_replacement = Product_Report::where('client_id', Auth::user()->id)
                                     ->get();            
@@ -42,14 +57,16 @@ class OrderReplacementController extends Controller
             return Datatables::of($file_replacement)
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
-                    if ($row->delivery_date != "") {
-                        return "--";
+                    if ($row->delivery_date != null) {
+                        return "NA";
                     }
                     if ($row->is_replaced == 1) {
-                        $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Replace Order" data-id="'.$row->id.'" data-clientid="'.$row->client_id.'" data-original-title="Edit" class="btn btn-success btn-sm setDeliver">Set Delivery</a>&nbsp;';
+                        $btn = '<a href="javascript:void(0)" data-id="'.$row->id.'" data-clientid="'.$row->client_id.'" data-original-title="Edit" class="btn btn-success btn-sm setDeliver">Set Delivery</a>&nbsp;';
+                    } else if($row->is_replaced == 0){
+                        $btn = '<a href="javascript:void(0)" data-id="'.$row->id.'" data-clientid="'.$row->client_id.'" data-original-title="Edit" class="btn btn-primary btn-sm editReplacementOrder mt-2">Approve</a>&nbsp;';
+                        $btn .= '<a href="javascript:void(0)" data-id="'.$row->id.'" data-clientid="'.$row->client_id.'" data-original-title="Edit" class="btn btn-danger btn-sm editDisapproveReplacement mt-2">Disapprove</a>';
                     } else {
-                        $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Replace Order" data-id="'.$row->id.'" data-clientid="'.$row->client_id.'" data-original-title="Edit" class="btn btn-primary btn-sm editReplacementOrder">Approve</a>&nbsp;';
-                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Disapprove Replacement" data-id="'.$row->id.'" data-clientid="'.$row->client_id.'" data-original-title="Edit" class="btn btn-danger btn-sm editDisapproveReplacement">Disapprove</a>';
+                        $btn = 'NA';
                     }
                     return $btn;
                 })
@@ -154,9 +171,10 @@ class OrderReplacementController extends Controller
 
     public function setDeliveryDate(Request $request)
     {
-        $deliveryDate = $request->txt_replacement_delivery_date;
-        $fileReport = Product_Report::find($request->id);
-        $fileReport->delivery_date = $deliveryDate;
+        $deliveryDate   = $request->txt_replacement_delivery_date;
+        $fileReport     = Product_Report::find($request->id);
+        $fileReport->delivery_date  = $deliveryDate;
+        $fileReport->is_replaced    = 1;
         $fileReport->save();
 
         $clientReport = ProductFileReport::where('product_report_id', '=', $fileReport->id)->first();

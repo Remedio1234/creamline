@@ -11,19 +11,19 @@
             <div class="card-header-1">
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#order-tab-pending" role="tab" aria-controls="profile" aria-selected="true">PENDING</a>
+                        <a class="nav-link active refresh_table" data-value="order-tab-pending" data-toggle="tab" href="#order-tab-pending" role="tab" aria-controls="profile" aria-selected="true">PENDING</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#order-tab-undelivered" role="tab" aria-selected="false">UNDELIVERED</a>
+                        <a class="nav-link refresh_table"  data-value="order-tab-undelivered" data-toggle="tab" href="#order-tab-undelivered" role="tab" aria-selected="false">UNDELIVERED</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#order-replacement" role="tab" aria-selected="false">REPLACEMENT</a>
+                        <a class="nav-link refresh_table"  data-value="order-replacement" data-toggle="tab" href="#order-replacement" role="tab" aria-selected="false">REPLACEMENT</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#order-damage" role="tab" aria-selected="false">DAMAGE</a>
+                        <a class="nav-link refresh_table" data-value="order-damage" data-toggle="tab" href="#order-damage" role="tab" aria-selected="false">DAMAGE</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-toggle="tab" href="#order-tab-tran-his" role="tab" aria-selected="false">TRANSACTION HISTORY</a>
+                        <a class="nav-link refresh_table" data-value="order-tab-tran-his" data-toggle="tab" href="#order-tab-tran-his" role="tab" aria-selected="false">TRANSACTION HISTORY</a>
                     </li>
                 </ul>
             </div>
@@ -69,10 +69,12 @@
                         <table style="width: 100%;" id="replacementTable" class="table table-striped table-bordered">
                         <thead class="bg-indigo-1 text-white">
                         <tr>
-                            <th>ID</th>
+                            <th>REP ID</th>
+                            <th>Rep Type</th>
+                            <th>Issued By</th>
                             <th>Client</th>
                             <th>Products</th>
-                            <th>Images</th>
+                            <th>Attached File</th>
                             <th>Quantity</th>
                             <th>Status</th>
                             <th width="280px">Action</th>
@@ -338,13 +340,19 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Delivery Schedule</h4>
+                <h4 class="modal-title">Are you sure?</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="replacementDelivery" name="replacementDelivery" class="form-horizontal">
+                    
                     <input type="hidden" name="id" id="reportId" value="">
                      <input type="hidden" name="replacement_delivery_to_display" id="replacement_delivery_to_display">
                     <div class="form-group">
+                        
+                        <label for="txt_resched_delivery_date" class="col-sm-12 control-label"><h4 class="mb-3">Once approved, it will be confirmed</h4></label>
                         <label for="txt_resched_delivery_date" class="col-sm-12 control-label">Delivery date</label>
                         <div class="col-sm-12">
                             <input type="date" name="txt_replacement_delivery_date" class="form-control" id="txt_replacement_delivery_date">
@@ -378,7 +386,7 @@
 
 {{-- display Products --}}
 <div class="modal fade" id="displayProductsModal" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Products</h4>
@@ -387,11 +395,6 @@
                 </button>
             </div>
             <div class="modal-body" id="divModalProducts">
-                <div class="row">
-                    <div class="col-4"><b> Product Name </b></div>
-                    <div class="col-4"><b> Size </b></div>
-                    <div class="col-4"><b> Quantity </b></div>
-                </div>
             </div>
             <div class="modal-footer">
                 <div class="row text-center">
@@ -489,6 +492,7 @@
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
+
 
         // edit pending order
         function getPendingOrders(invoice_id){
@@ -809,34 +813,87 @@
         /* -------------------------------------------------------------------------------
                                     REPLACEMENT LIST
         -------------------------------------------------------------------------------- */
+        $(document).on('keyup', '.qty_update', function(e){
+            e.preventDefault();
 
+            var id       = $(this).data('id')
+            var price    = $(this).data('price')
+            var quantity = $(this).val()
+            if(!quantity)
+                quantity = 0;
+
+            var total = price * quantity
+
+            $('#sub_total_'+id).text(total.toFixed(2))
+
+            var sum = 0;
+            $('.sub_total').each(function(){
+                sum += parseFloat($(this).text());
+            });
+            $('.all_total').text(sum.toFixed(2))
+        })
         $(document).on('click', '.displayProducts', function(){
             const products =JSON.parse($(this).attr("data-val"));
             $('#displayProductsModal').modal('show');
             $('#divModalProducts').empty();
 
             var header = `<div class="row">
-                            <div class="col-4"><b> Product Name </b></div>
-                            <div class="col-4"><b> Size </b></div>
-                            <div class="col-4"><b> Quantity </b></div>
+                            <div class="col-5"><b> Product (size) </b></div>
+                            <div class="col-2"><b> Price </b></div>
+                            <div class="col-3"><b> Quantity </b></div>
+                            <div class="col-2"><b> Total </b></div>
                         </div>`
             $('#divModalProducts').append(header)
 
+            // products.map(product => {
+            //     var jsx =`
+            //         <div class="row">
+            //             <div class="col-4">
+            //                 ${product.name}
+            //             </div>
+            //              <div class="col-4">
+            //                 ${product.size}
+            //             </div>
+            //              <div class="col-4">
+            //                 <input type="number" id="${product.id}" value="${product.quantity}" name="quantity" class="form-control" />
+            //             </div>
+            //         </div>`;
+            //     $('#divModalProducts').append(jsx)
+            // })
+            var total = 0;
+            var jsx = ''
             products.map(product => {
-                var jsx =`
+                
+                total += (product.quantity * product.price)
+                jsx  +=`
                     <div class="row">
-                        <div class="col-4">
-                            ${product.name}
+                        <div class="col-5">
+                            ${product.name}  ( ${product.size} )
                         </div>
-                         <div class="col-4">
-                            ${product.size}
+                        <div class="col-2">
+                            ${product.price.toFixed(2)}
                         </div>
-                         <div class="col-4">
-                            <input type="number" id="${product.id}" value="${product.quantity}" name="quantity" class="form-control" />
+                        <div class="col-3 mt-1">
+                            <input type="number" class="qty_update" data-id="${product.id}" id="${product.id}" data-price='${product.price}' value="${product.quantity}" required placeholder='0' name="quantity" style='width:100px;'/>
                         </div>
-                    </div>`;
-                $('#divModalProducts').append(jsx)
+                        <div class="col-2">
+                            <span class='sub_total' id="sub_total_${product.id}">${(product.quantity * product.price).toFixed(2)} 
+                        </div>
+                    </div>`;     
             })
+            jsx += `<div class="row">
+                        <div class="col-10">&nbsp;</div>
+                            <div class="col-2"><strong class='all_total'>${total.toFixed(2)}</strong></div>
+                        </div>`
+            // jsx += `<div class="row">
+            //             <div class="form-group">
+            //                 <label for="txt_resched_delivery_date" class="col-sm-12 control-label">Delivery date</label>
+            //                 <div class="col-12">
+            //                     <input type="date" name="txt_replacement_delivery_date" class="form-control" id="txt_replacement_delivery_date">
+            //                 </div>
+            //             </div>
+            //         </div>`            
+            $('#divModalProducts').append(jsx)
         });
 
         $(document).on('click', '.btnDisplayImages', function(){
@@ -861,18 +918,21 @@
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
-                {
-                    data: 'client', name: 'client',
-                    render: function(data, type, full, meta){
-                        var a = JSON.parse(full.client)
-                        return a.lname + ', ' + a.fname;
-                    }
-                },
+                {data: 'report_type', name: 'report_type'},
+                {data: 'issued_name', name: 'issued_name'},
+                {data: 'client_name', name: 'client_name'},
+                // {
+                //     data: 'client', name: 'client',
+                //     render: function(data, type, full, meta){
+                //         var a = JSON.parse(full.client)
+                //         return a.lname + ', ' + a.fname;
+                //     }
+                // },
                 {
                     data: 'products', 
                     name: 'products',
                     render: function(data, type, full, meta) {
-                        return "<a href='#' class='displayProducts' data-val='"+full.products+"'>View Products</a>"
+                        return "<a href='#' class='displayProducts' data-val='"+full.products+"'>View Lists</a>"
                     }
                 },
                 {
@@ -880,7 +940,7 @@
                     render: function(data, type, full, meta){
                         let output = ''
                         if(data != ""){
-                            output = "<a href='#' class='btnDisplayImages' data-val='"+full.images+"'>View Images</a>"
+                            output = "<a href='#' class='btnDisplayImages' data-val='"+full.images+"'>View Files</a>"
                         }
 
                         return output
@@ -892,17 +952,17 @@
                     "render": function (data, type, full, meta) {
                         var output = '';
 
-                        if (full.delivery_date == '0000-00-00') {
-                            if(data === 0){
-                            output = '<span class="text-warning font-weight-bold">Pending</span>'
-                            }else if(data === 1){
+                        // if (full.delivery_date != null) {
+                            if(data == 0){
+                                output = '<span class="text-warning font-weight-bold">Pending</span>'
+                            }else if(data == 1){
                                 output = '<span class="text-success font-weight-bold">Approved</span>'
                             }else{
                                 output = '<span class="text-danger font-weight-bold">Not Approved</span>'
                             }
-                        } else {
-                            output = '<span class="text-success font-weight-bold">On-delivery</span>'
-                        }
+                        // } else {
+                        //     output = '<span class="text-success font-weight-bold">On-delivery</span>'
+                        // }
                         return output;
                     }
                 },
@@ -911,7 +971,7 @@
         });
 
         //display when set delivery is clicked
-        $(document).on('click', '.setDeliver', function(e){
+        $(document).on('click', '.editReplacementOrder ', function(e){
 
             const product_report_id = $(this).attr("data-id")
 
@@ -946,10 +1006,7 @@
                     cache: false,
                     processData: false,
                     success: function (data) {
-                        console.log("printing data");
-                        console.log(data);
-
-                        swal("Information", "Order has been successfully confirmed!").then(res => {
+                        swal("Information", "Order Replacement has been successfully confirmed!").then(res => {
                             $('#updateReschedModal').modal('hide');
                             // undeliverTable.draw();
                             drawAllTable()
@@ -998,41 +1055,41 @@
 
 
         //when replacement order is approved
-        $(document).on('click', '.editReplacementOrder', function(){
-            const reportid = $(this).attr("data-id")
-            const clientid = $(this).attr("data-clientid")
-            const params = {
-                reportid,
-                clientid,
-                action: "approve_replacement"
-            }
-            swal({
-                title: "Are you sure?",
-                text: "Once approved, it will be confirmed",
-                icon: "warning",
-                buttons: true,
-                dangerMode: false,
-            })
-            .then((isTrue) => {
-                if (isTrue) {
-                    $.ajax({
-                        type: "POST",
-                        url: "{{ url('order_replacement') }}",
-                        data: params,
-                        success: function (data) {
-                            drawAllTable();
-                            swal(data.message, {
-                                icon: "success",
-                            });
-                            // console.log(data)
-                        },
-                        error: function (data) {
-                            console.log('Error:', data);
-                        }
-                    });
-                }
-            });
-        })
+        // $(document).on('click', '.editReplacementOrder', function(){
+        //     const reportid = $(this).attr("data-id")
+        //     const clientid = $(this).attr("data-clientid")
+        //     const params = {
+        //         reportid,
+        //         clientid,
+        //         action: "approve_replacement"
+        //     }
+        //     swal({
+        //         title: "Are you sure?",
+        //         text: "Once approved, it will be confirmed",
+        //         icon: "warning",
+        //         buttons: true,
+        //         dangerMode: false,
+        //     })
+        //     .then((isTrue) => {
+        //         if (isTrue) {
+        //             $.ajax({
+        //                 type: "POST",
+        //                 url: "{{ url('order_replacement') }}",
+        //                 data: params,
+        //                 success: function (data) {
+        //                     drawAllTable();
+        //                     swal(data.message, {
+        //                         icon: "success",
+        //                     });
+        //                     // console.log(data)
+        //                 },
+        //                 error: function (data) {
+        //                     console.log('Error:', data);
+        //                 }
+        //             });
+        //         }
+        //     });
+        // })
 
         //when replacement order is approved
         $(document).on('click', '.editDisapproveReplacement', function(){
@@ -1367,6 +1424,28 @@
             damageTable.draw();
             historyTable.draw()
         }
+
+        $(document).on('click', '.refresh_table', function(e){
+            e.preventDefault();
+            tab = $(this).data('value')
+            switch (tab) {
+                case 'order-tab-pending':
+                    table.draw()
+                break;
+                case 'order-tab-undelivered':
+                    undeliverTable.draw()
+                break;
+                case 'order-replacement':
+                    replacementTable.draw()
+                break;
+                case 'order-damage':
+                    damageTable.draw();
+                break;
+                case 'order-tab-tran-his':
+                    historyTable.draw()
+                break;
+            }
+        })
 
     })
 </script>
