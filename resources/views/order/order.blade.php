@@ -69,8 +69,8 @@
                         <table style="width: 100%;" id="replacementTable" class="table table-striped table-bordered">
                         <thead class="bg-indigo-1 text-white">
                         <tr>
-                            <th>REP ID</th>
-                            <th>Rep Type</th>
+                            <th>ID</th>
+                            <th>Type</th>
                             <th>Issued By</th>
                             <th>Client</th>
                             <th>Products</th>
