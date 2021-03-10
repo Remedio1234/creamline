@@ -74,8 +74,8 @@
                             <th>Issued By</th>
                             <th>Client</th>
                             <th>Products</th>
-                            <th>Attached File</th>
-                            <th>Quantity</th>
+                            <th>Files</th>
+                            <th>Reason</th>
                             <th>Status</th>
                             <th width="280px">Action</th>
                         </tr>
@@ -946,7 +946,7 @@
                         return output
                     }
                 },
-                {data: 'quantity', name: 'quantity'},
+                {data: 'reason', name: 'reason'},
                 {
                     data: 'is_replaced', name: 'is_replaced',
                     "render": function (data, type, full, meta) {
