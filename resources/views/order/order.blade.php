@@ -113,12 +113,24 @@
                     <div class="tab-pane fade show" id="order-damage" role="tabpanel">
                         <table style="width: 100%;" id="damageTable" class="table table-striped table-bordered">
                         <thead class="bg-indigo-1 text-white">
-                        <tr>
+                        {{-- <tr>
                             <th>ID</th>
                             <th>Client</th>
                             <th>Product Name</th>
                             <th>Images</th>
                             <th width="280px">Action</th>
+                        </tr> --}}
+                        <tr>
+                            <th>Rep ID</th>
+                            <th>Report Type</th>
+                            <th>Issued By</th>
+                            <th>Client</th>
+                            <th>Products</th>
+                            <th>Attached File</th>
+                            {{-- <th>Quantity</th> --}}
+                            <th>Status</th>
+                            <th>Reason</th>
+                            <th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -1409,20 +1421,67 @@
                                     DAMAGE LIST
         -------------------------------------------------------------------------------- */
         // datatable
+        // var damageTable = $('#damageTable').DataTable({
+        //     processing: true,
+        //     serverSide: true,
+        //     ajax: "{{ url('order_damage') }}",
+        //     columns: [
+        //         // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+        //         {data: 'damageid', name: 'damageid'},
+        //         {
+        //             data: 'clientName', name: 'clientName',
+        //             render: function(data, type, full, meta){
+        //                 return full.lname + ', ' + full.fname;
+        //             }
+        //         },
+        //         {data: 'prodname', name: 'prodname'},
+        //         {
+        //             data: 'is_replaced', name: 'is_replaced',
+        //             "render": function (data, type, full, meta) {
+        //                 var output = '';
+        //                 if(data === 0){
+        //                     output = '<span class="text-warning font-weight-bold">Pending</span>'
+        //                 }else if(data === 1){
+        //                     output = '<span class="text-success font-weight-bold">Approved</span>'
+        //                 }else{
+        //                     output = '<span class="text-danger font-weight-bold">Not Approved</span>'
+        //                 }
+        //                 return output;
+        //             }
+        //         },
+        //         {data: 'action', name: 'action', orderable: false, searchable: false},
+        //     ]
+        // });
+
         var damageTable = $('#damageTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ url('order_damage') }}",
+            ajax: "{{ url('file_replacement') }}",
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-                {data: 'damageid', name: 'damageid'},
+                {data: 'id', name: 'id'},
+                {data: 'report_type', name: 'report_type'},
+                {data: 'issued_by', name: 'issued_by'},
+                {data: 'client_name', name: 'client_name'},
                 {
-                    data: 'clientName', name: 'clientName',
-                    render: function(data, type, full, meta){
-                        return full.lname + ', ' + full.fname;
+                    data: 'products', 
+                    name: 'products',
+                    render: function(data, type, full, meta) {
+                        return "<a href='#' class='displayProducts' data-val='"+full.products+"'>View Lists</a>"
                     }
                 },
-                {data: 'prodname', name: 'prodname'},
+                {
+                    data: 'file_report_image', name: 'file_report_image',
+                    render: function(data, type, full, meta){
+                        let output = ''
+                        if(data != ""){
+                            output = "<a href='#' class='btnDisplayImages' data-val='"+full.images+"'>View Files</a>"
+                        }
+
+                        return output
+                    }
+                },
+                // {data: 'quantity', name: 'quantity'},
                 {
                     data: 'is_replaced', name: 'is_replaced',
                     "render": function (data, type, full, meta) {
@@ -1437,6 +1496,7 @@
                         return output;
                     }
                 },
+                {data: 'reason', name: 'reason'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });

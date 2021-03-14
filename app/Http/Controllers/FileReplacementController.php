@@ -32,17 +32,19 @@ class FileReplacementController extends Controller
     public function index(Request $request)
     {
         if(Auth::user()->user_role == 99) {
-            $file_replacement = Product_Report::where('client_id', Auth::user()->id)
+            $file_replacement = Product_Report::orderBy('id', 'desc')
                                     ->get()
                                     ->map(function($item){
-                                        $item->issued_by  = 'NA';
-                                        if($user = User::find($item->client_id)){
+                                        $item->issued_by  = $item->issued_by; //'NA';
+                                        if($user = User::find($item->issued_by)){
                                             $item->issued_by  = $user->fname . ' '. $user->lname;
+                                        } else {
+                                            $item->issued_by = 'NA';
                                         }
 
                                         $item->client_name  = 'NA';
-                                        if($user = User::find($item->issued_by)){
-                                            $item->client_name  = $user->fname . ' '. $user->lname;
+                                        if($user1 = User::find($item->client_id)){
+                                            $item->client_name  = $user1->fname . ' '. $user1->lname;
                                         }
 
                                         return $item;
@@ -74,7 +76,8 @@ class FileReplacementController extends Controller
         }
 
         if ($request->ajax()) {
-            return Datatables::of($file_replacement)
+            if(Auth::user()->user_role == 99) {
+                return Datatables::of($file_replacement)
                 ->addIndexColumn()
                 ->addColumn('status', function($row){
                   return $row ? $row->is_replaced : '-';
@@ -92,8 +95,38 @@ class FileReplacementController extends Controller
                 ->addColumn('images', function($row) {
                     return $row ? $row->images : '';
                 })
-                ->rawColumns(['status', 'quantity', 'images'])
+                ->addColumn('action', function ($row) {
+   
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Replace Order" data-id="'.$row->damageid.'" data-clientid="'.$row->clientid.'" data-original-title="Edit" class="btn btn-primary btn-sm editDamageOrder">Approve</a>&nbsp;';
+                    $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Disapprove Damage" data-id="'.$row->damageid.'" data-clientid="'.$row->clientid.'" data-original-title="Edit" class="btn btn-danger btn-sm editDisapproveDamage mt-1">Disapprove</a>';
+
+                     return $btn;
+                })
+                ->rawColumns(['action','status', 'quantity', 'images'])
                 ->make(true);
+            } else {
+                return Datatables::of($file_replacement)
+                    ->addIndexColumn()
+                    ->addColumn('status', function($row){
+                    return $row ? $row->is_replaced : '-';
+                    })
+                    ->addColumn('products', function($row) {
+                        return $row ? $row->products : '';
+                    })
+                    ->addColumn('quantity', function($row) {
+                    $total = 0;
+                    foreach ($row->products as $value) {
+                        $total += $value->quantity;
+                    }
+                        return $total;
+                    })
+                    ->addColumn('images', function($row) {
+                        return $row ? $row->images : '';
+                    })
+                    ->rawColumns(['status', 'quantity', 'images'])
+                    ->make(true);
+            }
+            
         }
 
         if(Auth::user()->user_role == 2 ) {
