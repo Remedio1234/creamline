@@ -325,7 +325,7 @@ class StaffDashboardController extends Controller
                     // $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->num.'" data-set="0" data-type="pending" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
                     // return $btn;
 
-                    $btn = '<a href="javascript:void(0)" ata-type="1" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" class="btn btn-primary btn-sm editCompleteOrder">View Details</a> ';
+                    $btn = '<a href="javascript:void(0)" ata-type="1" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" class="btn btn-primary btn-sm viewCompleteOrder">View Details</a> ';
                     // if (!$row->is_completed && !$row->is_cancelled) {
 
                     //     $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder mt-2">Cancel</a>';
