@@ -436,7 +436,7 @@
             </div>
             <div class="modal-body" id="divModalProducts">
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" hidden>
                 <div class="row text-center">
                     <button class="btn btn-success" id="replaceProduct">Submit</button>
                 </div>
@@ -1061,7 +1061,7 @@
                             ${product.price.toFixed(2)}
                         </div>
                         <div class="col-3 mt-1">
-                            <input type="number" class="qty_update" data-id="${product.id}" id="${product.id}" data-price='${product.price}' value="${product.quantity}" required placeholder='0' name="quantity" style='width:100px;'/>
+                            ${product.quantity} <input type="hidden" class="qty_update" data-id="${product.id}" id="${product.id}" data-price='${product.price}' value="${product.quantity}" required placeholder='0' name="quantity" style='width:100px;'/>
                         </div>
                         <div class="col-2">
                             <span class='sub_total' id="sub_total_${product.id}">${(product.quantity * product.price).toFixed(2)} 
