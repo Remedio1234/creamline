@@ -131,7 +131,7 @@ class StaffDashboardController extends Controller
                     if (!$row->is_completed && !$row->is_cancelled) {
                         $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" class="btn btn-primary btn-sm editCompleteOrder">Confirm</a> ';
 
-                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder">Cancel</a>';
+                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder mt-2">Cancel</a>';
 
                          return $btn;
                      } else {
@@ -317,7 +317,7 @@ class StaffDashboardController extends Controller
                     if (!$row->is_completed && !$row->is_cancelled) {
                         $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" class="btn btn-primary btn-sm editCompleteOrder">Confirm</a> ';
 
-                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder">Cancel</a>';
+                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder mt-2">Cancel</a>';
 
                          return $btn;
                      } else {
@@ -369,7 +369,7 @@ class StaffDashboardController extends Controller
             }
 
             //update the order
-            DB::table('orders')->where('id', $request->input("order_id"))
+            DB::table('orders')->where('invoice_id', $request->input("order_id"))
                                ->update([
                                     'cancelled_by' => $cancelled_by,
                                     'is_cancelled' => 1,
