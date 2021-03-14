@@ -45,7 +45,7 @@
             <th align="center">Attempt</th>
             <th align="center">Replacement</th>
             <th align="center">Status</th>
-            {{-- <th align="center">Action</th> --}}
+            <th align="center">Action</th>
         </tr>
         </thead>
         <tbody>
@@ -196,7 +196,7 @@
                             </tr>
                         </tfoot>
                     </table>
-                    <div class="float-right">
+                    <div class="float-right" id="pending_modal">
                         <input type="hidden" id="set_id_invoice">
                         <button type="button" class="btn btn-primary" id="btnConfirmPendingOrder">Completed</button>
                     </div>
@@ -307,7 +307,7 @@
                     },
                 },
                 {data: 'status', name: 'status'},
-                // {data: 'action', name: 'action', orderable: false, searchable: false},
+                {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
 
@@ -317,7 +317,12 @@
         })
 
         // edit pending order
-        function getPendingOrders(invoice_id){
+        function getPendingOrders(invoice_id, type){
+            if(type == 0){
+                $("#pending_modal").show();
+            } else {
+                $("#pending_modal").hide();
+            }
            $("#set_id_invoice").val(invoice_id)
             $.getJSON( "{{ url('order/items/completed/') }}" + '/'+ invoice_id, function( data ) {
                 var htmlData = ''
@@ -330,7 +335,11 @@
                         <td>${row.name}</td>
                         <td>${row.size}</td>
                         <td><a data-fancybox='' href='/img/product/${row.product_image}'><img src='/img/product/${row.product_image}' height='20'></a></td>`
-                    htmlData += `<td><input type='number' name='order[${i}][quantity]' value='${row.quantity_ordered}' data-iid='${invoice_id}' data-id='${row.id}' class="modal_qty" style='width:60px;' placeholder='0'></td>`
+                    if(type == 0){
+                        htmlData += `<td><input type='number' name='order[${i}][quantity]' value='${row.quantity_ordered}' data-iid='${invoice_id}' data-id='${row.id}' class="modal_qty" style='width:60px;' placeholder='0'></td>`
+                    } else {
+                        htmlData += `<td>${row.quantity_ordered}</td>`
+                    }
                     htmlData +=`<td>${row.ordered_total_price}
                             <input type='hidden' name='order[${i}][product_id]' value='${row.prodID}'>
                             <input type='hidden' name='order[${i}][order_id]' value='${row.id}'>
@@ -345,11 +354,12 @@
             });
         }
 
-        $('body').on('click', '.editCompleteOrder', function (e) {
+        $('body').on('click', '.editCompleteOrder, .viewCompleteOrder', function (e) {
             e.preventDefault();
             //get the data
             const invoice_id = $(this).data("id");
-            getPendingOrders(invoice_id)
+            const type = $(this).data("type");
+            getPendingOrders(invoice_id, type)
         });
 
         $(document).on('keyup', '.modal_qty', function(e){
@@ -363,7 +373,7 @@
                     data:{id: order_id, quantity_ordered: quantity_ordered},
                     dataType:'JSON',
                     success: function (data) {
-                        getPendingOrders(invoice_id)
+                        getPendingOrders(invoice_id, 0)
                     },
                     error: function (data) {
                         console.log('Error:', data);
