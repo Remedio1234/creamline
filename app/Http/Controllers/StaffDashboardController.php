@@ -292,7 +292,7 @@ class StaffDashboardController extends Controller
                 ->where('stores.area_id', $area->id)
                 ->when($request->filter_status, function($sql) use($request){
                     if($request->filter_status == 'completed'){
-                        return $sql->where('orders.is_completed', 1);
+                        return $sql->where(['orders.is_approved' => 1, 'orders.is_completed' => 1]);
                     } else if($request->filter_status == 'cancelled'){
                         return $sql->where('orders.is_cancelled', 1);
                     } else {
