@@ -45,7 +45,7 @@
             <th align="center">Attempt</th>
             <th align="center">Replacement</th>
             <th align="center">Status</th>
-            <th align="center">Action</th>
+            {{-- <th align="center">Action</th> --}}
         </tr>
         </thead>
         <tbody>
@@ -302,7 +302,7 @@
                 {data: 'attempt', name: 'attempt'},
                 {data: 'attempt', name: 'attempt'},
                 {data: 'status', name: 'status'},
-                {data: 'action', name: 'action', orderable: false, searchable: false},
+                // {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
 

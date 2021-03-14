@@ -318,25 +318,26 @@ class StaffDashboardController extends Controller
                         return '<span class="text-info font-weight-bold">Pending</span>';
                     }
                 })
-                ->addColumn('action', function ($row) use($area) {
+                // ->addColumn('action', function ($row) use($area) {
    
-                    // $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->num.'" data-set="0" data-type="pending" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
-                    // return $btn;
+                //     // $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->num.'" data-set="0" data-type="pending" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
+                //     // return $btn;
 
-                    if (!$row->is_completed && !$row->is_cancelled) {
-                        $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" class="btn btn-primary btn-sm editCompleteOrder">Confirm</a> ';
+                //     if (!$row->is_completed && !$row->is_cancelled) {
+                //         $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" class="btn btn-primary btn-sm editCompleteOrder">Confirm</a> ';
 
-                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder mt-2">Cancel</a>';
+                //         $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder mt-2">Cancel</a>';
 
-                         return $btn;
-                     } else {
-                        return 'NA';
-                     }
-                })
+                //          return $btn;
+                //      } else {
+                //         return 'NA';
+                //      }
+                // })
                 ->addColumn('total_price', function($row){
                     return '<strong>'.number_format($row->total_price,2).'</strong>';
                   })
-                ->rawColumns(['action', 'total_price', 'status'])
+                // ->rawColumns(['action', 'total_price', 'status'])
+                ->rawColumns(['total_price', 'status'])
                 ->make(true);
         }
 
