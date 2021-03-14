@@ -388,13 +388,23 @@ class StaffDashboardController extends Controller
             }
 
             //update the order
-            DB::table('orders')->where('invoice_id', $request->input("order_id"))
+            $attempt = DB::table('orders')->where('invoice_id', $request->input("order_id"))->get();
+            foreach ($attempt as $key => $value) {
+                $value->attempt +=  $value->attempt;
+                DB::table('orders')->where('id', $value->id)
                                ->update([
+                                    'attempt' => $value->attempt,
                                     'cancelled_by' => $cancelled_by,
                                     'is_cancelled' => 1,
-                                    'attempt' => 1,
                                     'reason' => $request->input("reason")
-                                ]);
+                                   ]);
+            }
+            // DB::table('orders')->where('invoice_id', $request->input("order_id"))
+            //                    ->update([
+            //                         'cancelled_by' => $cancelled_by,
+            //                         'is_cancelled' => 1,
+            //                         'reason' => $request->input("reason")
+            //                     ]);
 
             // return response
             $response = [
