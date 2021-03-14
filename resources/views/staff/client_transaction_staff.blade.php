@@ -9,13 +9,24 @@
     </div>
     <table id="dataTable" class="table table-striped table-bordered">
         <thead class="bg-indigo-1 text-white">
-        <tr>
+        {{-- <tr>
             <th>ID</th>
             <th>Client</th>
             <th>Store Name</th>
             <th>Store Address</th>
             <th>Status</th>
             <th>Action</th>
+        </tr> --}}
+        <tr>
+            <th>ID</th>
+            <th>Invoice #</th>
+            <th>Client</th>
+            <th>Ordered</th>
+            <th>Delivery</th>
+            <th align="center">Attempt</th>
+            <th align="center">Replacement</th>
+            <th align="center">Status</th>
+            <th align="center">Action</th>
         </tr>
         </thead>
         <tbody>
@@ -41,10 +52,12 @@
                     <input type="hidden" name="failed_order_id" id="failed_order_id">
                     <div class="form-group">
                         <label for="txt_cancelled_reason" class="col-sm-12 control-label">Reason:</label>
-                        <select class="custom-select mb-3" name="cancel_option" id="cancel_option" required>
-                          <option value="1">Client Cancel</option>
-                          <option value="2">Delivery Cancel</option>
-                        </select>
+                        <div class="col-sm-12">
+                            <select class="custom-select mb-3" name="cancel_option" id="cancel_option" required>
+                            <option value="1">Client Cancel</option>
+                            <option value="2">Delivery Cancel</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="txt_cancelled_reason" class="col-sm-12 control-label">Reason:</label>
@@ -53,7 +66,7 @@
                         </div>
                     </div>
                     <div class="col-sm-offset-12 col-sm-10">
-                        <button type="submit" class="btn btn-primary" id="btnConfirmCancelledOrder">Confirm</button>
+                        <button type="submit" class="btn btn-primary" id="btnConfirmCancelledOrder">Submit</button>
                     </div>
                 </form>
             </div>
@@ -131,6 +144,49 @@
     </div>
 </div>
 
+{{-- update pending modal--}}
+<div class="modal fade" id="updatePendingModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Order Confirmation</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="frmPendingOrder" name="frmPendingOrder" class="form-horizontal">
+                    <table class="table table-stripped" id="pending_orders">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Product</th>
+                                <th>Size</th>
+                                <th>Image</th>
+                                <th>Qty</th>
+                                <th>Sub Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                            <tr>  
+                                <td colspan="4">&nbsp;</td>  
+                                <td>Total:</td>
+                                <td><strong id="get_modal_total">0</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <div class="float-right">
+                        <input type="hidden" id="set_id_invoice">
+                        <button type="button" class="btn btn-primary" id="btnConfirmPendingOrder">Completed</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     $(() => {
 
@@ -145,25 +201,141 @@
         $("#date_here").html(moment().format('MMMM D YYYY'));
 
         // datatable
+        // var table = $('#dataTable').DataTable({
+        //     processing: true,
+        //     serverSide: true,
+        //     ajax: "{{ url('staff-transaction') }}",
+        //     columns: [
+        //         // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+        //         {
+        //             data: 'id', name: 'id',
+        //             "render": function(data, type, full, meta){
+        //                 return '<a href="#" class="btnDisplayOrderDetail" data-prod="'+ full.name +'" data-qty="'+ full.quantity_ordered +'" data-total="'+ full.ordered_total_price +'">'+ data +'</a>'
+        //             }
+        //         },
+        //         {data: 'name', name: 'name'},
+        //         {data: 'store_name', name: 'store_name'},
+        //         {data: 'store_address', name: 'store_address'},
+        //         {data: 'status', name: 'status'},
+        //         {data: 'action', name: 'action', orderable: false, searchable: false},
+        //     ]
+        // });
+
         var table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ url('staff-transaction') }}",
+            ajax: "{{ url('main') }}",
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                {data: 'id', name: 'id'},
+                {data: 'invoice_no', name: 'invoice_no'},
                 {
-                    data: 'id', name: 'id',
+                    data: 'fullname', name: 'fullname',
                     "render": function(data, type, full, meta){
-                        return '<a href="#" class="btnDisplayOrderDetail" data-prod="'+ full.name +'" data-qty="'+ full.quantity_ordered +'" data-total="'+ full.ordered_total_price +'">'+ data +'</a>'
+                        return full.fullname
                     }
                 },
-                {data: 'name', name: 'name'},
-                {data: 'store_name', name: 'store_name'},
-                {data: 'store_address', name: 'store_address'},
+                // {data: 'total_price', name: 'total_price'},
+                // {data: 'name', name: 'name'},
+                // {   
+                //     data: 'product_image', name: 'product_image',
+                //     "render": function (data, type, full, meta) {
+                //         return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
+                //     },
+                // },
+                // {
+                //     data: 'quantity_ordered', name: 'quantity_ordered',
+                //     "render": function(data, type, full, meta){
+                //         return data + " pcs"
+                //     }
+                // },
+                // {
+                //     data: 'ordered_total_price', name: 'ordered_total_price',
+                //     "render": function(data, type, full, meta){
+                //         return "&#x20b1; " + data
+                //     }
+                // },
+                {
+                    data: 'date_ordered', name: 'date_ordered',
+                    "render": function (data, type, full, meta) {
+                        return moment(data).format('MMMM D YYYY');
+                    },
+                },
+                {
+                    data: 'delivery_date', name: 'delivery_date',
+                    "render": function (data, type, full, meta) {
+                        let output = '';
+                        if(full.delivery_date == null){
+                            output = '<span class="text-info font-weight-bold">(Not set)</span>'
+                        }else{
+                            output = moment(data).format('MMMM D YYYY'); //, h:mm:ss a
+                        }
+
+                        return output
+                    },
+                },
+                {data: 'attempt', name: 'attempt'},
+                {data: 'attempt', name: 'attempt'},
                 {data: 'status', name: 'status'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
+
+        // edit pending order
+        function getPendingOrders(invoice_id){
+           $("#set_id_invoice").val(invoice_id)
+            $.getJSON( "{{ url('order/items/completed/') }}" + '/'+ invoice_id, function( data ) {
+                var htmlData = ''
+                var total = 0;
+                var i = 0
+                $.each(data, function( index, row ) {
+                    total += row.ordered_total_price
+                    htmlData += `<tr>
+                        <td>${row.id}</td>
+                        <td>${row.name}</td>
+                        <td>${row.size}</td>
+                        <td><a data-fancybox='' href='/img/product/${row.product_image}'><img src='/img/product/${row.product_image}' height='20'></a></td>`
+                    htmlData += `<td><input type='number' name='order[${i}][quantity]' value='${row.quantity_ordered}' data-iid='${invoice_id}' data-id='${row.id}' class="modal_qty" style='width:60px;' placeholder='0'></td>`
+                    htmlData +=`<td>${row.ordered_total_price}
+                            <input type='hidden' name='order[${i}][product_id]' value='${row.prodID}'>
+                            <input type='hidden' name='order[${i}][order_id]' value='${row.id}'>
+                            <input type='hidden' name='order[${i}][amount]' value='${row.ordered_total_price}'></td>
+                    </tr>`
+                    i++
+                });
+               $("#get_modal_total").text(total.toFixed(2)) 
+               $("#pending_amount").val(total.toFixed(2)) 
+               $("#pending_orders").find('tbody').html("").append(htmlData) 
+               $('#updatePendingModal').modal('show');
+            });
+        }
+
+        $('body').on('click', '.editCompleteOrder', function (e) {
+            e.preventDefault();
+            //get the data
+            const invoice_id = $(this).data("id");
+            getPendingOrders(invoice_id)
+        });
+
+        $(document).on('keyup', '.modal_qty', function(e){
+            e.preventDefault()
+            var order_id            = $(this).data('id'),
+                invoice_id          = $(this).data('iid'),
+                quantity_ordered    = $(this).val()
+                $.ajax({
+                    url:"{{ url('order/update/quantity') }}",
+                    method:"POST",
+                    data:{id: order_id, quantity_ordered: quantity_ordered},
+                    dataType:'JSON',
+                    success: function (data) {
+                        getPendingOrders(invoice_id)
+                    },
+                    error: function (data) {
+                        console.log('Error:', data);
+                    }
+                });
+            
+        })
 
         $(document).on('click', '#emergency_report', function() {
             $('#emergencyModal').modal('show');
@@ -205,7 +377,7 @@
         })
 
         //when complete order button is clicked
-        $(document).on('click', '.editCompleteOrder', function() {
+        $(document).on('click', '#btnConfirmPendingOrder', function() {
             swal({
                 title: "Are you sure?",
                 text: "Once confirmed, it will set the order as completed.",
@@ -217,11 +389,11 @@
                 if (isTrue) {
 
                     //get the current order id
-                    const order_id = $(this).attr("data-id");
+                    const invoice_id = $("#set_id_invoice").val();
 
                     //set params
                     const params = {
-                        order_id,
+                        'invoice_id': invoice_id,
                         "action" : "completed"
                     }
 
@@ -230,6 +402,7 @@
                         url: "{{ url('main') }}",
                         data: params,
                         success: function (data) {
+                            $('#updatePendingModal').modal('hide');
                             table.draw();
                             swal(data.message, {
                                 icon: "success",
