@@ -55,6 +55,10 @@ class CartController extends Controller
         return view('client/cart', compact('cart'));
     }
 
+    public function storeDamageCart(Request $request){
+
+    }
+
     /**
      * Store a newly created resource in storage.
      *

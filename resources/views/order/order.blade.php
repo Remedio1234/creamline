@@ -1117,6 +1117,111 @@
                 $('#divContentImages').append(jsx)
             })
         });
+
+
+        $(document).on('click', '.editDamageOrder', function(){
+            const products = JSON.parse($(this).attr("data-val"));
+            const clientid = $(this).attr("data-clientid");
+            $('#displayProductsModal').modal('show');
+            $('#divModalProducts').empty();
+
+            var header = `<div class="row">
+                            <div class="col-5"><b> Product (size) </b></div>
+                            <div class="col-2"><b> Price </b></div>
+                            <div class="col-3"><b> Quantity </b></div>
+                            <div class="col-2"><b> Total </b></div>
+                        </div>`
+            $('#divModalProducts').append(header)
+
+            var total = 0;
+            var jsx = ''
+            var i   = 0;
+            products.map(product => {
+                total += (product.quantity * product.price)
+                jsx  +=`<form id='checkoutDamageOrder'>
+                    <div class="row">
+                        <div class="col-5">
+                            ${product.name}  ( ${product.size} )
+                        </div>
+                        <div class="col-2">
+                            ${product.price.toFixed(2)}
+                        </div>
+                        <div class="col-3 mt-1">
+                            <input type="text" class="qty_update" 
+                                data-id="${product.id}" 
+                                id="${product.id}" 
+                                data-price='${product.price}' 
+                                value="${product.quantity}" 
+                                required 
+                                placeholder='0' 
+                                name="damage[${i}][quantity]" 
+                                style='width:100px;'/>
+                            <input type="hidden" value="${product.product_id}"  name="damage[${i}][product_id]"/>
+                            <input type="hidden" value="${product.price}"  name="damage[${i}][price]"/>
+                            <input type="hidden" value="${product.size}"  name="damage[${i}][size]"/>
+                        </div>
+                        <div class="col-2">
+                            <span class='sub_total' id="sub_total_${product.id}">${(product.quantity * product.price).toFixed(2)} 
+                        </div>
+                    </div>`;     
+                i++;
+            })
+            jsx += `<div class="row">
+                        <div class="col-10">&nbsp;</div>
+                            <div class="col-2"><strong class='all_total'>${total.toFixed(2)}</strong></div>
+                    </div>`
+                     jsx += `<div class="row">
+                        <div class="form-group">
+                            <label for="txt_resched_delivery_date" class="col-sm-12 control-label">Delivery date</label>
+                            <div class="col-12">
+                                <input type="date" name="damage_delivery_date" class="form-control" id="damage_delivery_date">
+                            </div>
+                        </div>
+                    </div>`  
+            jsx += `<div class="modal-footer">
+                        <div class="row text-center">
+                            <input type="hidden" value="${clientid}" id="data_client_id" name="data_client_id"/>
+                            <button type='submit' class="btn btn-success">Checkout</button>
+                        </div>
+                    </div>
+                </form>`            
+            $('#divModalProducts').append(jsx)
+        });
+
+        $(document).on('submit', '#checkoutDamageOrder', function(e){
+            e.preventDefault()
+            swal({
+                title: "Are you sure you want to checkout?",
+                icon: "info",
+                buttons: true,
+                dangerMode: false,
+            })
+            .then((isTrue) => {
+                if (isTrue) {
+                    $.ajax({
+                        data: $(this).serialize(),
+                        url: "{{ url('damage-cart') }}",
+                        type: "POST",
+                        dataType: 'json',
+                        success: function (data) {
+
+                            //display a successful message
+                            // swal("Information", data.message).then(function() {
+                            //     if(isAdmin === true){
+                            //         window.location = "order#order-tab-tran-his";
+                            //     }else{
+                            //         window.location = "order-success";
+                            //     }
+                            // })
+                        },
+                        error: function (data) {
+                            console.log('Error:', data);
+                        }
+                    });
+                }
+            });
+        })
+
         // datatable
         // var replacementTable = $('#replacementTable').DataTable({
         //     processing: true,
@@ -1512,7 +1617,7 @@
                         }else if(data === 1){
                             output = '<span class="text-success font-weight-bold">Approved</span>'
                         }else{
-                            output = '<span class="text-danger font-weight-bold">Not Approved</span>'
+                            output = '<span class="text-danger font-weight-bold">Declined</span>'
                         }
                         return output;
                     }
@@ -1528,7 +1633,18 @@
                         return output
                     }
                 },
-                {data: 'action', name: 'action', orderable: false, searchable: false},
+                {data: 'action', name: 'action', orderable: false, searchable: false,
+                    render: function(data, type, full, meta) {
+                        var output = ''
+                        if(!full.is_replaced){
+                            output += "<a href='javascript:void(0)' class='btn btn-primary btn-sm editDamageOrder' data-clientid='"+full.client_id+"'  data-val='"+full.products+"'>Approve </a>";
+                            output += "<a href='javascript:void(0)' data-id='"+full.id+"' data-clientid='"+full.client_id+"' class='btn btn-danger btn-sm editDisapproveDamage mt-1'>Decline</a>";
+                        } else {
+                            output = 'NA';
+                        }
+                       return  output
+                    }
+                },
             ]
         });
 
@@ -1568,41 +1684,41 @@
         })
 
         //when damage order is approved
-        $(document).on('click', '.editDamageOrder', function(){
-            const damageid = $(this).attr("data-id")
-            const clientid = $(this).attr("data-clientid")
-            const params = {
-                damageid,
-                clientid,
-                action: "approve_damage"
-            }
-            swal({
-                title: "Are you sure?",
-                text: "Once approved, it will be confirmed",
-                icon: "warning",
-                buttons: true,
-                dangerMode: false,
-            })
-            .then((isTrue) => {
-                if (isTrue) {
-                    $.ajax({
-                        type: "POST",
-                        url: "{{ url('order_damage') }}",
-                        data: params,
-                        success: function (data) {
-                            drawAllTable();
-                            swal(data.message, {
-                                icon: "success",
-                            });
-                            // console.log(data)
-                        },
-                        error: function (data) {
-                            console.log('Error:', data);
-                        }
-                    });
-                }
-            });
-        })
+        // $(document).on('click', '.editDamageOrder', function(){
+        //     const damageid = $(this).attr("data-id")
+        //     const clientid = $(this).attr("data-clientid")
+        //     const params = {
+        //         damageid,
+        //         clientid,
+        //         action: "approve_damage"
+        //     }
+        //     swal({
+        //         title: "Are you sure?",
+        //         text: "Once approved, it will be confirmed",
+        //         icon: "warning",
+        //         buttons: true,
+        //         dangerMode: false,
+        //     })
+        //     .then((isTrue) => {
+        //         if (isTrue) {
+        //             $.ajax({
+        //                 type: "POST",
+        //                 url: "{{ url('order_damage') }}",
+        //                 data: params,
+        //                 success: function (data) {
+        //                     drawAllTable();
+        //                     swal(data.message, {
+        //                         icon: "success",
+        //                     });
+        //                     // console.log(data)
+        //                 },
+        //                 error: function (data) {
+        //                     console.log('Error:', data);
+        //                 }
+        //             });
+        //         }
+        //     });
+        // })
 
         //when damage order is approved
         $(document).on('click', '.editDisapproveDamage', function(){
@@ -1759,7 +1875,8 @@
                 {
                     data: 'is_completed', name: 'is_completed',
                     render: function(data, type, full, meta){
-                        let output = full.is_approved == 1 ? '<span class="text-info font-weight-bold">Approved</span><br/>' : '<span class="text-danger font-weight-bold">Pending</span><br/>';
+                        let output = ''
+                        // let output = full.is_approved == 1 ? '<span class="text-info font-weight-bold">Approved</span><br/>' : '<span class="text-danger font-weight-bold">Pending</span><br/>';
 
                         if(full.is_completed == 1){
                             output += '<span class="text-success font-weight-bold">Completed</span>'

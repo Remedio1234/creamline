@@ -113,6 +113,7 @@ Route::post('save_to_cart',                                             'ShopCon
 Route::resource('store',                                                'StoreController');
 Route::get('save_cart',                                                 'CartController@save_cart')->name('save_cart');
 Route::resource('cart',                                                 'CartController');
+Route::post('damage-cart',                                              'CartController@storeDamageCart');
 Route::resource('transaction',                                          'TransactionController');
 Route::resource('transaction_history',                                  'TransactionHistoryController');
 Route::get('order-success',                                             'TransactionController@thankyou')->name('thankyou');

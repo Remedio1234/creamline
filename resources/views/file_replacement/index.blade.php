@@ -382,7 +382,7 @@
                         }else if(data === 1){
                             output = '<span class="text-success font-weight-bold">Approved</span>'
                         }else{
-                            output = '<span class="text-danger font-weight-bold">Not Approved</span>'
+                            output = '<span class="text-danger font-weight-bold">Declined</span>'
                         }
                         return output;
                     }
