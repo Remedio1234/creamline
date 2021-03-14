@@ -106,6 +106,7 @@
             </div>
             <div class="modal-body">
                 <form id="frmPendingOrder" name="frmPendingOrder" class="form-horizontal">
+                    <input type="hidden" name="get_user_id" id="get_user_id">
                     <table class="table table-stripped" id="store_list_html">
                         <thead>
                             <tr>
@@ -162,8 +163,19 @@
                             <p class="card-text">
                                 <strong>Fridge Model:</strong> ${row.model} 
                                 <br> 
-                                <strong>Description:</strong> ${row.description} </p>
-                                <select name='fridge_status' id='fridge_status_${row.id}'>
+                                    <strong>Description:</strong> ${row.description} 
+                                <br>
+                                <strong>Status:</strong>`
+                                if(row.status == 2){
+                                    htmlData += ' For Deployment'
+                                }else if(row.status == 4){
+                                    htmlData += ' Deployed'
+                                }
+                                else if(row.status == 3){
+                                    htmlData += ' For Pull-Out'
+                                }
+                    htmlData +=`</p>
+                                <select name='old_fridge_status' id='old_fridge_status_${row.id}' hidden>
                                     <option value='3' ${row.status == 3 ? 'selected' : ''}>Pull-Out</option>
                                     <option value='4' ${row.status == 4 ? 'selected' : ''}>Deployed</option>`
                                     if(row.status == 1) {
@@ -172,7 +184,11 @@
                     htmlData += ` <option value='2' selected>UnAvailable</option>`
                                     }
                     htmlData += `</select>
-                                <button type='button' ${ ([3,4].indexOf(row.status) !== 1 ? 'disabled' : '') } data-id='${row.id}' id='confirm_fridge' class='btn btn-primary' style='padding: 2px;'>Confirm</button>
+                                    <select name='fridge_status' id='fridge_status_${row.id}' hidden>
+                                        <option value='4' ${row.status == 2 ? 'selected' : ''}>Deployed</option>
+                                        <option value='1' ${row.status == 3 ? 'selected' : ''}>Pullout</option>`
+                            htmlData += `</select>
+                                <button type='button' ${ (row.status == 2 || row.status == 3 ? '' : 'disabled') } data-id='${row.id}' id='confirm_fridge' class='btn btn-primary' style='padding: 2px;'>Confirm</button>
                         </div>
                     </div>`
                 }); 
@@ -181,10 +197,9 @@
             return htmlData;
         }
 
-        $(document).on('click', '.viewStore', function(e){
-            e.preventDefault();
-            var user_id = $(this).data('id')
+        function viewStoreData(user_id){
             $.getJSON( "/client/"+user_id+"/stores/json", function( data ) {
+                $("#get_user_id").val(user_id)
                 var htmlData = ''
                 $.each(data, function( index, row ) {
                     htmlData += `<tr>
@@ -197,6 +212,12 @@
                $("#store_list_html").find('tbody').html("").append(htmlData) 
                $('#storeListModal').modal('show');
             });
+        }
+
+        $(document).on('click', '.viewStore', function(e){
+            e.preventDefault();
+            var user_id = $(this).data('id')
+            viewStoreData(user_id)
         })
 
         $(document).on('click', '#confirm_fridge', function(e){
@@ -204,6 +225,8 @@
             var id = $(this).data('id')
             var status = $('#fridge_status_'+id).val()
             $.get( "/fridge/edit/history/"+status+'/'+id+'/'+'setB', function( data ) {
+                var user_id = $("#get_user_id").val()
+                viewStoreData(user_id)
                 swal('Status has been changed.', {
                                 icon: "success",
                             });

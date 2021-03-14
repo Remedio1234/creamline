@@ -482,6 +482,7 @@ class ClientController extends Controller
                         $item->fridges = UserFridge::join('fridges', ['user_fridges.fridge_id' => 'fridges.id'])
                                         ->selectRaw('fridges.id, fridges.model, fridges.description, fridges.status')
                                         ->where(['store_id' => $item->id, 'user_fridges.status' => 'available'])
+                                        ->where('fridges.is_pullout',0)
                                         ->get();
                         return $item;
                     });

@@ -56,13 +56,14 @@
                     {{-- <input type="hidden" name="status" value=1> --}}
                     <input type="hidden" name="cmb_user">
                     <input type="hidden" name="location">
-                    <div class="form-group">
+                    <div class="form-group" hidden>
                         <label class="col-sm-12 control-label">Status</label>
                         <div class="col-sm-12">
                             <select name="status" id="status" class="form-control">
-                                @foreach(config('fridge.status') as $key => $label)
+                                {{-- @foreach(config('fridge.status') as $key => $label)
                                     <option value="{{ $key  }}"> {{ $label }}</option>
-                                @endforeach
+                                @endforeach --}}
+                                <option value="1"> UnAvailable</option>
                             </select>
                         </div>
                     </div>

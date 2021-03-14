@@ -54,9 +54,9 @@ class FridgeController extends Controller
                     if ($row->status == 1) {
                         $btn = $btn.' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Assign" class="btn btn-warning btn-sm assignFridge">Assign</a>';
                     } 
-                    // elseif ($row->status == 2) {
-                    //     $btn = $btn.' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Pull Out" class="btn btn-warning btn-sm pullOutFridge">Pull Out</a>';
-                    // }
+                    elseif ($row->status == 4) {
+                        $btn = $btn.' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'"data-original-title="Pull Out" class="btn btn-warning btn-sm pullOutFridge">Pull Out</a>';
+                    }
 
                     $btn = $btn.' <a href="javascript:void(0)" data-id="'.$row->id.'"class="btn btn-success btn-sm fridge_history">History</a>';
 
@@ -173,12 +173,17 @@ class FridgeController extends Controller
 
     public function editHistoryFridge(Request $request)
     {
+         
         if($request->type == 'setA'){
             UserFridge::whereId($request->id)->update(["status" => $request->status]);
             $a = 0;
         } else {
             $a = 1;
             Fridge::find($request->id)->update(["status" => $request->status]);
+        }
+
+        if($request->status == 1 && $a == 1){
+            Fridge::whereId($request->id)->update(["is_pullout" => 1]);
         }
         $response = [
             'success', true,
