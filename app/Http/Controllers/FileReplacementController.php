@@ -102,9 +102,12 @@ class FileReplacementController extends Controller
                     return $row ? $row->images : '';
                 })
                 ->addColumn('action', function ($row) {
-   
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Replace Order" data-id="'.$row->damageid.'" data-clientid="'.$row->clientid.'" data-original-title="Edit" class="btn btn-primary btn-sm editDamageOrder">Approve</a>&nbsp;';
-                    $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Disapprove Damage" data-id="'.$row->damageid.'" data-clientid="'.$row->clientid.'" data-original-title="Edit" class="btn btn-danger btn-sm editDisapproveDamage mt-1">Disapprove</a>';
+                    if(!$row->is_replaced){
+                        $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Replace Order" data-id="'.$row->id.'" data-clientid="'.$row->client_id.'" data-original-title="Edit" class="btn btn-primary btn-sm editDamageOrder">Approve</a>&nbsp;';
+                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Disapprove Damage" data-id="'.$row->id.'" data-clientid="'.$row->client_id.'" data-original-title="Edit" class="btn btn-danger btn-sm editDisapproveDamage mt-1">Decline</a>';
+                    } else {
+                        $btn = 'NA';
+                    }
 
                      return $btn;
                 })

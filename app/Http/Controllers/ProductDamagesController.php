@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\ProductDamages;
+use App\Product_Report;
 use App\ProductFileDamages;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -78,7 +79,7 @@ class ProductDamagesController extends Controller
         switch($action){
             //if approve damage request button is clicked
             case "approve_damage":
-                ProductDamages::where('id', $request->input("damageid"))->update(["is_replaced" => 1]);
+                Product_Report::where('id', $request->input("damageid"))->update(["is_replaced" => 1]);
                 
                 //set message
                 $message = 'Your Damage request # '.$request->input("damageid").' has been accepted. Please be advised accordingly';
@@ -91,7 +92,7 @@ class ProductDamagesController extends Controller
                 ]);
                 break;
             case "disapprove_damage":
-                ProductDamages::where('id', $request->input("damageid"))->update(["is_replaced" => 2]);
+                Product_Report::where('id', $request->input("damageid"))->update(["is_replaced" => 2]);
                 
                 //set message
                 $message = 'Your Damage request # '.$request->input("damageid").' has been disapproved. Please be advised accordingly';
