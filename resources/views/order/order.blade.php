@@ -1659,10 +1659,10 @@
 
         function drawAllTable(){
             table.draw()
-            // undeliverTable.draw()
-            // replacementTable.draw()
-            // damageTable.draw();
-            // historyTable.draw()
+            undeliverTable.draw()
+            replacementTable.draw()
+            damageTable.draw();
+            historyTable.draw()
         }
 
         $(document).on('click', '.refresh_table', function(e){
