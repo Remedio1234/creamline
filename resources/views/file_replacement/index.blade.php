@@ -16,6 +16,7 @@
             <th>Rep ID</th>
             <th>Report Type</th>
             <th> {{ Auth::user()->user_role == 1 ? 'Client' : 'Issued By'}}</th>
+            <th>Store</th>
             <th>Products</th>
             <th>Attached File</th>
             {{-- <th>Quantity</th> --}}
@@ -327,6 +328,7 @@
                 {data: 'id', name: 'id'},
                 {data: 'report_type', name: 'report_type'},
                 {data: 'full_name', name: 'full_name'},
+                {data: 'store_name', name: 'store_name'},
                 {
                     data: 'products', 
                     name: 'products',

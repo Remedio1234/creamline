@@ -125,8 +125,9 @@
                             <th>Report Type</th>
                             <th>Issued By</th>
                             <th>Client</th>
+                            <th>Store</th>
                             <th>Products</th>
-                            <th>Attached File</th>
+                            <th>Files</th>
                             {{-- <th>Quantity</th> --}}
                             <th>Status</th>
                             <th>Reason</th>
@@ -479,6 +480,25 @@
                         </tfoot>
                     </table>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- display Reason --}}
+<div class="modal fade" id="displayReason" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Details</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row text-center text-lg-left">
+                    <div class="col-md-12"  id="reason_div"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1463,6 +1483,7 @@
                 {data: 'report_type', name: 'report_type'},
                 {data: 'issued_by', name: 'issued_by'},
                 {data: 'client_name', name: 'client_name'},
+                {data: 'store_name', name: 'store_name'},
                 {
                     data: 'products', 
                     name: 'products',
@@ -1496,10 +1517,28 @@
                         return output;
                     }
                 },
-                {data: 'reason', name: 'reason'},
+                // {data: 'reason', name: 'reason'},
+                {
+                    data: 'reason', name: 'reason',
+                    render: function(data, type, full, meta){
+                        let output = '(empty)'
+                        if(data != ""){
+                            output = "<a href='#' id='btnReason' data-val='"+data+"'>View</a>"
+                        }
+                        return output
+                    }
+                },
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
+
+        $(document).on('click', '#btnReason', function(e){
+            e.preventDefault();
+            var str = $(this).data('val')
+            $("#displayReason").modal('show')
+            $("#reason_div").html(str)
+
+        })
 
         //when display dot is clicked
         $(document).on('click', '.btnDisplayImages', function(){

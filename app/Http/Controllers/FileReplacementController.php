@@ -32,7 +32,9 @@ class FileReplacementController extends Controller
     public function index(Request $request)
     {
         if(Auth::user()->user_role == 99) {
-            $file_replacement = Product_Report::orderBy('id', 'desc')
+            $file_replacement = Product_Report::join('stores', ['stores.id' => 'product_reports.store_id'])
+                                    ->selectRaw('product_reports.*, stores.store_name')
+                                    ->orderBy('id', 'desc')
                                     ->get()
                                     ->map(function($item){
                                         $item->issued_by  = $item->issued_by; //'NA';
@@ -52,7 +54,9 @@ class FileReplacementController extends Controller
         } else {
 
             if(Auth::user()->user_role == 1){ //staff
-                $file_replacement = Product_Report::where(['issued_by' => Auth::user()->id])
+                $file_replacement = Product_Report::join('stores', ['stores.id' => 'product_reports.store_id'])
+                            ->selectRaw('product_reports.*, stores.store_name')
+                            ->where(['issued_by' => Auth::user()->id])
                             ->get()
                             ->map(function($item){
                                 $item->full_name  = 'NA';
@@ -62,7 +66,9 @@ class FileReplacementController extends Controller
                                 return $item;
                             });
             } else { //client
-                $file_replacement = Product_Report::where(['client_id' => Auth::user()->id])
+                $file_replacement = Product_Report::join('stores', ['stores.id' => 'product_reports.store_id'])
+                        ->selectRaw('product_reports.*, stores.store_name')
+                        ->where(['client_id' => Auth::user()->id])
                         ->get()
                         ->map(function($item){
                             $item->full_name  = 'NA';
@@ -155,17 +161,32 @@ class FileReplacementController extends Controller
             $allowedfileExtension=['jpg','png', 'jpeg'];
             $files = $request->file('file_report_image');
 
-            $items = Product_Report::create([
-                'report_type'       => $request->report_type,
-                'product_id'        => null,
-                'store_id'          => $request->store,
-                'size'              => null,
-                'flavor'            => null,
-                'client_id'         => $request->client_id,
-                'issued_by'         => Auth::user()->id,
-                'is_replaced'       => 0,
-                'reason'            => $request->reason,
-            ]);
+            if(Auth::user()->user_role == 1){ //staff
+                $items = Product_Report::create([
+                    'report_type'       => $request->report_type,
+                    'product_id'        => null,
+                    'store_id'          => $request->store,
+                    'size'              => null,
+                    'flavor'            => null,
+                    'client_id'         => $request->client_id,
+                    'issued_by'         => Auth::user()->id,
+                    'is_replaced'       => 0,
+                    'reason'            => $request->reason,
+                ]);
+            } else {
+                $items = Product_Report::create([
+                    'report_type'       => $request->report_type,
+                    'product_id'        => null,
+                    'store_id'          => $request->store,
+                    'size'              => null,
+                    'flavor'            => null,
+                    'client_id'         => Auth::user()->id,
+                    'issued_by'         => null,
+                    'is_replaced'       => 0,
+                    'reason'            => $request->reason,
+                ]);
+            }
+            
 
             foreach ($prodIds as $key => $product) {
                 $data = explode('-',$size[$key]);
