@@ -174,7 +174,7 @@ class OrderController extends Controller
                 $quantity = $stock->quantity - $value['quantity'];
                 Stock::where('product_id', $value['product_id'])->update([ 'quantity' => $quantity]);
             }
-            Order::where('id', $value['order_id'])->update(['is_approved' => 1, 'delivery_date' => $delivery_date]);
+            Order::where('id', $value['order_id'])->update(['is_cancelled' => 0,'is_approved' => 1, 'delivery_date' => $delivery_date]);
         }
         // exit;
         // $order_id = $request->input("pending_order_id");
