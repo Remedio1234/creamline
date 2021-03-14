@@ -58,15 +58,15 @@
     @endif
     <div class="card">
         <div class="card-header">
-            Customer Information
+            Client Information
         </div>
         <div class="card-body">
             @if(Auth::user()->user_role == 99)
                 <div class="row">
                     <div class="col-md-6">
-                        <label for="select_customer" class="control-label">Assign Customer:</label>
+                        <label for="select_customer" class="control-label">Assign Client:</label>
                         <select class="form-control" id="select_customer">
-                            <option value="99999">Choose a customer to assign</option>
+                            <option value="99999">Choose a Client to assign</option>
                             @foreach($clients->where('user_role', 2)->orderBy('lname', 'asc')->get() as $client)
                                 @if(!empty($client))
                                     <option value="{{ $client->id }}" data-detail="{{ $client->fname.','.$client->mname.','.$client->lname.','.$client->address.','.$client->contact_num.','.$client->email }}">{{ $client->lname.", ".$client->fname }}</option>
@@ -255,7 +255,7 @@
 
                 //if admin and there is no customer selected
                 if($("#select_customer").length && $("#select_customer option:selected").val() == "99999"){
-                    return swal("Error", "Please select a customer first!")
+                    return swal("Error", "Please select a client first!")
                 }
 
                 //if there is no store selected then prompt the user
