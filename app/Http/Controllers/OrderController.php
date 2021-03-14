@@ -87,6 +87,20 @@ class OrderController extends Controller
     }
 
     /**
+     * @desc get orders item
+     */
+
+    public function cancelOrder(Request $request){
+        if ($request->ajax()) {
+            DB::table('orders')
+                ->where('orders.invoice_id', $request->invoice_id)
+                ->update(['order_cancel' => 1]);
+
+                return response()->json(['response' => 'success'], 200);
+        }
+    }
+
+    /**
      * @desc update quantity order
      */
     public function updateQuantityOrder(Request $request){

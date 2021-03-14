@@ -1210,6 +1210,41 @@
             ]
         });
 
+
+        //  replacement cancel order
+        $(document).on('click', '.cancelOrder', function(e){
+                e.preventDefault()
+                var invoice_id = $(this).data('id')
+            swal({
+                title: "Are you sure you want to cancel?",
+                icon: "info",
+                buttons: true,
+                dangerMode: false,
+            })
+            .then((isTrue) => {
+                if (isTrue) {
+                    //set params
+                    var params = {};
+                    params.invoice_id = invoice_id;
+                    $.ajax({
+                        data: params,
+                        url: "{{ url('order/cancel/') }}" + '/' + invoice_id,
+                        type: "POST",
+                        dataType: 'json',
+                        success: function (data) {
+                            swal("Information", "Order has been successfully cancelled!").then(res => {
+                            // table.draw();
+                            drawAllTable()
+                        })
+                        },
+                        error: function (data) {
+                            console.log('Error:', data);
+                        }
+                    });
+                }
+            });
+            });
+
         //display when set delivery is clicked
         $(document).on('click', '.editReplacementOrder ', function(e){
 

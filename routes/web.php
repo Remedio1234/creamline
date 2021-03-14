@@ -51,7 +51,7 @@ Route::resource('order',                                                'OrderCo
 Route::get('order/pending/{invoice_id}/{type}/{setId}',                 'OrderController@pendingOrder');
 Route::get('order/items/completed/{invoice_id}',                        'StaffDashboardController@pendingOrder');
 Route::get('order/completed/{invoice_id}',                              'OrderController@completedOrder');
-
+Route::post('order/cancel/{invoice_id}',                                'OrderController@cancelOrder');
 Route::post('order/update/quantity',                                    'OrderController@updateQuantityOrder');
 Route::resource('undeliver',                                            'UndeliveredOrderController');
 Route::resource('history',                                              'TransactionHistoryOrderController');
