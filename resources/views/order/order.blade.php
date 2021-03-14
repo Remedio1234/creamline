@@ -560,7 +560,7 @@
 
         // edit pending order
         function getPendingOrders(invoice_id, type, setId){
-            if(type == 'pending'){
+            if(['all','pending'].indexOf(type) !== -1){
                 $('.wrap_modal').show()
             } else {
                 $('.wrap_modal').hide()
