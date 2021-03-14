@@ -390,7 +390,7 @@ class StaffDashboardController extends Controller
             //update the order
             $attempt = DB::table('orders')->where('invoice_id', $request->input("order_id"))->get();
             foreach ($attempt as $key => $value) {
-                $value->attempt +=  $value->attempt;
+                $value->attempt +=  1;
                 DB::table('orders')->where('id', $value->id)
                                ->update([
                                     'attempt' => $value->attempt,
