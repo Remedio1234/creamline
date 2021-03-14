@@ -63,6 +63,9 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/sidebar.css') }}" rel="stylesheet">
+
+    <!-- Datatables bootstrap css -->
+    <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
 </head>
 <body>
     <div id="app" class="container-with-sidebar">
