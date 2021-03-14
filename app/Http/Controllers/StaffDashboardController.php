@@ -392,6 +392,7 @@ class StaffDashboardController extends Controller
                                ->update([
                                     'cancelled_by' => $cancelled_by,
                                     'is_cancelled' => 1,
+                                    'attempt' => 1,
                                     'reason' => $request->input("reason")
                                 ]);
 
