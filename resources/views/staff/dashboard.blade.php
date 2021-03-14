@@ -316,7 +316,7 @@
 
         // edit pending order
         function getPendingOrders(invoice_id, type){
-            if(type == 0){
+            if(type == 0){ //
                 $("#pending_modal").show();
             } else {
                 $("#pending_modal").hide();
