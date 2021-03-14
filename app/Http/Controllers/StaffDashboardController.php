@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Order;
+use App\{Order,Stock};
 use App\Traits\GlobalFunction;
 use DataTables;
 use Illuminate\Http\Request;
@@ -359,6 +359,13 @@ class StaffDashboardController extends Controller
 
             //update the order
             DB::table('orders')->where('invoice_id', $request->input("invoice_id"))->update(['is_completed' => 1]);
+            $order = DB::table('orders')->where('invoice_id', $request->input("invoice_id"))->get();
+            foreach ($order as $key => $value) {
+                if($stock = Stock::where('product_id', $value->product_id)->first()){
+                    $quantity = $stock->quantity - $value->quantity_ordered;
+                    Stock::where('product_id', $value->product_id)->update([ 'quantity' => $quantity]);
+                }
+            }
 
             // return response
             $response = [
