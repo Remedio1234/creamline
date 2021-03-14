@@ -130,7 +130,7 @@ class StaffDashboardController extends Controller
                     // return $btn;
                     $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" data-type="1" class="btn btn-primary btn-sm viewCompleteOrder">View Details</a> ';
                     if (!$row->is_completed && !$row->is_cancelled) {
-                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" data-type="0" class="btn btn-primary btn-sm editCompleteOrder">Confirm</a> ';
+                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" data-type="0" class="btn btn-primary mt-2 btn-sm editCompleteOrder">Confirm</a> ';
 
                         $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder mt-2">Cancel</a>';
 
