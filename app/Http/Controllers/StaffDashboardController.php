@@ -361,6 +361,12 @@ class StaffDashboardController extends Controller
             DB::table('orders')->where('invoice_id', $request->input("invoice_id"))->update(['is_completed' => 1]);
             $order = DB::table('orders')->where('invoice_id', $request->input("invoice_id"))->get();
             foreach ($order as $key => $value) {
+                $value->attempt +=  1;
+                DB::table('orders')->where('id', $value->id)
+                        ->update([
+                            'attempt' => $value->attempt
+                            ]);
+
                 if($stock = Stock::where('product_id', $value->product_id)->first()){
                     $quantity = $stock->quantity - $value->quantity_ordered;
                     Stock::where('product_id', $value->product_id)->update([ 'quantity' => $quantity]);
