@@ -2,11 +2,30 @@
 
 @section('content')
 <div class="container">
-    <div class="container-fluid">
+    {{-- <div class="container-fluid">
         <div class="row mb-3">
             <h4 class="center">All Transactions</h4>
         </div>
+    </div> --}}
+    <div class="container-fluid">
+        <div class="row">
+            <h4 class="center">All Transactions</h4>
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="padding:0px;">
+                
+            </div>
+            <div class="col-md-6" style="padding:0px;">
+                <select class="form-control float-right" id="filter_status" style="width: 300px;">
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="pending">Impending</option>
+                </select>
+            </div>
+            
+        </div>
     </div>
+    <br>
     <table id="dataTable" class="table table-striped table-bordered">
         <thead class="bg-indigo-1 text-white">
         {{-- <tr>
@@ -224,7 +243,13 @@
         var table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
-            ajax: "{{ url('main') }}",
+            // ajax: "{{ url('staff-transaction') }}",
+            ajax: {
+                url: "{{ url('staff-transaction') }}",
+                data: function(e){
+                    e.filter_status = $('#filter_status').val();
+                }
+            },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
@@ -280,6 +305,11 @@
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
+
+        $(document).on('change', '#filter_status', function(e){
+            e.preventDefault();
+            table.ajax.reload();
+        })
 
         // edit pending order
         function getPendingOrders(invoice_id){
