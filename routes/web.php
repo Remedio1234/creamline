@@ -46,9 +46,9 @@ Route::resource('fridge',                                               'FridgeC
 Route::post('pull-out',                                                 'FridgeController@pullOut');
 Route::post('assign-fridge',                                            'FridgeController@assign');
 Route::get('fridge/history/{fridge_id}',                                'FridgeController@fridgeHistory');
-Route::get('fridge/edit/history/{status}/{id}/{type}',                    'FridgeController@editHistoryFridge');
+Route::get('fridge/edit/history/{status}/{id}/{type}',                  'FridgeController@editHistoryFridge');
 Route::resource('order',                                                'OrderController');
-Route::get('order/pending/{invoice_id}',                                'OrderController@pendingOrder');
+Route::get('order/pending/{invoice_id}/{type}/{setId}',                         'OrderController@pendingOrder');
 Route::get('order/completed/{invoice_id}',                              'OrderController@completedOrder');
 
 Route::post('order/update/quantity',                                    'OrderController@updateQuantityOrder');

@@ -250,7 +250,7 @@
                         return swal("Error", "Sorry! You’ve reached the stock limit. Please enter a lesser quantity.");
                     }
 
-                    if(!size || !price || !flavor || !quantity){
+                    if(!size || !price || !quantity){
                         return swal("Error", "Sorry, There was an error adding this product to your cart. ");
                     }
 

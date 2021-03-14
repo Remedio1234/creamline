@@ -47,7 +47,7 @@
                                 <input type="text" class="form-control" id="size" maxlength="255">
                             </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" hidden>
                             <label class="col-sm-12 control-label" for="flavor">Product Flavor</label>
                             <div class="col-sm-12">
                                 <input type="text" class="form-control" id="flavor" maxlength="255">

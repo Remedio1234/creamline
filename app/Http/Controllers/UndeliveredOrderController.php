@@ -29,12 +29,46 @@ class UndeliveredOrderController extends Controller
      */
     public function index(Request $request)
     {
-        $undeliver = DB::table('orders')
-                ->join('products', 'orders.product_id', '=', 'products.id')
+        // $undeliver = DB::table('orders')
+        //         ->join('products', 'orders.product_id', '=', 'products.id')
+        //         ->join('users', 'orders.client_id', '=', 'users.id')
+        //         ->select('products.name', 'products.product_image', 'orders.quantity_ordered',
+        //             'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.is_cancelled', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.attempt', 'orders.reason')
+        //         ->where('is_cancelled', 1)
+        //         ->get();
+
+        // if ($request->ajax()) {
+        //     return Datatables::of($undeliver)
+        //         ->addIndexColumn()
+        //         ->addColumn('action', function ($row) {
+   
+        //             $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-id="'.$row->id.'" data-num="'.$row->contact_num.'" data-prodname="'.$row->name.'" data-qty="'.$row->quantity_ordered.'"  data-total="'.$row->ordered_total_price.'" data-original-title="Edit" class="btn btn-primary btn-sm editReschedOrder">Reschedule</a>';
+
+        //              return $btn;
+        //         })
+        //         ->rawColumns(['action'])
+        //         ->make(true);
+        // }
+
+        $undeliver = DB::table('order_invoice')
+                ->join('orders', 'orders.invoice_id', '=', 'order_invoice.id')
                 ->join('users', 'orders.client_id', '=', 'users.id')
-                ->select('products.name', 'products.product_image', 'orders.quantity_ordered',
-                    'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.is_cancelled', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.attempt', 'orders.reason')
-                ->where('is_cancelled', 1)
+                // ->selectRaw("order_invoice.id, order_invoice.created_at as date_ordered, order_invoice.invoice_no, SUM(orders.ordered_total_price) as , CONCAT(users.fname, ' ', users.lname) as fullname, users.email")
+                ->selectRaw("order_invoice.id, 
+                order_invoice.created_at as date_ordered, 
+                order_invoice.invoice_no, 
+                SUM(orders.ordered_total_price) as total_price, 
+                CONCAT(users.fname, ' ', users.lname) as fullname, 
+                users.email, 
+                orders.delivery_date,
+                orders.attempt,
+                users.id as client_id,
+                users.contact_num as num")
+                // ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',
+                //     'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
+                ->where('is_approved', 1)
+                ->where('is_completed', 0)
+                ->groupBy('orders.invoice_id')
                 ->get();
 
         if ($request->ajax()) {
@@ -42,11 +76,14 @@ class UndeliveredOrderController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
    
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-id="'.$row->id.'" data-num="'.$row->contact_num.'" data-prodname="'.$row->name.'" data-qty="'.$row->quantity_ordered.'"  data-total="'.$row->ordered_total_price.'" data-original-title="Edit" class="btn btn-primary btn-sm editReschedOrder">Reschedule</a>';
-
-                     return $btn;
+                    // $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-id="'.$row->id.'" data-num="'.$row->num.'" data-prodname="'.$row->fullname.'" data-qty="'.$row->quantity_ordered.'"  data-total="'.$row->ordered_total_price.'" data-original-title="Edit" class="btn btn-primary btn-sm editReschedOrder">Reschedule</a>';
+                    $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->num.'" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-set="1" data-type="deliver" data-original-title="Edit" class="btn btn-primary btn-sm editReschedOrder" >View Details</a>';
+                    return $btn;
                 })
-                ->rawColumns(['action'])
+                ->addColumn('total_price', function($row){
+                    return '<strong>'.number_format($row->total_price,2).'</strong>';
+                  })
+                ->rawColumns(['action', 'total_price'])
                 ->make(true);
         }
 

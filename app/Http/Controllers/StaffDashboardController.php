@@ -40,45 +40,45 @@ class StaffDashboardController extends Controller
         $order =  $area->orders()->where('delivery_date', '=', $now)->get();
 
         if ($request->ajax()) {
-            return Datatables::of($order)
-                ->addIndexColumn()
-                ->addColumn('name', function($row) {
-                    return $row->client->fname. " " . $row->client->lname;
-                })
-                ->addColumn('store_name', function($row) {
-                    return $row->store->store_name;
-                })
-                ->addColumn('store_address', function($row) {
-                    return $row->store->store_address;
-                })
-                ->addColumn('action', function ($row) {
+            // return Datatables::of($order)
+            //     ->addIndexColumn()
+            //     ->addColumn('name', function($row) {
+            //         return $row->client->fname. " " . $row->client->lname;
+            //     })
+            //     ->addColumn('store_name', function($row) {
+            //         return $row->store->store_name;
+            //     })
+            //     ->addColumn('store_address', function($row) {
+            //         return $row->store->store_address;
+            //     })
+            //     ->addColumn('action', function ($row) {
 
-                    if (!$row->is_completed && !$row->is_cancelled) {
-                        $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" class="btn btn-primary btn-sm editCompleteOrder">Completed</a>&nbsp;';
+            //         if (!$row->is_completed && !$row->is_cancelled) {
+            //             $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" class="btn btn-primary btn-sm editCompleteOrder">Completed</a>&nbsp;';
 
-                        $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder">Cancel</a>';
+            //             $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as cancelled" data-id="'.$row->id.'" class="btn btn-danger btn-sm editCancelOrder">Cancel</a>';
 
-                         return $btn;
-                     } else {
-                        return 'NA';
-                     }
+            //              return $btn;
+            //          } else {
+            //             return 'NA';
+            //          }
    
-                })
-                ->addColumn('status', function($row) {
-                    if ($row->is_completed) {
-                        return '<span class="text-success font-weight-bold">Completed</span>';
-                    }
+            //     })
+            //     ->addColumn('status', function($row) {
+            //         if ($row->is_completed) {
+            //             return '<span class="text-success font-weight-bold">Completed</span>';
+            //         }
 
-                    if ($row->is_cancelled) {
-                        return '<span class="text-danger font-weight-bold">Cancelled</span>';
-                    }
+            //         if ($row->is_cancelled) {
+            //             return '<span class="text-danger font-weight-bold">Cancelled</span>';
+            //         }
 
-                    if (!$row->is_completed) {
-                        return '<span class="text-info font-weight-bold">Pending</span>';
-                    }
-                })
-                ->rawColumns(['action', 'store_name', 'store_address', 'name', 'status'])
-                ->make(true);
+            //         if (!$row->is_completed) {
+            //             return '<span class="text-info font-weight-bold">Pending</span>';
+            //         }
+            //     })
+            //     ->rawColumns(['action', 'store_name', 'store_address', 'name', 'status'])
+            //     ->make(true);
         }
 
         return view('staff.dashboard', compact('order'));

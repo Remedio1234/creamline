@@ -9,12 +9,20 @@
     </div>
     <table id="dataTable" class="table table-striped table-bordered">
         <thead class="bg-indigo-1 text-white">
-        <tr>
+        {{-- <tr>
             <th>ID</th>
             <th>Client</th>
             <th>Store Name</th>
             <th>Store Address</th>
             <th>Status</th>
+            <th>Action</th>
+        </tr> --}}
+        <tr>
+            <th>ID</th>
+            <th>Invoice #</th>
+            <th>Customer</th>
+            <th>Date Ordered</th>
+            <th>Delivery Date</th>
             <th>Action</th>
         </tr>
         </thead>
@@ -32,16 +40,21 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Failed Delivery Report</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
                 <form id="frmCancelledOrder" name="frmCancelledOrder" class="form-horizontal">
                     <input type="hidden" name="failed_order_id" id="failed_order_id">
                     <div class="form-group">
                         <label for="txt_cancelled_reason" class="col-sm-12 control-label">Reason:</label>
-                        <select class="custom-select mb-3" name="cancel_option" id="cancel_option" required>
+                        <div class="col-sm-12">
+                        <select class="form-control custom-select mb-3" name="cancel_option" id="cancel_option" required>
                           <option value="1">Client Cancel</option>
                           <option value="2">Delivery Cancel</option>
                         </select>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="txt_cancelled_reason" class="col-sm-12 control-label">Reason:</label>

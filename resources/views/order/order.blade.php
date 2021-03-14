@@ -14,16 +14,16 @@
                         <a class="nav-link active refresh_table" data-value="order-tab-pending" data-toggle="tab" href="#order-tab-pending" role="tab" aria-controls="profile" aria-selected="true">PENDING</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link refresh_table"  data-value="order-tab-undelivered" data-toggle="tab" href="#order-tab-undelivered" role="tab" aria-selected="false">UNDELIVERED</a>
+                        <a class="nav-link refresh_table"  data-value="order-tab-undelivered" data-toggle="tab" href="#order-tab-undelivered" role="tab" aria-selected="false">FOR DELIVERY</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link refresh_table"  data-value="order-replacement" data-toggle="tab" href="#order-replacement" role="tab" aria-selected="false">REPLACEMENT</a>
+                        <a class="nav-link refresh_table"  data-value="order-replacement" data-toggle="tab" href="#order-replacement" role="tab" aria-selected="false">UNDELIVERED</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link refresh_table" data-value="order-damage" data-toggle="tab" href="#order-damage" role="tab" aria-selected="false">DAMAGE</a>
+                        <a class="nav-link refresh_table" data-value="order-damage" data-toggle="tab" href="#order-damage" role="tab" aria-selected="false">REPLACEMENT</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link refresh_table" data-value="order-tab-tran-his" data-toggle="tab" href="#order-tab-tran-his" role="tab" aria-selected="false">TRANSACTION HISTORY</a>
+                        <a class="nav-link refresh_table" data-value="order-tab-tran-his" data-toggle="tab" href="#order-tab-tran-his" role="tab" aria-selected="false">REPORTS</a>
                     </li>
                 </ul>
             </div>
@@ -36,7 +36,7 @@
                                 <th>ID</th>
                                 <th>Invoice #</th>
                                 <th>Customer</th>
-                                <th>Total</th>
+                                {{-- <th>Total</th> --}}
                                 <th>Date Ordered</th>
                                 <th>Delivery Date</th>
                                 <th>Action</th>
@@ -48,7 +48,7 @@
                     </div>
                     <div class="tab-pane fade show" id="order-tab-undelivered" role="tabpanel">
                         <table style="width: 100%;" id="undeliveredTable" class="table table-striped table-bordered">
-                            <thead class="bg-indigo-1 text-white">
+                            {{-- <thead class="bg-indigo-1 text-white">
                             <tr>
                                 <th>ID</th>
                                 <th>Customer</th>
@@ -62,7 +62,22 @@
                             </tr>
                             </thead>
                             <tbody>
-                            </tbody>
+                            </tbody> --}}
+                            <thead class="bg-indigo-1 text-white">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Invoice #</th>
+                                    <th>Customer</th>
+                                    {{-- <th>Total</th> --}}
+                                    <th>Date Ordered</th>
+                                    <th>Delivery Date</th>
+                                    <th>Attempt</th>
+                                    <th>Replacement</th>
+                                    <th>Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
                         </table>
                     </div>
                     <div class="tab-pane fade show" id="order-replacement" role="tabpanel">
@@ -195,6 +210,7 @@
                             <input type="date" name="delivery_date" class="form-control" id="delivery_date">
                         </div>
                     </div> --}}
+                    <div class="wrap_modal">
                     <div class="form-group">
                         <label for="txt_pending_delivery_date" class="col-sm-12 control-label">Delivery date</label>
                         <div class="col-sm-12">
@@ -203,6 +219,7 @@
                     </div>
                     <div class="col-sm-offset-12 col-sm-10">
                         <button type="submit" class="btn btn-primary" id="btnConfirmPendingOrder">Confirm</button>
+                    </div>
                     </div>
                 </form>
             </div>
@@ -450,7 +467,7 @@
                         return full.fullname
                     }
                 },
-                {data: 'total_price', name: 'total_price'},
+                // {data: 'total_price', name: 'total_price'},
                 // {data: 'name', name: 'name'},
                 // {   
                 //     data: 'product_image', name: 'product_image',
@@ -495,8 +512,13 @@
 
 
         // edit pending order
-        function getPendingOrders(invoice_id){
-            $.getJSON( "{{ url('order/pending') }}" + '/'+ invoice_id, function( data ) {
+        function getPendingOrders(invoice_id, type, setId){
+            if(type == 'pending'){
+                $('.wrap_modal').show()
+            } else {
+                $('.wrap_modal').hide()
+            }
+            $.getJSON( "{{ url('order/pending') }}" + '/'+ invoice_id + '/' + type + '/' + setId, function( data ) {
                 var htmlData = ''
                 var total = 0;
                 var i = 0
@@ -506,9 +528,13 @@
                         <td>${row.id}</td>
                         <td>${row.name}</td>
                         <td>${row.size}</td>
-                        <td><a data-fancybox='' href='/img/product/${row.product_image}'><img src='/img/product/${row.product_image}' height='20'></a></td>
-                        <td><input type='number' name='order[${i}][quantity]' value='${row.quantity_ordered}' data-iid='${invoice_id}' data-id='${row.id}' class="modal_qty" style='width:60px;' placeholder='0'></td>
-                        <td>${row.ordered_total_price}
+                        <td><a data-fancybox='' href='/img/product/${row.product_image}'><img src='/img/product/${row.product_image}' height='20'></a></td>`
+                        if(type == 'pending'){
+                            htmlData += `<td><input type='number' name='order[${i}][quantity]' value='${row.quantity_ordered}' data-iid='${invoice_id}' data-id='${row.id}' class="modal_qty" style='width:60px;' placeholder='0'></td>`
+                        } else {
+                            htmlData += `<td>${row.quantity_ordered}</td>`
+                        }
+                    htmlData +=`<td>${row.ordered_total_price}
                             <input type='hidden' name='order[${i}][product_id]' value='${row.prodID}'>
                             <input type='hidden' name='order[${i}][order_id]' value='${row.id}'>
                             <input type='hidden' name='order[${i}][amount]' value='${row.ordered_total_price}'></td>
@@ -522,10 +548,13 @@
             });
         }
 
-        $('body').on('click', '.editPendingOrder', function () {
+        $('body').on('click', '.editPendingOrder, .editReschedOrder', function (e) {
+            e.preventDefault();
             //get the data
-            const invoice_id = $(this).attr("data-id");
-            getPendingOrders(invoice_id)
+            const invoice_id = $(this).data("id");
+            var type         = $(this).data("type");
+            var setId        = $(this).data("set");
+            getPendingOrders(invoice_id, type, setId)
 
             var invoice_no = $(this).data('invoice');
             $("#pending_invoice").val(invoice_no);
@@ -654,40 +683,100 @@
                                         UNDELIVERED LIST
         -------------------------------------------------------------------------------- */
         // datatable
+        // var undeliverTable = $('#undeliveredTable').DataTable({
+        //     processing: true,
+        //     serverSide: true,
+        //     ajax: "{{ url('undeliver') }}",
+        //     columns: [
+        //         // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+        //         {data: 'id', name: 'id'},
+        //         {
+        //             data: 'fname', name: 'fname',
+        //             "render": function(data, type, full, meta){
+        //                 return full.lname + ', ' + full.fname
+        //             }
+        //         },
+        //         {data: 'name', name: 'name'},
+        //         {   
+        //             data: 'product_image', name: 'product_image',
+        //             "render": function (data, type, full, meta) {
+        //                 return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
+        //             },
+        //         },
+        //         {
+        //             data: 'quantity_ordered', name: 'quantity_ordered',
+        //             "render": function(data, type, full, meta){
+        //                 return data + " pcs"
+        //             }
+        //         },
+        //         {
+        //             data: 'ordered_total_price', name: 'ordered_total_price',
+        //             "render": function(data, type, full, meta){
+        //                 return "&#x20b1; " + data
+        //             }
+        //         },
+        //         {
+        //             data: 'created_at', name: 'created_at',
+        //             "render": function (data, type, full, meta) {
+        //                 return moment(data).format('MMMM D YYYY, h:mm:ss a');
+        //             },
+        //         },
+        //         {
+        //             data: 'delivery_date', name: 'delivery_date',
+        //             "render": function (data, type, full, meta) {
+        //                 let output = '';
+        //                 if(full.is_cancelled == 1){
+        //                     output = '<span class="text-danger font-weight-bold">(To be reschedule)</span>'
+        //                 }else{
+        //                     output = moment(data).format('MMMM D YYYY');
+        //                 }
+
+        //                 return output
+        //             },
+        //         },
+        //         {data: 'action', name: 'action', orderable: false, searchable: false},
+        //     ]
+        // });
+
         var undeliverTable = $('#undeliveredTable').DataTable({
             processing: true,
             serverSide: true,
             ajax: "{{ url('undeliver') }}",
+            data: { 
+              ajaxid: 4
+            },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
+                {data: 'invoice_no', name: 'invoice_no'},
                 {
-                    data: 'fname', name: 'fname',
+                    data: 'fullname', name: 'fullname',
                     "render": function(data, type, full, meta){
-                        return full.lname + ', ' + full.fname
+                        return full.fullname
                     }
                 },
-                {data: 'name', name: 'name'},
-                {   
-                    data: 'product_image', name: 'product_image',
-                    "render": function (data, type, full, meta) {
-                        return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
-                    },
-                },
+                // {data: 'total_price', name: 'total_price'},
+                // {data: 'name', name: 'name'},
+                // {   
+                //     data: 'product_image', name: 'product_image',
+                //     "render": function (data, type, full, meta) {
+                //         return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
+                //     },
+                // },
+                // {
+                //     data: 'quantity_ordered', name: 'quantity_ordered',
+                //     "render": function(data, type, full, meta){
+                //         return data + " pcs"
+                //     }
+                // },
+                // {
+                //     data: 'ordered_total_price', name: 'ordered_total_price',
+                //     "render": function(data, type, full, meta){
+                //         return "&#x20b1; " + data
+                //     }
+                // },
                 {
-                    data: 'quantity_ordered', name: 'quantity_ordered',
-                    "render": function(data, type, full, meta){
-                        return data + " pcs"
-                    }
-                },
-                {
-                    data: 'ordered_total_price', name: 'ordered_total_price',
-                    "render": function(data, type, full, meta){
-                        return "&#x20b1; " + data
-                    }
-                },
-                {
-                    data: 'created_at', name: 'created_at',
+                    data: 'date_ordered', name: 'date_ordered',
                     "render": function (data, type, full, meta) {
                         return moment(data).format('MMMM D YYYY, h:mm:ss a');
                     },
@@ -696,8 +785,8 @@
                     data: 'delivery_date', name: 'delivery_date',
                     "render": function (data, type, full, meta) {
                         let output = '';
-                        if(full.is_cancelled == 1){
-                            output = '<span class="text-danger font-weight-bold">(To be reschedule)</span>'
+                        if(full.delivery_date == null){
+                            output = '<span class="text-info font-weight-bold">(Not set)</span>'
                         }else{
                             output = moment(data).format('MMMM D YYYY');
                         }
@@ -705,29 +794,31 @@
                         return output
                     },
                 },
+                {data: 'attempt', name: 'attempt'},
+                {data: 'attempt', name: 'attempt'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
         });
 
         // edit resched order
-        $('body').on('click', '.editReschedOrder', function () {
-            //get the data
-            const order_id = $(this).attr("data-id");
-            const contact = $(this).attr("data-num");
-            const prodname = $(this).attr("data-prodname");
-            const qty = $(this).attr("data-qty");
-            const total = $(this).attr("data-total");
+        // $('body').on('click', '.editReschedOrder', function () {
+        //     //get the data
+        //     const order_id = $(this).attr("data-id");
+        //     const contact = $(this).attr("data-num");
+        //     const prodname = $(this).attr("data-prodname");
+        //     const qty = $(this).attr("data-qty");
+        //     const total = $(this).attr("data-total");
 
-            //set the data
-            $("#resched_order_id").val(order_id);
-            $("#resched_contact").val(contact);
-            $("#txt_resched_product").val(prodname);
-            $("#resched_amount").val(total);
-            $("#txt_resched_qty").val(qty);
-            $("#txt_resched_amount").val(total);
+        //     //set the data
+        //     $("#resched_order_id").val(order_id);
+        //     $("#resched_contact").val(contact);
+        //     $("#txt_resched_product").val(prodname);
+        //     $("#resched_amount").val(total);
+        //     $("#txt_resched_qty").val(qty);
+        //     $("#txt_resched_amount").val(total);
             
-            $('#updateReschedModal').modal('show');
-        });
+        //     $('#updateReschedModal').modal('show');
+        // });
 
         //when button confirm order is clicked
         $("#frmReschedOrder").on('submit', function(e) {

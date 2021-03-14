@@ -68,7 +68,10 @@ class TransactionHistoryController extends Controller
                     return '<strong>'.number_format($row->total_price,2).'</strong>';
                   })
                 ->addColumn('action', function ($row) {
-                    $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->contact_num.'" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm viewCompletedOrder">View details</a>';
+                    $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->contact_num.'" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm viewCompletedOrder">View details</a> ';
+                    if($row->is_approved == 0){
+                        $btn .= '<a  href="javascript:void(0)" data-id="'.$row->id.'" class="btn btn-danger btn-sm viewCompletedOrder">Remove Order</a>';
+                    }
                     return $btn;
                 })
                 ->rawColumns(['action','total_price'])

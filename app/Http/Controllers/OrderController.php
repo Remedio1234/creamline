@@ -35,7 +35,7 @@ class OrderController extends Controller
                 ->join('users', 'orders.client_id', '=', 'users.id')
                 ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered','orders.size',
                     'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
-                ->where('orders.is_approved', 0)
+                ->where('orders.is_approved', $request->setId)
                 ->where('orders.invoice_id', $request->invoice_id)
                 ->get();
 
@@ -120,6 +120,7 @@ class OrderController extends Controller
                 // ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',
                 //     'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
                 ->where('is_approved', 0)
+                ->where('is_completed', 0)
                 ->groupBy('orders.invoice_id')
                 ->get();
 
@@ -128,7 +129,7 @@ class OrderController extends Controller
                 ->addIndexColumn()
                 ->addColumn('action', function ($row) {
    
-                    $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->num.'" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
+                    $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->num.'" data-set="0" data-type="pending" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
                     return $btn;
                 })
                 ->addColumn('total_price', function($row){
