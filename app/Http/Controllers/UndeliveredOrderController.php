@@ -62,6 +62,7 @@ class UndeliveredOrderController extends Controller
                 users.email, 
                 orders.delivery_date,
                 orders.attempt,
+                orders.is_replacement,
                 users.id as client_id,
                 users.contact_num as num")
                 // ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',

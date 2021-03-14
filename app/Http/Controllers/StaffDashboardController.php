@@ -97,6 +97,7 @@ class StaffDashboardController extends Controller
                 orders.delivery_date,
                 orders.is_completed,
                 orders.is_cancelled,
+                orders.is_replacement,
                 users.id as client_id,
                 users.contact_num as num")
                 // ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',
