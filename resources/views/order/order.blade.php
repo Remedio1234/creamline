@@ -576,7 +576,7 @@
                         <td>${row.name}</td>
                         <td>${row.size}</td>
                         <td><a data-fancybox='' href='/img/product/${row.product_image}'><img src='/img/product/${row.product_image}' height='20'></a></td>`
-                        if(type == 'pending'){
+                        if(['all','pending'].indexOf(type) !== -1){
                             htmlData += `<td><input type='number' name='order[${i}][quantity]' value='${row.quantity_ordered}' data-iid='${invoice_id}' data-id='${row.id}' class="modal_qty" style='width:60px;' placeholder='0'></td>`
                         } else {
                             htmlData += `<td>${row.quantity_ordered}</td>`
