@@ -316,12 +316,12 @@
 
         // edit pending order
         function getPendingOrders(invoice_id, type){
-            if(type == 0){ //
+            if(type == 0){ 
                 $("#pending_modal").show();
             } else {
                 $("#pending_modal").hide();
             }
-           $("#set_id_invoice").val(invoice_id)
+            $("#set_id_invoice").val(invoice_id)
             $.getJSON( "{{ url('order/items/completed/') }}" + '/'+ invoice_id, function( data ) {
                 var htmlData = ''
                 var total = 0;
