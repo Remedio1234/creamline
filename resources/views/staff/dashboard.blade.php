@@ -268,7 +268,12 @@
                     },
                 },
                 {data: 'attempt', name: 'attempt'},
-                {data: 'attempt', name: 'attempt'},
+                {
+                    data: 'is_replacement', name: 'is_replacement',
+                    "render": function (data, type, full, meta) {
+                        return data == 1 ? 'Yes' : 'No'
+                    },
+                },
                 {data: 'status', name: 'status'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
