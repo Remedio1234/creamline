@@ -535,6 +535,7 @@
         var table = $('#dataTable').DataTable({
             processing: true,
             serverSide: true,
+            paging      : false,
             ajax: "{{ url('order') }}",
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
@@ -820,6 +821,7 @@
         var undeliverTable = $('#undeliveredTable').DataTable({
             processing: true,
             serverSide: true,
+            paging    : false,
             ajax: "{{ url('undeliver') }}",
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
@@ -1122,6 +1124,8 @@
         $(document).on('click', '.editDamageOrder', function(){
             const products = JSON.parse($(this).attr("data-val"));
             const clientid = $(this).attr("data-clientid");
+            const product_report_id = $(this).attr("data-id");
+            const storeid = $(this).attr("data-store");
             $('#displayProductsModal').modal('show');
             $('#divModalProducts').empty();
 
@@ -1156,6 +1160,7 @@
                                 placeholder='0' 
                                 name="damage[${i}][quantity]" 
                                 style='width:100px;'/>
+                            <input type="hidden" value="${product.id}"  name="damage[${i}][id]"/>
                             <input type="hidden" value="${product.product_id}"  name="damage[${i}][product_id]"/>
                             <input type="hidden" value="${product.price}"  name="damage[${i}][price]"/>
                             <input type="hidden" value="${product.size}"  name="damage[${i}][size]"/>
@@ -1171,9 +1176,9 @@
                             <div class="col-2"><strong class='all_total'>${total.toFixed(2)}</strong></div>
                     </div>`
                      jsx += `<div class="row">
-                        <div class="form-group">
+                        <div class="form-group col-lg-6">
                             <label for="txt_resched_delivery_date" class="col-sm-12 control-label">Delivery date</label>
-                            <div class="col-12">
+                            <div class="col-lg-12">
                                 <input type="date" name="damage_delivery_date" class="form-control" id="damage_delivery_date">
                             </div>
                         </div>
@@ -1181,7 +1186,9 @@
             jsx += `<div class="modal-footer">
                         <div class="row text-center">
                             <input type="hidden" value="${clientid}" id="data_client_id" name="data_client_id"/>
-                            <button type='submit' class="btn btn-success">Checkout</button>
+                            <input type="hidden" value="${storeid}" id="data_store_id" name="data_store_id"/>
+                            <input type="hidden" value="${product_report_id}" id="data_report_id" name="product_report_id"/>
+                            <button type='submit' id='is_loading' class="btn btn-success">Checkout</button>
                         </div>
                     </div>
                 </form>`            
@@ -1190,6 +1197,11 @@
 
         $(document).on('submit', '#checkoutDamageOrder', function(e){
             e.preventDefault()
+
+            if(!$("#damage_delivery_date").val()){
+                swal("Error", "Please select a date to schedule the delivery!")
+                return 
+            }
             swal({
                 title: "Are you sure you want to checkout?",
                 icon: "info",
@@ -1198,23 +1210,22 @@
             })
             .then((isTrue) => {
                 if (isTrue) {
+                    $("#is_loading").text('Submitting..').prop('disabled', true)
                     $.ajax({
                         data: $(this).serialize(),
                         url: "{{ url('damage-cart') }}",
                         type: "POST",
                         dataType: 'json',
                         success: function (data) {
-
-                            //display a successful message
-                            // swal("Information", data.message).then(function() {
-                            //     if(isAdmin === true){
-                            //         window.location = "order#order-tab-tran-his";
-                            //     }else{
-                            //         window.location = "order-success";
-                            //     }
-                            // })
+                            $("#is_loading").text('Confirm').removeAttr('disabled')
+                            replacementTable.draw()
+                            swal("Information", data.message).then(function() {
+                                window.location = "order#order-tab-undelivered";
+                            })
+                            $("#displayProductsModal").modal('hide')
                         },
                         error: function (data) {
+                            $("#is_loading").text('Confirm').removeAttr('disabled')
                             console.log('Error:', data);
                         }
                     });
@@ -1285,6 +1296,7 @@
         var replacementTable = $('#replacementTable').DataTable({
             processing: true,
             serverSide: true,
+            paging    : false,
             // ajax: "{{ url('undeliver') }}",
             ajax: "{{ url('order_replacement') }}",
             columns: [
@@ -1581,6 +1593,7 @@
         var damageTable = $('#damageTable').DataTable({
             processing: true,
             serverSide: true,
+            paging    : false,
             ajax: "{{ url('file_replacement') }}",
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
@@ -1637,8 +1650,8 @@
                     render: function(data, type, full, meta) {
                         var output = ''
                         if(!full.is_replaced){
-                            output += "<a href='javascript:void(0)' class='btn btn-primary btn-sm editDamageOrder' data-clientid='"+full.client_id+"'  data-val='"+full.products+"'>Approve </a>";
-                            output += "<a href='javascript:void(0)' data-id='"+full.id+"' data-clientid='"+full.client_id+"' class='btn btn-danger btn-sm editDisapproveDamage mt-1'>Decline</a>";
+                            output += "<a href='javascript:void(0)' data-id='"+full.id+"' data-store='"+full.store_id+"' class='btn btn-primary btn-sm editDamageOrder' data-clientid='"+full.client_id+"'  data-val='"+full.products+"'>Approve </a>";
+                            output += "<a href='javascript:void(0)' data-id='"+full.id+"'  data-clientid='"+full.client_id+"' class='btn btn-danger btn-sm editDisapproveDamage mt-1'>Decline</a>";
                         } else {
                             output = 'NA';
                         }
@@ -1769,6 +1782,7 @@
         var historyTable = $('#historyTable').DataTable({
             processing: true,
             serverSide: true,
+            paging    : false,
             ajax: "{{ url('history') }}",
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
@@ -1936,6 +1950,16 @@
                     historyTable.draw()
                 break;
             }
+
+            var uri = window.location.toString(); 
+  
+            if (uri.indexOf("#") > 0) { 
+                var clean_uri = uri.substring(0,  
+                                uri.indexOf("#")); 
+  
+                window.history.replaceState({},  
+                        document.title, clean_uri); 
+            } 
         })
 
     })

@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Cart;
-use App\Product;
+use App\{
+    Cart,
+    Product,
+    Order,
+    Product_Report
+};
 use DataTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
-
+use Illuminate\Support\Facades\DB;
 class CartController extends Controller
 {
     /**
@@ -56,7 +60,86 @@ class CartController extends Controller
     }
 
     public function storeDamageCart(Request $request){
+        if ($request->ajax()) {
+            $ids = array();
+            $client_id      = $request->data_client_id;
+            foreach ($request->damage as $key => $cart) {
+                $product = Product::find($cart['product_id']);
+                if($product){
+                    $ids[] = Cart::insertGetId([
+                        'product_id'            => $product->id,
+                        'user_id'               => $client_id,
+                        'product_name'          => $product->name,
+                        'product_description'   => $product->description,
+                        'product_image'         => $product->product_image,
+                        'size'                  => $cart['size'],
+                        'flavor'                => '',
+                        'quantity'              => $cart['quantity'],
+                        'subtotal'              => ($cart['price'] * $cart['quantity']),
+                        'is_checkout'           => '1',
+                        'is_placed'             => '1',
+                        'created_at'            => date('Y-m-d H:s:i'),
+                        'updated_at'            => date('Y-m-d H:s:i')
+                    ]);
+                }
+            }
 
+            $id             = DB::table('order_invoice')->insertGetId(['invoice_no' => null, 'user_id' => $client_id, 'created_at' => date('Y-m-d H:i:s')]);
+            $orderId        = 0;
+            $count_order    = DB::table('order_invoice')->select('id')->whereRaw('DATE(created_at) = DATE("'.date('Y-m-d H:i:s').'")')->limit(1)->first();
+            $orderId        = (int) ($id - $count_order->id) + 1;
+
+            $uId            = sprintf("%04s", $orderId);
+            $invoiceNo      = date('ymd').$uId;
+
+            DB::table('order_invoice')->whereId($id)->update(['invoice_no' => $invoiceNo]);
+
+            $store_id       = $request->input("data_store_id");
+
+        $cart_data = Cart::whereIn('id', $ids)->get()->toArray();    
+            //loop the cart data
+        foreach($cart_data as $cart){
+            if(!empty($cart)){
+                $cart_object_array[] = [
+                    "client_id"                 => $client_id,
+                    'invoice_id'                => $id,
+                    "delivery_date"             => $request->damage_delivery_date,
+                    "store_id"                  => $store_id,
+                    "product_id"                => $cart["product_id"],
+                    "size"                      => $cart["size"],
+                    "flavor"                    => $cart["flavor"],
+                    "quantity_ordered"          => $cart["quantity"],
+                    "ordered_total_price"       => $cart["subtotal"],
+                    "quantity_received"         => 0,
+                    "received_total_price"      => 0,
+                    "is_replacement"            => '1',
+                    "is_approved"               => Auth::user()->user_role == 99,
+                    "is_cancelled"              => 0,
+                    "is_rescheduled"            => 0,
+                    "is_completed"              => 0,
+                    'is_replacement_reference'  => $request->product_report_id,
+                    "attempt"                   => 0,
+                    "reason"                    => "",
+                    'updated_at'                => date('Y-m-d H:s:i'),
+                    'created_at'                => date('Y-m-d H:s:i')
+                ];
+            }
+        }
+
+        if(Order::insert($cart_object_array)){
+            Product_Report::where('id', $request->product_report_id)->update(['is_replaced' => '1']);
+            $response = [
+                'success' => true,
+                'message' => '('.$invoiceNo . ') Order successfully saved.',
+            ];
+        } else {
+            $response = [
+                'success' => false,
+                'message' => 'There is an error in saving the order.',
+            ];
+        }
+            return response()->json($response, 200);
+        }
     }
 
     /**
