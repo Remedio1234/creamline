@@ -122,3 +122,14 @@ Route::get('order-success',                                             'Transac
 Route::get('display_order_to_receive_count_for_client',                 'HomeController@display_order_to_receive_count_for_client')->name('display_order_to_receive_count_for_client');
 Route::get('display_order_to_approve_count_for_client',                 'HomeController@display_order_to_approve_count_for_client')->name('display_order_to_approve_count_for_client');
 Route::get('display_3_best_product_of_the_month',                       'HomeController@display_3_best_product_of_the_month')->name('display_3_best_product_of_the_month');
+
+
+
+//refactor stocks
+Route::post('save-edit-stocks',                                         'StockController@createUpdate');
+Route::get('stocks-table',                                              'StockController@getStocksTable');
+Route::get('stocks/edit/{id}',                                          'StockController@getStocksRow');
+
+
+//refactor Products
+Route::get('product/edit/{id}',                                         'ProductController@getProductRow');

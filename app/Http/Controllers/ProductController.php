@@ -32,33 +32,36 @@ class ProductController extends Controller
     {
         $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
                     ->selectRaw('products.*,stocks.quantity, stocks.threshold')
+                    ->when($request->filter_status != 'all', function($sql) use($request){
+                        return $sql->where('is_deleted', $request->filter_status);
+                    })
                         ->latest()
                             ->get();
-        if($request->filter_status != 'all'){
-            if(in_array($request->filter_status, [0,1])){ //available
-                $where = ['is_deleted' => $request->filter_status];
-                $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
-                    ->selectRaw('products.*,stocks.quantity, stocks.threshold')
-                        ->where($where)
-                            ->whereRaw('stocks.quantity > stocks.threshold')
-                                ->latest()
-                                    ->get();
-            } else if($request->filter_status == 3){
-                $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
-                    ->selectRaw('products.*,stocks.quantity, stocks.threshold')
-                        ->where('stocks.quantity',0)
-                            ->latest()
-                                ->get();
-            } 
-            else if($request->filter_status == 2){
-                $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
-                    ->selectRaw('products.*,stocks.quantity, stocks.threshold')
-                        ->whereRaw('stocks.quantity <= stocks.threshold')
-                            ->where('stocks.quantity','>', 0)
-                                ->latest()
-                                    ->get();
-            } 
-        }
+        // if($request->filter_status != 'all'){
+        //     if(in_array($request->filter_status, [0,1])){ //available
+        //         $where = ['is_deleted' => $request->filter_status];
+        //         $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
+        //             ->selectRaw('products.*,stocks.quantity, stocks.threshold')
+        //                 ->where($where)
+        //                     ->whereRaw('stocks.quantity > stocks.threshold')
+        //                         ->latest()
+        //                             ->get();
+        //     } else if($request->filter_status == 3){
+        //         $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
+        //             ->selectRaw('products.*,stocks.quantity, stocks.threshold')
+        //                 ->where('stocks.quantity',0)
+        //                     ->latest()
+        //                         ->get();
+        //     } 
+        //     else if($request->filter_status == 2){
+        //         $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
+        //             ->selectRaw('products.*,stocks.quantity, stocks.threshold')
+        //                 ->whereRaw('stocks.quantity <= stocks.threshold')
+        //                     ->where('stocks.quantity','>', 0)
+        //                         ->latest()
+        //                             ->get();
+        //     } 
+        // }
         if ($request->ajax()) {
             return Datatables::of($product)
                 ->addIndexColumn()
@@ -78,9 +81,9 @@ class ProductController extends Controller
                         $delete_btn = 'btn-success';
                     }
 
-                    $btn = '<a href="product/'.$row->id.'/edit" data-toggle="tooltip" data-placement="top" title="Update Product" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
-                    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Stock" data-toggle="tooltip" data-id="'.$row->id.'" data-name="'.$row->name.'" data-original-title="Stock" class="btn btn-warning btn-sm StockProduct">Stock</a>';
-                    $btn = $btn.' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Product" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteProduct">'.$delete_status.'</a>';
+                    $btn = '<a href="javascript://;" data-toggle="tooltip" data-placement="top" title="Update Product" data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editProduct">Edit</a>';
+                    $btn .=' <a href="product/'.$row->id.'/edit" data-toggle="tooltip" data-placement="top" title="Stock" data-toggle="tooltip" data-id="'.$row->id.'" data-name="'.$row->name.'" data-original-title="Stock" class="btn btn-warning btn-sm"> Manage Stock</a>';
+                    // $btn .=' <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Product" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteProduct">'.$delete_status.'</a>';
 
                     return $btn;
                 })
@@ -90,15 +93,15 @@ class ProductController extends Controller
                         $status = '<span class="text-success font-weight-bold">Available</span>';
                     } 
                     else if($row->is_deleted == 1){
-                        $status = '<span class="text-danger font-weight-bold">Phased out </span>';
+                        $status = '<span class="text-danger font-weight-bold">Phased out</span>';
                     } 
                      
-                    if($row->quantity == 0){
-                        $status = '<span class="text-danger font-weight-bold"">Out of Stock</span>';
-                    } 
-                    else if($row->quantity <= $row->threshold){
-                        $status = '<span class="text-warning font-weight-bold">Running Low</span>';
-                    }
+                    // if($row->quantity == 0){
+                    //     $status = '<span class="text-danger font-weight-bold"">Out of Stock</span>';
+                    // } 
+                    // else if($row->quantity <= $row->threshold){
+                    //     $status = '<span class="text-warning font-weight-bold">Running Low</span>';
+                    // }
 
                     return $status;
                 })
@@ -117,6 +120,46 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {  
+        if ($request->ajax()) {
+
+            if(empty($request->product_id)){
+                $image = $request->file('product_image');
+                $new_name = rand() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('img/product'), $new_name);
+            } else {
+                if($request->hasFile("product_image")){
+                    $image = $request->file('product_image');
+                    $new_name = rand() . '.' . $image->getClientOriginalExtension();
+                    $image->move(public_path('img/product'), $new_name);
+                } else {
+                    $pdct = Product::find($request->product_id);
+                    $new_name = $pdct->product_image;
+                }
+            }
+        
+            Product::updateOrCreate([
+                'id' => $request->product_id
+            ],[
+                'name'          => $request->name,
+                'description'   => $request->description,
+                'product_image' => $new_name,
+                'is_deleted'    => $request->is_deleted
+            ]);
+
+
+
+            return response()->json([
+                'message'   => 'Product Successfully submitted.',
+                200
+            ]);
+        }
+
+
+
+
+
+
+        //old 
         //if there is a product image selected
         if($request->hasFile("product_image")){
             $validation = Validator::make($request->all(), [
@@ -383,5 +426,12 @@ class ProductController extends Controller
                 $data[$prices[$key]] = $value;
         }
         return response()->json($data);
+    }
+
+    public function getProductRow(Request $request){
+        if ($request->ajax()) {
+            $stock = Product::find($request->id);
+            return response()->json($stock);
+        }
     }
 }

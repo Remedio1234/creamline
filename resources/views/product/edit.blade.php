@@ -4,92 +4,94 @@
 <div class="container">
     <h3>{{ $product->name}}</h3>
     <div class="row">
-        <div class="col-md-4 padding-2px">
+        <div class="col-md-3 padding-2px">
             <div class="card">
-                <div class="card-header">Edit Product</div>
+                <div class="card-header">Stocks</div>
                 <div class="card-body">
-                    <form id="productForm" enctype="multipart/form-data">
+                    <form id="productForm" method="POST">
+                        <input type="hidden" name="id" id="id">
                         <input type="hidden" name="product_id" id="product_id" value="{{ $product->id }}">
                         <div class="form-group">
-                            <label for="name" class="col-sm-12 control-label">Product Name</label>
+                            <label for="name" class="col-sm-12 control-label">Size</label>
                             <div class="col-sm-12">
-                                <input type="text" class="form-control" id="name" name="name" maxlength="50" required="" value="{{ $product->name }}">
+                                <input type="text" class="form-control" id="size" name="size" maxlength="50" required placeholder="ex. 100ml">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-12 control-label">Product Description</label>
+                            <label for="name" class="col-sm-12 control-label">Quantity</label>
                             <div class="col-sm-12">
-                                <input for="description" type="text" class="form-control" id="description" name="description" maxlength="255" required="" value="{{ $product->description }}">
+                                <input type="number" class="form-control" id="quantity" name="quantity" maxlength="50" required placeholder="ex.100">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="col-sm-12 control-label">Product Image</label>
+                            <label for="name" class="col-sm-12 control-label">Price</label>
                             <div class="col-sm-12">
-                                <label class="new-avatar hidden"><span class="far fa-plus-square"></span>
-                                    <input id="product_image" name="product_image[]" multiple type="file" class="text-center center-block file-upload"/>
-                                </label>
+                                <input type="number" class="form-control" id="price" name="price" maxlength="50" required placeholder="ex. 10">
                             </div>
                         </div>
-                        <button class="btn btn-success full-width-button" id="btnUpdateProduct">Update</button>
+                        <div class="form-group">
+                            <label for="name" class="col-sm-12 control-label">Threshold</label>
+                            <div class="col-sm-12">
+                                <input type="number" class="form-control" id="threshold" name="threshold" maxlength="50" required placeholder="ex. 10">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name" class="col-sm-12 control-label">Promo</label>
+                            <div class="col-sm-12">
+                                <input type="number" class="form-control" id="promo" name="promo" maxlength="50" value="0" placeholder="ex. 10">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name" class="col-sm-12 control-label">Status</label>
+                            <div class="col-sm-12">
+                                <select class="form-control" name="status" id="status">
+                                    <option value="0">Available</option>
+                                    <option value="1">UnAvailable</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-success full-width-button" id="btnUpdateProduct">Submit</button>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-3 padding-2px">
+        <div class="col-md-9 padding-2px">
             <form id="variationForm" name="variationForm">
                 <div class="card">
-                    <div class="card-header">Edit Variation</div>
+                    <div class="card-header">List of Stocks</div>
                     <div class="card-body">
-                        <div class="form-group">
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <label class="col-sm-12 control-label" for="size">Product Size</label>
-                            <div class="col-sm-12">
-                                <input type="text" class="form-control" id="size" maxlength="255">
-                            </div>
+                        <div class="col-md-12" style="padding:0px;">
+                            <select class="form-control float-right" id="filter_status" style="width: 300px;">
+                                <option value="0">Available</option>
+                                <option value="1">Phased out</option>
+                                <option value="2">Running Low</option>
+                                <option value="3">Out of Stocks</option>
+                                <option value="all">All</option>
+                            </select>
                         </div>
-                        <div class="form-group" hidden>
-                            <label class="col-sm-12 control-label" for="flavor">Product Flavor</label>
-                            <div class="col-sm-12">
-                                <input type="text" class="form-control" id="flavor" maxlength="255">
-                            </div>
-                        </div>
-                        <button class="btn btn-success full-width-button" type="submit">Update</button>
+                        <br><br>
+                        <table id="stocks_table" class="table table-striped table-bordered">
+                            <thead class="bg-indigo-1 text-white">
+                            <tr>
+                                <th>ID</th>
+                                <th>Size</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Threshold</th>
+                                <th>Promo</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </form>
-        </div>
-        <div class="col-md-5 padding-2px">
-            <div class="card">
-                <div class="card-header">Edit Price</div>
-                <div class="card-body">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Size</th>
-                                <th>Price</th>
-                                <th>Promo</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php 
-                                //get the value for variation size and price
-                                $var_size = explode(",", $variation->size);
-                                $var_price = explode(",", $variation->price);
-                                $var_promo = explode(",", $variation->promo);
-                                $size_count = count($var_price) - 1;
-                                for($i = 0; $i < $size_count; $i++){
-                                    echo "<tr>";
-                                    echo    "<td>".$var_size[$i]."</td>";
-                                    echo    "<td>&#8369;&nbsp;&nbsp;<input type='number' class='names' style='width:100px;' placeholder='0' value='".$var_price[$i]."'</td>";
-                                    echo    "<td>&#8369;&nbsp;&nbsp;<input type='number' class='promo' style='width:100px;' placeholder='0' value='".$var_promo[$i]."'</td>";
-                                    echo "</tr>";
-                                }
-                             ?>
-                        </tbody>
-                    </table>
-                    <button class="btn btn-success float-right full-width-button" id="btnUpdatePrice">Update</button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -97,7 +99,7 @@
 
 <script type="text/javascript">
 
-    $(function () {
+    $( document ).ready(function() {
 
         //ajax setup
         $.ajaxSetup({
@@ -106,236 +108,75 @@
             }
         });
 
-        // create or update price
-        $('#productForm').on('submit', function (e) {
+        //get data table
+        // datatable
+        var table = $('#stocks_table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ url('stocks-table') }}",
+                data: function(e){
+                    e.product_id    = $('#product_id').val();
+                    e.filter_status = $('#filter_status').val();
+                }
+            },
+            columns: [
+                // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+                {data: 'id', name: 'id'},
+                {data: 'size', name: 'size'},
+                {data: 'quantity', name: 'quantity'},
+                {data: 'price', name: 'price'},
+                {data: 'threshold', name: 'threshold'},
+                {data: 'promo', name: 'promo'},
+                {data: 'status', name: 'status'},
+                {data: 'action', name: 'action', orderable: false, searchable: false},
+            ]
+        });
+
+        $(document).on('change', '#filter_status', function(e){
             e.preventDefault();
-
-            $.ajax({
-                url:"{{ url('product') }}",
-                method:"POST",
-                data:new FormData(this),
-                dataType:'JSON',
-                contentType: false,
-                cache: false,
-                processData: false,
-                success: function (data) {
-                    // console.log("printing data");
-                    // console.log(data);
-                    swal("Information", data.message);
-                    $('#productForm').trigger("reset");
-                    // $("input[name='size']").val('');
-                    // $("input[name='flavor']").val('');
-                },
-                error: function (data) {
-                    console.log('Error:', data);
-                    swal("Information", data);
-                }
-            });
-        });
-
-        // create or update price
-        $('#variationForm').on('submit', function (e) {
-
+            table.ajax.reload();
+        })
+        
+        //edit stocks
+        $(document).on('click', '.editStock', function(e){
             e.preventDefault();
+            var id = $(this).data('id')
+            $.get("{{ url('stocks') }}" + '/edit/' + id, function (data) {
+                $('#id').val(data.id)
+                $('#size').val(data.size)
+                $('#quantity').val(data.quantity)
+                $('#price').val(data.price)
+                $('#threshold').val(data.threshold)
+                $('#promo').val(data.promo)
+                $('#status').val(data.status)
+                $("#btnUpdateProduct").text('Update')
+            })
+        })
 
-            //get input values
-            var product_id = $("#product_id").val();
-            var size_values = $("input[name='size']").val();
-            var flavor_values = $("input[name='flavor']").val();
-
-            //declare parameters
-            var params = {};
-
-            //set parameters
-            params.product_id = product_id;
-            params.size = size_values.trim();
-            params.flavor = flavor_values.trim();
-            params.action = "update_size_flavor";
-
-            $.ajax({
-                data: params,
-                url: "{{ url('product') }}",
-                type: "POST",
-                dataType: 'json',
-                success: function (data) {
-                    // console.log("printing data");
-                    // console.log(data);
-                    swal("Information", data.message).then(data => {
-                        if(data){
-                            location.reload();
-                        }
-                    });
-                },
-                error: function (data) {
-                    console.log('Error:', data);
-                    swal("Information", data);
-                }
-            });
-        });
-
-        // create or update price
-        $('#btnUpdatePrice').on('click', function () {
-
-            //get the DOM values for price
-            var price = $(".names");
-            var promo = $(".promo");
-            var price_values = '';
-            var promo_values = '';
-
-            //get the value of product id
-            var product_id = $("#product_id").val();
-
-            for(var i = 0; i < price.length; i++){
-                price_values += $(price[i]).val()+",";
-                promo_values += $(promo[i]).val()+",";
+        //save edit stocks
+        $(document).on('submit', '#productForm', function(e){
+            e.preventDefault();
+            if(confirm("Do you want to submit this data?")){
+                $.ajax({
+                    data: $(this).serialize(),
+                    url: "{{ url('save-edit-stocks') }}",
+                    type: "POST",
+                    dataType: 'json',
+                    success: function (data) {
+                        table.ajax.reload();
+                        $('#id').val('')
+                        $('#productForm').trigger("reset");
+                        swal("Information", data.message);
+                        $("#btnUpdateProduct").text('Submit')
+                    },
+                    error: function (data) {
+                        console.log('Error:', data);
+                    }
+                });
             }
-
-            //clear all spaces and whitespaces
-            price_values.replace(/\s/g,'');
-            promo_values.replace(/\s/g,'');
-
-            //declare parameters
-            var params = {};
-
-            //set parameters
-            params.product_id = product_id;
-            params.price = price_values;
-            params.promo = promo_values;
-            params.action = "update_price";
-
-            $.ajax({
-                data: params,
-                url: "{{ url('product') }}",
-                type: "POST",
-                dataType: 'json',
-                success: function (data) {
-                    // console.log("printing data");
-                    // console.log(data);
-                    swal("Information", data.message);
-                },
-                error: function (data) {
-                    console.log('Error:', data);
-                    swal("Information", data);
-                }
-            });
         });
-
-    });
-
-    
-
-    /* ----------------- size and flavor functionalites -------------------*/
-
-    let cSize = "<?php echo $variation->size ?>".split(",");
-    let cFlavor = "<?php echo $variation->flavor ?>".split(",");
-
-    // let ccSize = variation_data[0].size.split(",");
-    // let ccFlavor = variation_data[0].flavor.split(",");
-
-    (function( $ ){
-        $.fn.Size = function() {
-          return this.each(function() {
-            $list = $('<ul class="list-group list-group-flush" />');
-
-            for(let i=cSize.length;i--;){
-              if(!cSize[i]) continue;
-              $list.append($('<li class="multipleInput-size list-group-item"><span> '+ cSize[i] +'</span></li>')
-                .append($('<a href="#" class="multipleInput-close" title="Remove">&nbsp;x</a>')
-                  .click(function(e) {
-                    $(this).parent().remove();
-                    e.preventDefault();
-                  })
-                )
-              );
-            }
-
-            // input
-            var $input = $('<input name="size" class="form-control" placeholder="Press semicolon (;) to add sizes" />').keyup(function(event) {
-
-              if(event.which == 186) {
-                // key press is space or comma
-                var val = $(this).val().slice(0, -1); // remove space/comma from value
-
-                // append to list of emails with remove button
-                $list.append($('<li class="list-group-item multipleInput-size"><span> ' + val + '</span></li>')
-                  .append($('<a href="#" class="multipleInput-close" title="Remove">&nbsp;x</a>')
-                    .click(function(e) {
-                      $(this).parent().remove();
-                      e.preventDefault();
-                    })
-                  )
-                );
-
-                $(this).attr('placeholder', '');
-                // empty input
-                $(this).val('');
-              }
-            });
-
-            // container div
-            var $container = $('<div class="multipleInput-container"  id="container-size"/>').click(function() {
-              $input.focus();
-            });
-
-            // insert elements into DOM
-            $container.append($list).append($input).insertAfter($(this));
-
-            // add onsubmit handler to parent form to copy emails into original input as csv before submitting
-            var $orig = $(this);
-            $(this).closest('form').submit(function(e) {
-              var sizes = new Array();
-              $('.multipleInput-size span').each(function() {
-                sizes.push($(this).html());
-              });
-
-              sizes.push($input.val());
-
-              $orig.val(sizes.join());
-              $('input[name="size"]').val(sizes.join());
-            });
-
-            return $(this).hide();
-          });
-        };
-
-        $.fn.Flavor = function() {
-          return this.each(function() {
-
-            // input
-            var $input2 = $('<input name="flavor" class="form-control" value="'+cFlavor+'" placeholder="e.g Mango,Ube"/>')
-
-            // container div
-            var $container = $('<div class="multipleInput-container" id="container-flavor" />').click(function() {
-              $input2.focus();
-            });
-
-            // insert elements into DOM
-            $container.append($input2).insertAfter($(this));
-
-            // add onsubmit handler to parent form to copy emails into original input as csv before submitting
-            var $orig = $(this);
-
-            $(this).closest('form').submit(function(e) {
-
-              var flavors = new Array();
-              $('.multipleInput-flavor span').each(function() {
-                flavors.push($(this).html());
-              });
-
-              flavors.push($input2.val());
-
-              $orig.val(flavors.join());
-              $('input[name="flavor"]').val(flavors.join());
-            });
-
-            return $(this).hide();
-          });
-        };
-
-    })( jQuery );
-
-    $('#size').Size();
-    $('#flavor').Flavor();
+    })
 
 </script>
 @endsection
