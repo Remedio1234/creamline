@@ -9,7 +9,7 @@
             <h4 class="center">Transaction Details</h4>
         </div>
     </div>
-    @if(Auth::user()->user_role == 2)
+  
     <div class="card mt-3 mb-3">
         <div class="card-header">
             Order Information 
@@ -21,7 +21,6 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Size</th>
-                        {{-- <th>Flavor</th> --}}
                         <th>Qty</th>
                         <th>Sub-Total</th>
                     </tr>
@@ -36,16 +35,15 @@
                     @endphp
                     <tr>
                         <td>{{$cart->id}}</td>
-                        <td>{{$cart->name}}</td>
+                        <td>{{$cart->product_name}}</td>
                         <td>{{$cart->size}}</td>
-                        {{-- <td>{{$cart->flavor}}</td> --}}
                         <td>{{$cart->quantity}}</td>
                         <td>{{number_format($cart->subtotal,2)}}</td>
                     </tr>
                     @endforeach
                     <tfoot>
                         <tr>
-                            <td colspan="4"></td>
+                            <td colspan="3"></td>
                             <td><strong>Total</strong></td>
                             <td><strong>{{ number_format($total,2) }}</strong></td>
                         </tr>
@@ -54,8 +52,6 @@
             </table>
         </div>
     </div>
-    
-    @endif
     <div class="card">
         <div class="card-header">
             Client Information
@@ -299,7 +295,7 @@
                                 //display a successful message
                                 swal("Information", data.message).then(function() {
                                     if(isAdmin === true){
-                                        window.location = "order#order-tab-tran-his";
+                                        window.location = "order#order-tab-undelivered";
                                     }else{
                                         window.location = "order-success";
                                     }
