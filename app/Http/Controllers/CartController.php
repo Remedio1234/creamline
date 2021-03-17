@@ -157,11 +157,11 @@ class CartController extends Controller
                       ->first();
 
         Cart::updateOrCreate([
-            'product_id'    => $request->product_id,
             'user_id'       => Auth::user()->id,
+            'product_id'    => $request->product_id,
             'is_checkout'   => 0,
         ],[
-            
+            'product_stock_id'      => $request->product_stock_id,
             'product_image'         => $product->product_image,
             'product_name'          => $request->product_name,
             'product_description'   => $request->product_description,

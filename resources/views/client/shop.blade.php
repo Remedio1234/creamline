@@ -218,9 +218,10 @@
                     var price = $("#size_id option:selected").attr("data-price");
                     var promo = $("#size_id option:selected").attr("data-promo");
                     var prod_stocks_qty = $("#size_id option:selected").attr("data-stock");
+                    var product_stock_id = $("#size_id option:selected").attr("data-id");
                     // var flavor = $("#flavor_id option:selected").val();
                     var quantity = $("#quantity").val();
-                    console.log(prod_stocks_qty, quantity)
+                   
                     //check if the current quantity selected is greater than the current stocks
                     if(parseFloat(quantity) > parseFloat(prod_stocks_qty)){
                         return swal("Error", "Sorry! You’ve reached the stock limit. Please enter a lesser quantity.");
@@ -238,6 +239,7 @@
 
                     //set value to parameter
                     params.product_id           = prod_id;
+                    params.product_stock_id     = prod_id;
                     params.product_image        = prod_image;
                     params.product_name         = prod_name;
                     params.product_description  = prod_desc;
@@ -292,7 +294,7 @@
 
             if(data.length){
                 $.each(data, function(key, row){
-                    output += '<option value="'+ row.size +'" data-stock="'+ row.quantity +'" data-price="'+ row.price +'" data-promo="'+ row.promo +'">'+ row.size +'</option>';
+                    output += '<option value="'+ row.size +'" data-id="'+ row.id +'" data-stock="'+ row.quantity +'" data-price="'+ row.price +'" data-promo="'+ row.promo +'">'+ row.size +'</option>';
                 })
             } else {
                 output += `<option val="no available size"></option>`;
