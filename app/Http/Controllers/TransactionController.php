@@ -78,26 +78,28 @@ class TransactionController extends Controller
                 $now = Carbon::now();
 
                 $cart_object_array[] = [
-                    "client_id" => $client_id,
-                    'invoice_id'    => $id,
-                    "delivery_date" => Auth::user()->user_role == 99 ? $request->delivery_date : null,
-                    "store_id" => $store_id,
-                    "product_id" => $cart["product_id"],
-                    "size" => $cart["size"],
-                    "flavor" => $cart["flavor"],
-                    "quantity_ordered" => $cart["quantity"],
-                    "ordered_total_price" => $cart["subtotal"],
-                    "quantity_received" => 0,
-                    "received_total_price" => 0,
-                    "is_replacement" => $is_replacement,
-                    "is_approved" => Auth::user()->user_role == 99,
-                    "is_cancelled" => 0,
-                    "is_rescheduled" => 0,
-                    "is_completed" => 0,
-                    "attempt" => 0,
-                    "reason" => "",
-                    'updated_at' => $now,
-                    'created_at' => $now
+                    "client_id"             => $client_id,
+                    'invoice_id'            => $id,
+                    "delivery_date"         => Auth::user()->user_role == 99 ? $request->delivery_date : null,
+                    "store_id"              => $store_id,
+                    "product_id"            => $cart["product_id"],
+                    "product_stock_id"      => $cart["product_stock_id"],
+                    "size"                  => $cart["size"],
+                    "flavor"                => $cart["flavor"],
+                    "quantity_ordered"      => $cart["quantity"],
+                    "ordered_total_price"   => $cart["subtotal"],
+                    "item_price"            => $cart['price'],
+                    "quantity_received"     => 0,
+                    "received_total_price"  => 0,
+                    "is_replacement"        => $is_replacement,
+                    "is_approved"           => Auth::user()->user_role == 99,
+                    "is_cancelled"          => 0,
+                    "is_rescheduled"        => 0,
+                    "is_completed"          => 0,
+                    "attempt"               => 0,
+                    "reason"                => "",
+                    'updated_at'            => $now,
+                    'created_at'            => $now
                 ];
             }
         }

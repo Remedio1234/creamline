@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\{Order,Stock};
+use App\{Order,Stock, ProductStock};
 use App\Traits\GlobalFunction;
 use DataTables;
 use Illuminate\Http\Request;
@@ -128,7 +128,7 @@ class StaffDashboardController extends Controller
    
                     // $btn = '<a data-invoice="'.$row->invoice_no.'" data-num="'.$row->num.'" data-set="0" data-type="pending" href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Order" data-contact data-client="'.$row->client_id.'" data-id="'.$row->id.'" data-original-title="Edit" class="btn btn-primary btn-sm editPendingOrder">Approve</a>';
                     // return $btn;
-                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" data-type="1" class="btn btn-primary btn-sm viewCompleteOrder">View Details</a> ';
+                    $btn = '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" data-type="1" class="btn btn-primary btn-sm mt-2 viewCompleteOrder">View Details</a> ';
                     if (!$row->is_completed && !$row->is_cancelled) {
                         $btn .= '<a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Mark this order as completed" data-id="'.$row->id.'" data-type="0" class="btn btn-primary mt-2 btn-sm editCompleteOrder">Confirm</a> ';
 
@@ -367,9 +367,9 @@ class StaffDashboardController extends Controller
                             'attempt' => $value->attempt
                             ]);
 
-                if($stock = Stock::where('product_id', $value->product_id)->first()){
+                if($stock = ProductStock::where('id', $value->product_stock_id)->first()){
                     $quantity = $stock->quantity - $value->quantity_ordered;
-                    Stock::where('product_id', $value->product_id)->update([ 'quantity' => $quantity]);
+                    ProductStock::where('id', $value->product_stock_id)->update([ 'quantity' => $quantity]);
                 }
             }
 

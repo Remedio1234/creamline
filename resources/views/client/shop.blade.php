@@ -245,6 +245,7 @@
                     params.product_description  = prod_desc;
                     params.size                 = size;
                     params.flavor               = '';
+                    params.price                = price;
                     params.quantity             = quantity;
                     params.subtotal             = price * quantity;
 

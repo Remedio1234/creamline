@@ -153,13 +153,17 @@ class CartController extends Controller
         $product = Product::find($request->product_id);
 
         $cart = Cart::where('product_id', $request->product_id)
-                      ->where('user_id', Auth::user()->id)
-                      ->first();
+                        ->where('product_stock_id', $request->product_stock_id)
+                        ->where('user_id', Auth::user()->id)
+                        ->where('is_checkout', '0')
+                        ->first();
 
+        $quantity = $cart ? $cart->quantity + $request->quantity : $request->quantity;
         Cart::updateOrCreate([
-            'user_id'       => Auth::user()->id,
-            'product_id'    => $request->product_id,
-            'is_checkout'   => 0,
+            'user_id'           => Auth::user()->id,
+            'product_id'        => $request->product_id,
+            'product_stock_id'  => $request->product_stock_id,
+            'is_checkout'       => '0',
         ],[
             'product_stock_id'      => $request->product_stock_id,
             'product_image'         => $product->product_image,
@@ -167,8 +171,9 @@ class CartController extends Controller
             'product_description'   => $request->product_description,
             'size'                  => $request->size,
             'flavor'                => $request->flavor,
-            'quantity'              => $cart ? $cart->quantity + $request->quantity : $request->quantity,
-            'subtotal'              => $cart ? $cart->quantity + $request->subtotal : $request->subtotal
+            'quantity'              => $quantity,
+            'price'                 => $request->price,
+            'subtotal'              => ($quantity * $request->price)
         ]);
 
         // return response
