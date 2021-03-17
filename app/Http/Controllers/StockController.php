@@ -96,7 +96,8 @@ class StockController extends Controller
 
     public function getStocksTable(Request $request){
         if ($request->ajax()) {
-            $stocks = ProductStock::when($request->filter_status != 'all', function($sql) use($request){
+            $stocks = ProductStock::where('product_id', $request->product_id)
+                ->when($request->filter_status != 'all', function($sql) use($request){
                 if(in_array($request->filter_status, [0,1])){
                     return $sql->where('status', $request->filter_status);
                 } else if($request->filter_status == 2){

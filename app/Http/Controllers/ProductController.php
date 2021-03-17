@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Product;
-use App\Stock;
+use App\{Stock,ProductStock};
 use App\Variation;
 use DataTables;
 use Illuminate\Http\Request;
@@ -145,8 +145,6 @@ class ProductController extends Controller
                 'product_image' => $new_name,
                 'is_deleted'    => $request->is_deleted
             ]);
-
-
 
             return response()->json([
                 'message'   => 'Product Successfully submitted.',
@@ -326,14 +324,23 @@ class ProductController extends Controller
      */
     public function edit_product($id)
     {
-        $product = Product::with('images')->find($id);
-        $variation = Variation::where('product_id', $id)->first();
-        $stock = Stock::where('product_id', $id)->first();
+        // $product = Product::with('images')->find($id);
+        // $variation = Variation::where('product_id', $id)->first();
+        // $stock = Stock::where('product_id', $id)->first();
+
+        // $data = [
+        //   'product' => $product,
+        //   'variation' => $variation,
+        //   'stock' => $stock,
+        // ];
+
+        $product = Product::find($id);
+        $stocks  = ProductStock::where('product_id', $id)->where('quantity','!=', 0)->where('status',  0)->get();
 
         $data = [
           'product' => $product,
-          'variation' => $variation,
-          'stock' => $stock,
+        //   'variation' => $variation,
+          'stocks' => $stocks,
         ];
 
         return response()->json($data);

@@ -157,18 +157,18 @@ class CartController extends Controller
                       ->first();
 
         Cart::updateOrCreate([
-            'product_id' => $request->product_id,
-            'user_id' => Auth::user()->id,
-            'is_checkout' => 0,
+            'product_id'    => $request->product_id,
+            'user_id'       => Auth::user()->id,
+            'is_checkout'   => 0,
         ],[
             
-            'product_image' => $product->product_image,
-            'product_name' => $request->product_name,
-            'product_description' => $request->product_description,
-            'size' => $request->size,
-            'flavor' => $request->flavor,
-            'quantity' => $cart ? $cart->quantity + $request->quantity : $request->quantity,
-            'subtotal' => $request->subtotal,
+            'product_image'         => $product->product_image,
+            'product_name'          => $request->product_name,
+            'product_description'   => $request->product_description,
+            'size'                  => $request->size,
+            'flavor'                => $request->flavor,
+            'quantity'              => $cart ? $cart->quantity + $request->quantity : $request->quantity,
+            'subtotal'              => $cart ? $cart->quantity + $request->subtotal : $request->subtotal
         ]);
 
         // return response

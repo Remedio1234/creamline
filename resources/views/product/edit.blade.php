@@ -76,7 +76,7 @@
                         <table id="stocks_table" class="table table-striped table-bordered">
                             <thead class="bg-indigo-1 text-white">
                             <tr>
-                                <th>ID</th>
+                                {{-- <th>ID</th> --}}
                                 <th>Size</th>
                                 <th>Quantity</th>
                                 <th>Price</th>
@@ -122,7 +122,7 @@
             },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-                {data: 'id', name: 'id'},
+                // {data: 'id', name: 'id'},
                 {data: 'size', name: 'size'},
                 {data: 'quantity', name: 'quantity'},
                 {data: 'price', name: 'price'},
