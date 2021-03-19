@@ -199,6 +199,7 @@ class FileReplacementController extends Controller
                   'product_id'          => $product,
                   'size'                => $data[0],
                   'price'               => $data[1],
+                  'product_stock_id'    => $data[2],
                   'quantity'            => $quantity[$key]
                 ]);
             }

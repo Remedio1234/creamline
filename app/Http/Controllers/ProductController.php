@@ -423,15 +423,16 @@ class ProductController extends Controller
 
         // return response()->json($formatted);
 
-        $variation =  Variation::where('product_id', $id)->first();
+        // $variation =  Variation::where('product_id', $id)->first();
 
-        $sizes = explode(',', $variation->size);
-        $prices = explode(',', $variation->price);
-        $data = array();
-        foreach ($sizes as $key => $value) {
-            if($value)
-                $data[$prices[$key]] = $value;
-        }
+        // $sizes = explode(',', $variation->size);
+        // $prices = explode(',', $variation->price);
+        // $data = array();
+        // foreach ($sizes as $key => $value) {
+        //     if($value)
+        //         $data[$prices[$key]] = $value;
+        // }
+        $data  = ProductStock::where('product_id', $id)->where('quantity','!=', 0)->where('status',  0)->get();
         return response()->json($data);
     }
 

@@ -72,6 +72,7 @@ class CartController extends Controller
                         'product_name'          => $product->name,
                         'product_description'   => $product->description,
                         'product_image'         => $product->product_image,
+                        'product_stock_id'      => $cart['product_stock_id'],
                         'size'                  => $cart['size'],
                         'flavor'                => '',
                         'quantity'              => $cart['quantity'],
@@ -98,18 +99,19 @@ class CartController extends Controller
 
         $cart_data = Cart::whereIn('id', $ids)->get()->toArray();    
             //loop the cart data
-        foreach($cart_data as $cart){
-            if(!empty($cart)){
+        foreach($cart_data as $order){
+            if(!empty($order)){
                 $cart_object_array[] = [
                     "client_id"                 => $client_id,
                     'invoice_id'                => $id,
                     "delivery_date"             => $request->damage_delivery_date,
                     "store_id"                  => $store_id,
-                    "product_id"                => $cart["product_id"],
-                    "size"                      => $cart["size"],
-                    "flavor"                    => $cart["flavor"],
-                    "quantity_ordered"          => $cart["quantity"],
-                    "ordered_total_price"       => $cart["subtotal"],
+                    'product_stock_id'          => $order['product_stock_id'],
+                    "product_id"                => $order["product_id"],
+                    "size"                      => $order["size"],
+                    "flavor"                    => $order["flavor"],
+                    "quantity_ordered"          => $order["quantity"],
+                    "ordered_total_price"       => $order["subtotal"],
                     "quantity_received"         => 0,
                     "received_total_price"      => 0,
                     "is_replacement"            => '1',

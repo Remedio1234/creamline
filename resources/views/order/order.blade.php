@@ -1161,6 +1161,7 @@
                                 name="damage[${i}][quantity]" 
                                 style='width:100px;'/>
                             <input type="hidden" value="${product.id}"  name="damage[${i}][id]"/>
+                            <input type="hidden" value="${product.product_stock_id}"  name="damage[${i}][product_stock_id]"/>
                             <input type="hidden" value="${product.product_id}"  name="damage[${i}][product_id]"/>
                             <input type="hidden" value="${product.price}"  name="damage[${i}][price]"/>
                             <input type="hidden" value="${product.size}"  name="damage[${i}][size]"/>
