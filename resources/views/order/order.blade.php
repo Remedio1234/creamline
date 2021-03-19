@@ -22,9 +22,9 @@
                     <li class="nav-item">
                         <a class="nav-link refresh_table" data-value="order-damage" data-toggle="tab" href="#order-damage" role="tab" aria-selected="false">REPLACEMENT</a>
                     </li>
-                    <li class="nav-item">
+                    {{-- <li class="nav-item">
                         <a class="nav-link refresh_table" data-value="order-tab-tran-his" data-toggle="tab" href="#order-tab-tran-his" role="tab" aria-selected="false">REPORTS</a>
-                    </li>
+                    </li> --}}
                 </ul>
             </div>
             <div class="card-body">
@@ -138,7 +138,7 @@
                         </tbody>
                         </table>
                     </div>
-                    <div class="tab-pane fade show" id="order-tab-tran-his" role="tabpanel">
+                    {{-- <div class="tab-pane fade show" id="order-tab-tran-his" role="tabpanel">
                         <table style="width: 100%;" id="historyTable" class="table table-striped table-bordered">
                             <thead class="bg-indigo-1 text-white">
                                 <tr>
@@ -157,7 +157,7 @@
                             <tbody>
                             </tbody>
                         </table>
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -1928,7 +1928,7 @@
             undeliverTable.draw()
             replacementTable.draw()
             damageTable.draw();
-            historyTable.draw()
+            // historyTable.draw()
         }
 
         $(document).on('click', '.refresh_table', function(e){
@@ -1947,9 +1947,9 @@
                 case 'order-damage':
                     damageTable.draw();
                 break;
-                case 'order-tab-tran-his':
-                    historyTable.draw()
-                break;
+                // case 'order-tab-tran-his':
+                //     historyTable.draw()
+                // break;
             }
 
             var uri = window.location.toString(); 

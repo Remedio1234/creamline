@@ -133,3 +133,7 @@ Route::get('stocks/edit/{id}',                                          'StockCo
 
 //refactor Products
 Route::get('product/edit/{id}',                                         'ProductController@getProductRow');
+
+//reports here
+Route::get('report/orders',                                             'ReportsController@index');
+Route::get('order/reports/json/{filter_status}',                        'ReportsController@getOrders');

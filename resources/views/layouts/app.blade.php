@@ -178,6 +178,12 @@
                                 Fridge
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('order.index') }}">
+                                <span data-feather="align-justify"></span>
+                                Orders
+                            </a>
+                        </li>
 
                         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
                             <span>Submit Order to Customer</span>
@@ -200,9 +206,9 @@
                             <span>Reports</span>
                         </h6>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('order.index') }}">
+                            <a class="nav-link" href="/report/orders">
                                 <span data-feather="align-justify"></span>
-                                Orders
+                                Orders Report
                             </a>
                             <a class="nav-link" href="{{ route('sales.index') }}">
                                 <span data-feather="pie-chart"></span>
@@ -214,7 +220,7 @@
                             </a>
                             <a class="nav-link" href="{{ route('quota.index') }}">
                                 <span data-feather="pie-chart"></span>
-                                Quota
+                                Yearly Quota
                             </a>
                         </li>
 
