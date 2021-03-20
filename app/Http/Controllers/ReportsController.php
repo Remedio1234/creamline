@@ -28,7 +28,7 @@ class ReportsController extends Controller
         return view('reports.report_orders');
     }
 
-    public function getOrders(){
+    public function getOrders(Request $request){
         $response = DB::table('order_invoice')
                 ->join('orders', 'orders.invoice_id', '=', 'order_invoice.id')
                 ->join('users', 'orders.client_id', '=', 'users.id')
@@ -40,6 +40,25 @@ class ReportsController extends Controller
                     users.contact_num,
                     stores.store_name
                 ")
+                ->when($request->filter_status != 'ALL', function($sql) use ($request){
+                    switch ($request->filter_status) {
+                        case 'PENDING':
+                            return $sql->where('orders.is_approved', 0)
+                                    ->where('orders.is_completed', 0);
+                        break;
+                        case 'FOR DELIVERY':
+                            return $sql->where('orders.is_approved', 1)
+                                    ->where('orders.is_completed', 0);
+                        break;
+                        case 'UNDELIVERED':
+                            return $sql->where('orders.is_cancelled', 1)
+                                    ->where('orders.order_cancel', 0);
+                        break;
+                        case 'COMPLETED':
+                            return $sql->where('orders.is_completed', 1);
+                        break;
+                    }
+                })
                 ->groupBy('orders.invoice_id')
                 ->get()
                 ->map(function($item){

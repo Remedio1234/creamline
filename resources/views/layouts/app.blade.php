@@ -50,7 +50,7 @@
     
     <!-- Chart js -->
     <script src="{{ asset('js/Chart.min.js') }}"></script>
-
+    <script src="{{ asset('js/tableexport.js') }}"></script>
     <!-- Scripts -->
     <!-- <script src="{{ asset('js/app.js') }}" defer></script> -->
 

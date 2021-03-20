@@ -9,16 +9,16 @@
         <div class="row">
             <div class="col-md-6" style="padding:0px;">
                 <select class="form-control float-left" id="filter_status" style="width: 300px;">
-                    <option value="all">ALL</option>
-                    <option value="pending">PENDING</option>
-                    <option value="for_delivery">FOR DELIVERY</option>
-                    <option value="undelivered">UNDELIVERED</option>
-                    <option value="replacement">REPLACEMENT</option>
-                    <option value="completed">COMPLETED</option>
+                    <option value="ALL">ALL</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="FOR DELIVERY">FOR DELIVERY</option>
+                    <option value="UNDELIVERED">UNDELIVERED</option>
+                    <option value="COMPLETED">COMPLETED</option>
                 </select>
             </div>
             <div class="col-md-6" style="padding:0px;">
-                <button class="btn btn-success ml-auto float-right">Print</button>
+                <button class="btn btn-success ml-auto float-right" onclick="printData();" id="print_data">Print</button> &nbsp;
+                <button class="btn btn-primary ml-auto float-right mr-2" onclick="exportEx('xls');" id="export_data">Export</button>
             </div>
         </div>
     </div>
@@ -26,6 +26,9 @@
     <br>
     <table style="width: 100%" border="1" id="order_list_html" cellpadding="10">
         <thead>
+            <tr>
+                <th colspan="8" style="text-align: center;"> <span id="selected_status"></span> ORDERS </th>
+            </tr>
             <tr>
                 <th>INVOICE NO.</th>
                 <th>CLIENT NAME</th>
@@ -35,51 +38,29 @@
                 <th>TOTAL</th>
                 <th>DATE ORDERED</th>
                 <th>DELIVERY DATE</th>
-                {{-- <th>Status</th> --}}
             </tr>
         </thead>
         <tbody>
-            {{-- <tr>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-                <td>1</td>
-            </tr>
-            <tr>
-                <th colspan="9" style="text-align:center;">
-                    ITEMS
-                </th>
-            </tr>
-            <tr>
-                <th colspan="9">
-                    <table style="width: 100%;border:0px;" border="1" cellpadding="5">
-                        <tr>
-                            <th>ID</th>
-                            <th>PRODUCT</th>
-                            <th>SIZE</th>
-                            <th>QUANTITY</th>
-                            <th>SUBTOTAL</th>
-                        </tr>
-                        <tr>
-                            <td>1</td>
-                            <td>2</td>
-                            <td>1</td>
-                            <td>1</td>
-                            <td>1</td>
-                        </tr>
-                    </table>
-                </th>
-            </tr> --}}
         </tbody>
     </table>
 </div>
 
 <script type="text/javascript">
+    function printData()
+    {
+        var divToPrint=document.getElementById("order_list_html");
+        newWin= window.open("");
+        newWin.document.write(divToPrint.outerHTML);
+        newWin.print();
+        newWin.close();
+    }
+    function exportEx(type) {
+        $('#order_list_html').tableExport({
+            filename: 'Orders_%DD%-%MM%-%YY%',
+            format: type,
+            cols: '1,2,3,4,5,6,7,8'
+        });
+    }
     $(function () {
         //ajax setup
         $.ajaxSetup({
@@ -88,13 +69,25 @@
             }
         });
 
+        $(document).on('change', '#filter_status', function(e){
+            e.preventDefault();
+            order_reports($(this).val())
+        })
+
         order_reports($("#filter_status").val())
 
         // $(document).on('change')
 
         function order_reports(filter_status){
+            $("#selected_status").text(filter_status)
             $.getJSON( "{{ url('order/reports/json') }}" + '/'+ filter_status, function( data ) {
-                
+                if(!data.length){
+                    $("#export_data").prop('disabled', true)
+                    $("#print_data").prop('disabled', true)
+                } else {
+                    $("#export_data").prop('disabled', false)
+                    $("#print_data").prop('disabled', false)
+                }
                 var htmlData = ''
                 $.each(data, function( index, row ) {
                     htmlData += `<tr>

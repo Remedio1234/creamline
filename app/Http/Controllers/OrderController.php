@@ -146,8 +146,8 @@ class OrderController extends Controller
                 users.contact_num as num")
                 // ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',
                 //     'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
-                ->where('is_approved', 0)
-                ->where('is_completed', 0)
+                ->where('orders.is_approved', 0)
+                ->where('orders.is_completed', 0)
                 ->groupBy('orders.invoice_id')
                 ->get();
 
