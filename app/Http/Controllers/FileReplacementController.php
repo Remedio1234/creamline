@@ -32,8 +32,15 @@ class FileReplacementController extends Controller
     public function index(Request $request)
     {
         if(Auth::user()->user_role == 99) {
-            $file_replacement = Product_Report::join('stores', ['stores.id' => 'product_reports.store_id'])
+            $file_replacement = Product_Report::leftJoin('stores', ['stores.id' => 'product_reports.store_id'])
                                     ->selectRaw('product_reports.*, stores.store_name')
+                                    ->when($request->type, function($sql) use($request){
+                                        if($request->type == 'replacement'){
+                                            return $sql->where('product_reports.report_type', 'Replacement');
+                                        } else {
+                                            return $sql->where('product_reports.report_type', 'Delivery Issues');
+                                        }
+                                    })
                                     ->orderBy('id', 'desc')
                                     ->get()
                                     ->map(function($item){
@@ -54,7 +61,7 @@ class FileReplacementController extends Controller
         } else {
 
             if(Auth::user()->user_role == 1){ //staff
-                $file_replacement = Product_Report::join('stores', ['stores.id' => 'product_reports.store_id'])
+                $file_replacement = Product_Report::leftJoin('stores', ['stores.id' => 'product_reports.store_id'])
                             ->selectRaw('product_reports.*, stores.store_name')
                             ->where(['issued_by' => Auth::user()->id])
                             ->get()
@@ -91,6 +98,9 @@ class FileReplacementController extends Controller
                 ->addColumn('products', function($row) {
                     return $row ? $row->products : '';
                 })
+                ->editColumn('store_name', function($row){
+                    return $row->store_name ? $row->store_name : 'NA';
+                })
                 ->addColumn('quantity', function($row) {
                    $total = 0;
                    foreach ($row->products as $value) {
@@ -119,6 +129,9 @@ class FileReplacementController extends Controller
                     ->addIndexColumn()
                     ->addColumn('status', function($row){
                     return $row ? $row->is_replaced : '-';
+                    })
+                    ->editColumn('store_name', function($row){
+                        return $row->store_name ? $row->store_name : 'NA';
                     })
                     ->addColumn('products', function($row) {
                         return $row ? $row->products : '';

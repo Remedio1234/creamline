@@ -119,6 +119,7 @@ class CartController extends Controller
                     "is_cancelled"              => 0,
                     "is_rescheduled"            => 0,
                     "is_completed"              => 0,
+                    "is_damages"                => $request->report_type == 'damages' ? 1 : 0,
                     'is_replacement_reference'  => $request->product_report_id,
                     "attempt"                   => 0,
                     "reason"                    => "",

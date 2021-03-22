@@ -57,6 +57,13 @@ class TransactionHistoryController extends Controller
                 // ->select('products.id AS prodID', 'products.name', 'products.product_image', 'orders.quantity_ordered',
                 //     'orders.ordered_total_price', 'orders.created_at', 'orders.is_approved', 'orders.is_completed', 'orders.delivery_date', 'orders.id', 'users.fname', 'users.lname', 'users.contact_num', 'orders.client_id')
                 // ->where('is_approved', 0)
+                ->when($request->filter_status != 'all', function($sql) use($request){
+                    if($request->filter_status == 'pending'){
+                        return $sql->where('is_approved', 0);
+                    } else {
+                        return $sql->where('is_approved', 1);
+                    }
+                })
                 ->where('users.id', Auth::user()->id)
                 ->groupBy('orders.invoice_id')
                 ->get();

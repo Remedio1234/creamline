@@ -2,11 +2,30 @@
 
 @section('content')
 <div class="container">
-    <div class="container-fluid">
+    <!-- <div class="container-fluid">
         <div class="row">
             <h4 class="center">Order History</h4>
         </div>
+    </div> -->
+    <div class="container-fluid">
+        <div class="row">
+            
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="padding:0px;">
+                <select class="form-control float-left" id="filter_status" style="width: 300px;">
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="padding:0px;">
+            <h4 class="center float-right">Order History</h4>
+                <!-- <button class="btn btn-info ml-auto float-left" id="createNewStaff">Create Staff</button> -->
+            </div>
+        </div>
     </div>
+    <br>
     {{-- <table id="dataTable" class="table table-striped table-bordered">
         <thead class="bg-indigo-1 text-white">
         <tr>
@@ -89,6 +108,12 @@
                 }
             });
 
+            if(window.location.hash) {
+                if(window.location.hash == '#approved'){
+                    $("#filter_status").val('approved')
+                }
+            }
+
             function getCompletedOrders(invoice_id){
             $.getJSON( "{{ url('order/completed') }}" + '/'+ invoice_id, function( data ) {
                 var htmlData = ''
@@ -122,7 +147,13 @@
             var table = $('#dataTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ url('transaction_history') }}",
+                // ajax: "{{ url('transaction_history') }}",
+                ajax: {
+                    url: "{{ url('transaction_history') }}",
+                    data: function(e){
+                        e.filter_status = $('#filter_status').val();
+                    }
+                },
                 columns: [
                     // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                     // {data: 'id', name: 'id'},
@@ -258,6 +289,11 @@
                 {data: 'action', name: 'action', orderable: false, searchable: false},
                 ]
             });
+            history.replaceState("", document.title, window.location.pathname);
+            $(document).on('change', '#filter_status', function(e){
+                e.preventDefault()
+                table.ajax.reload()
+            })
         })
     </script>
     

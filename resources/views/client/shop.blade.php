@@ -136,8 +136,8 @@
                 //call the function that will populate the flavor dropdown
                 // populateFlavorDropdown(data);
 
-                var price = data.stocks[0].price; //$("#size_id option:selected").attr("data-price");
-                var promo = data.stocks[0].promo; //$("#size_id option:selected").attr("data-promo");
+                var price = data.stocks[0].price; //$("#size_id").find(':selected').attr("data-price");
+                var promo = data.stocks[0].promo; //$("#size_id").find(':selected').attr("data-promo");
                 if(parseFloat(promo) > 0){
                     $("#div-modal-text").html("<span style='text-decoration: line-through;color:red;'>&#8369; " + parseFloat(price).toFixed(2) + "</span> &nbsp; &nbsp;<span>&#8369; " + promo.toFixed(2) + "</span>");
                 } else {
@@ -152,9 +152,9 @@
 
         //when size is changed
         $("#size_id").change(() =>{
-            var price = $("#size_id option:selected").attr("data-price");
-            var promo = $("#size_id option:selected").attr("data-promo");
-            var stock = $("#size_id option:selected").attr("data-stock");
+            var price = $("#size_id").find(':selected').attr("data-price");
+            var promo = $("#size_id").find(':selected').attr("data-promo");
+            var stock = $("#size_id").find(':selected').attr("data-stock");
             
 
             var qty = $("#quantity").val();
@@ -172,14 +172,14 @@
         });
 
         function calc(current_val){
-            var stock = $("#size_id option:selected").attr("data-stock");
+            var stock = $("#size_id").find(':selected').attr("data-stock");
 
             
             if(parseFloat(current_val) == 0 || parseFloat(current_val) == ''){
                 $("#quantity").val(0);
             }else{
-                var price = $("#size_id option:selected").attr("data-price");
-                var promo = $("#size_id option:selected").attr("data-promo");
+                var price = $("#size_id").find(':selected').attr("data-price");
+                var promo = $("#size_id").find(':selected').attr("data-promo");
                 if(parseFloat(promo) > 0){
                     price = promo
                 }
@@ -214,12 +214,12 @@
                 if (isTrue) {
 
                     //get all the values
-                    var size = $("#size_id option:selected").val();
-                    var price = $("#size_id option:selected").attr("data-price");
-                    var promo = $("#size_id option:selected").attr("data-promo");
-                    var prod_stocks_qty = $("#size_id option:selected").attr("data-stock");
-                    var product_stock_id = $("#size_id option:selected").attr("data-id");
-                    // var flavor = $("#flavor_id option:selected").val();
+                    var size = $("#size_id").val();
+                    var price = $("#size_id").find(':selected').attr("data-price");
+                    var promo = $("#size_id").find(':selected').attr("data-promo");
+                    var prod_stocks_qty = $("#size_id").find(':selected').attr("data-stock");
+                    var product_stock_id = $("#size_id").find(':selected').attr("data-id");
+                    // var flavor = $("#flavor_id").val();
                     var quantity = $("#quantity").val();
                    
                     //check if the current quantity selected is greater than the current stocks
@@ -239,7 +239,7 @@
 
                     //set value to parameter
                     params.product_id           = prod_id;
-                    params.product_stock_id     = prod_id;
+                    params.product_stock_id     = product_stock_id;
                     params.product_image        = prod_image;
                     params.product_name         = prod_name;
                     params.product_description  = prod_desc;

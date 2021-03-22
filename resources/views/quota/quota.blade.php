@@ -2,14 +2,34 @@
 
 @section('content')
 <div class="container">
-    <div class="container-fluid">
+    <!-- <div class="container-fluid">
         <div class="row">
             <h4 class="center">Quota</h4>
             <button class="btn btn-info ml-auto" id="createNewQuota">Create Quota</button>
         </div>
     </div>
+    <br> -->
+    <div class="container-fluid">
+        <div class="row">
+            <h4 class="center">Quota</h4>
+        </div>
+        <div class="row">
+            <div class="col-md-6" style="padding:0px;">
+                <select class="form-control float-left" id="filter_status" style="width: 300px;">
+                    <option value="2021">2021</option>
+                    <option value="2022">2022</option>
+                    <option value="2023">2023</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                </select>
+            </div>
+            <div class="col-md-6" style="padding:0px;">
+            <button class="btn btn-info ml-auto float-right" id="createNewQuota">Create Quota</button>
+            </div>
+        </div>
+    </div>
     <br>
-    <table id="dataTable" style="width: 100%" class="table table-striped table-bordered">
+    <!-- <table id="dataTable" style="width: 100%" class="table table-striped table-bordered">
         <thead class="bg-indigo-1 text-white">
         <tr>
             <th>Year</th>
@@ -26,6 +46,17 @@
             <th>Nov</th>
             <th>Dec</th>
             <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table> -->
+    <table id="quota" style="width: 100%" class="table table-striped table-bordered">
+        <thead class="bg-indigo-1 text-white">
+        <tr>
+            <th>Months</th>
+            <th>Quota Value</th>
+            <!-- <th>Action</th> -->
         </tr>
         </thead>
         <tbody>
@@ -153,6 +184,13 @@
         //call the function for displaying the years
         displayYears();
 
+        loadSalesReport()
+
+        $(document).on('change', '#filter_status', function(e){
+            e.preventDefault()
+            loadSalesReport()
+        })
+
         function displayYears(){
             //create all the years to be displayed on the dropdown
             var year_list = '<option value="999999999">Please select year</option>'
@@ -163,6 +201,54 @@
             }
             //append the list
             $("#quota_year").empty().append(year_list);
+            $("#filter_status").empty().append(year_list);
+        }
+
+        function loadSalesReport(){
+            $("#set_date").text($('#filter_status').val())
+            $.ajax({
+                url: "{{ url('get/quota/') }}" + '/' + $("#filter_status").val(),
+                method: "GET",
+                data: {},
+                success: function(response){
+                    var htmlData = ''
+                    var $status = '';
+                    var $delete_status = '';
+                    var  $delete_btn = '';
+
+                    if(response.is_deleted == 0){
+                        $status = 0;
+                        $delete_status = 'Delete';
+                        $delete_btn = 'btn-danger';
+                    }else{
+                        $status = 1;
+                        $delete_status = 'Activate';
+                        $delete_btn = 'btn-success';
+                    }
+
+                    $.each(response.list, function(key, row){
+                        htmlData += `
+                            <tr>
+                                <td scope="row">${key}</td>
+                                <td>${row}</td>
+                            </tr>
+                        `
+                    })
+                    if(response.id > 0){
+                    htmlData += `<tr>
+                            <td>
+                                <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="Update Quota" data-id="${response.id}" data-original-title="Edit" class="edit btn btn-primary btn-sm editQuota">Edit</a>
+                                <a href="javascript:void(0)" data-toggle="tooltip" data-placement="top" title="'.$delete_status.' Quota" data-stat="${$status}" data-toggle="tooltip" data-id="${response.id}" data-original-title="Delete" class="btn ${$delete_btn} btn-sm deleteQuota">${$delete_status}</a>
+                            <td>
+                        <td>&nbsp;<td>
+                        </tr>`
+                    }
+                    $("#quota").find('tbody').html("").append(htmlData)
+                },
+                error: function(err){
+                    console.log(err)
+                }
+            })
         }
 
         // datatable
@@ -254,6 +340,7 @@
                     table.draw();
                     $('#saveBtn').html('Save');
                     // console.log(data)
+                    loadSalesReport()
                 },
                 error: function (data) {
                     console.log('Error:', data);
@@ -282,6 +369,8 @@
                 $('#quota_oct').val(data.oct);
                 $('#quota_nov').val(data.nov);
                 $('#quota_dev').val(data.dev);
+                $("#quota_year").val(data.year)
+                // loadSalesReport()
             })
         });
 
@@ -306,6 +395,7 @@
                             swal(data.message, {
                                 icon: "success",
                             });
+                            loadSalesReport()
                         },
                         error: function (data) {
                             console.log('Error:', data);

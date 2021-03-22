@@ -22,9 +22,9 @@
                     <li class="nav-item">
                         <a class="nav-link refresh_table" data-value="order-damage" data-toggle="tab" href="#order-damage" role="tab" aria-selected="false">REPLACEMENT</a>
                     </li>
-                    {{-- <li class="nav-item">
-                        <a class="nav-link refresh_table" data-value="order-tab-tran-his" data-toggle="tab" href="#order-tab-tran-his" role="tab" aria-selected="false">REPORTS</a>
-                    </li> --}}
+                    <li class="nav-item">
+                        <a class="nav-link refresh_table" data-value="order-tab-tran-his" data-toggle="tab" href="#order-tab-tran-his" role="tab" aria-selected="false">DAMAGES</a>
+                    </li>
                 </ul>
             </div>
             <div class="card-body">
@@ -138,26 +138,26 @@
                         </tbody>
                         </table>
                     </div>
-                    {{-- <div class="tab-pane fade show" id="order-tab-tran-his" role="tabpanel">
+                    <div class="tab-pane fade show" id="order-tab-tran-his" role="tabpanel">
                         <table style="width: 100%;" id="historyTable" class="table table-striped table-bordered">
                             <thead class="bg-indigo-1 text-white">
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Invoice #</th>
-                                    <th>Customer</th>
-                                    <th>Total</th>
-                                    <th>Date Ordered</th>
-                                    <th>Delivery Date</th>
-                                    <th>Attempt</th>
-                                    <th>Reason</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
+                            <tr>
+                                <th>Rep ID</th>
+                                <th>Report Type</th>
+                                <th>Issued By</th>
+                                <!-- <th>Client</th> -->
+                                <!-- <th>Store</th> -->
+                                <th>Products</th>
+                                <th>Files</th>
+                                <th>Status</th>
+                                <th>Reason</th>
+                                <th>Action</th>
+                            </tr>
                             </thead>
                             <tbody>
                             </tbody>
                         </table>
-                    </div> --}}
+                    </div>
                 </div>
             </div>
         </div>
@@ -1126,6 +1126,7 @@
             const clientid = $(this).attr("data-clientid");
             const product_report_id = $(this).attr("data-id");
             const storeid = $(this).attr("data-store");
+            const report_type = $(this).attr("data-type");
             $('#displayProductsModal').modal('show');
             $('#divModalProducts').empty();
 
@@ -1187,6 +1188,7 @@
             jsx += `<div class="modal-footer">
                         <div class="row text-center">
                             <input type="hidden" value="${clientid}" id="data_client_id" name="data_client_id"/>
+                            <input type="hidden" value="${report_type}" id="data_client_id" name="report_type"/>
                             <input type="hidden" value="${storeid}" id="data_store_id" name="data_store_id"/>
                             <input type="hidden" value="${product_report_id}" id="data_report_id" name="product_report_id"/>
                             <button type='submit' id='is_loading' class="btn btn-success">Checkout</button>
@@ -1595,7 +1597,13 @@
             processing: true,
             serverSide: true,
             paging    : false,
-            ajax: "{{ url('file_replacement') }}",
+            // ajax: "{{ url('file_replacement') }}",
+            ajax: {
+                url: "{{ url('file_replacement') }}",
+                data: function(e){
+                    e.type = 'replacement'
+                }
+            },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'id', name: 'id'},
@@ -1651,7 +1659,7 @@
                     render: function(data, type, full, meta) {
                         var output = ''
                         if(!full.is_replaced){
-                            output += "<a href='javascript:void(0)' data-id='"+full.id+"' data-store='"+full.store_id+"' class='btn btn-primary btn-sm editDamageOrder' data-clientid='"+full.client_id+"'  data-val='"+full.products+"'>Approve </a>";
+                            output += "<a href='javascript:void(0)' data-id='"+full.id+"' data-store='"+full.store_id+"' class='btn btn-primary btn-sm editDamageOrder' data-type='replacement' data-clientid='"+full.client_id+"'  data-val='"+full.products+"'>Approve </a>";
                             output += "<a href='javascript:void(0)' data-id='"+full.id+"'  data-clientid='"+full.client_id+"' class='btn btn-danger btn-sm editDisapproveDamage mt-1'>Decline</a>";
                         } else {
                             output = 'NA';
@@ -1784,131 +1792,208 @@
             processing: true,
             serverSide: true,
             paging    : false,
-            ajax: "{{ url('history') }}",
+            // ajax: "{{ url('file_replacement') }}",
+            ajax: {
+                url: "{{ url('file_replacement') }}",
+                data: function(e){
+                    e.type = 'damages'
+                }
+            },
             columns: [
                 // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
-                // {data: 'id', name: 'id'},
-                // {
-                //     data: 'fullname', name: 'fullname',
-                //     "render": function(data, type, full, meta){
-                //         return data.fullname
-                //     }
-                // },
-                // {data: 'name', name: 'name'},
-                // {   
-                //     data: 'product_image', name: 'product_image',
-                //     "render": function (data, type, full, meta) {
-                //         return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
-                //     },
-                // },
-                // {
-                //     data: 'quantity_ordered', name: 'quantity_ordered',
-                //     "render": function(data, type, full, meta){
-                //         return data + " pcs"
-                //     }
-                // },
-                // {
-                //     data: 'ordered_total_price', name: 'ordered_total_price',
-                //     "render": function(data, type, full, meta){
-                //         return "&#x20b1; " + data
-                //     }
-                // },
-                // {
-                //     data: 'created_at', name: 'created_at',
-                //     "render": function (data, type, full, meta) {
-                //         return moment(data).format('MMMM D YYYY');
-                //     },
-                // },
-                // {
-                //     data: 'delivery_date', name: 'delivery_date',
-                //     "render": function (data, type, full, meta) {
-                //         let output = '';
-                //         if(data === '1010-10-10'){
-                //             output = '<span class="text-info font-weight-bold">(Not set)</span>'
-                //         }else{
-                //             if(full.is_cancelled == 1){
-                //                 output = '<span class="text-danger font-weight-bold">(To be reschedule)</span>'
-                //             }else{
-                //                 output = moment(data).format('MMMM D YYYY');
-                //             }
-                //         }
-
-
-                //         return output
-                //     },
-                // },
                 {data: 'id', name: 'id'},
-                {data: 'invoice_no', name: 'invoice_no'},
+                {data: 'report_type', name: 'report_type'},
+                {data: 'issued_by', name: 'issued_by'},
+                // {data: 'client_name', name: 'client_name'},
+                // {data: 'store_name', name: 'store_name'},
                 {
-                    data: 'fullname', name: 'fullname',
-                    "render": function(data, type, full, meta){
-                        return full.fullname
+                    data: 'products', 
+                    name: 'products',
+                    render: function(data, type, full, meta) {
+                        return "<a href='#' class='displayProducts' data-val='"+full.products+"'>View Lists</a>"
                     }
                 },
-                {data: 'total_price', name: 'total_price'},
                 {
-                    data: 'date_ordered', name: 'date_ordered',
-                    "render": function (data, type, full, meta) {
-                        return moment(data).format('MMMM D YYYY');
-                    },
-                },
-                {
-                    data: 'delivery_date', name: 'delivery_date',
-                    "render": function (data, type, full, meta) {
-                        let output = '';
-                        if(full.delivery_date == null){
-                            output = '<span class="text-info font-weight-bold">(Not set)</span>'
-                        }else{
-                            output = moment(data).format('MMMM D YYYY');
-                        }
-
-                        return output
-                    },
-                },
-                {
-                    data: 'attempt', name: 'attempt',
-                    render: function(data, type, full, meta){
-                        
-                        let output = parseInt(data) + 1
-                        let times = output > 1 ? "times" : "time"
-
-                        return output + " " + times
-                    }
-                },
-                
-                
-                {
-                    data: 'reason', name: 'reason',
+                    data: 'file_report_image', name: 'file_report_image',
                     render: function(data, type, full, meta){
                         let output = ''
                         if(data != ""){
-                            output = "<a href='#' class='btnDisplayReason' data-reason='"+data+"'>View</a>"
+                            output = "<a href='#' class='btnDisplayImages' data-val='"+full.images+"'>View Files</a>"
                         }
+
                         return output
                     }
                 },
+                // {data: 'quantity', name: 'quantity'},
                 {
-                    data: 'is_completed', name: 'is_completed',
+                    data: 'is_replaced', name: 'is_replaced',
+                    "render": function (data, type, full, meta) {
+                        var output = '';
+                        if(data === 0){
+                            output = '<span class="text-warning font-weight-bold">Pending</span>'
+                        }else if(data === 1){
+                            output = '<span class="text-success font-weight-bold">Approved</span>'
+                        }else{
+                            output = '<span class="text-danger font-weight-bold">Declined</span>'
+                        }
+                        return output;
+                    }
+                },
+                // {data: 'reason', name: 'reason'},
+                {
+                    data: 'reason', name: 'reason',
                     render: function(data, type, full, meta){
-                        let output = ''
-                        // let output = full.is_approved == 1 ? '<span class="text-info font-weight-bold">Approved</span><br/>' : '<span class="text-danger font-weight-bold">Pending</span><br/>';
-
-                        if(full.is_completed == 1){
-                            output += '<span class="text-success font-weight-bold">Completed</span>'
+                        let output = '(empty)'
+                        if(data != ""){
+                            output = "<a href='#' id='btnReason' data-val='"+data+"'>View</a>"
                         }
-                        if(full.is_cancelled == 1){
-                            output += '<span class="text-danger font-weight-bold">Cancelled</span>'
-                        }
-                        if(full.is_rescheduled == 1){
-                            output += '<span class="text-info font-weight-bold">Rescheduled</span>'
-                        }
-
                         return output
                     }
                 },
-                {data: 'action', name: 'action', orderable: false, searchable: false},
+                {data: 'action', name: 'action', orderable: false, searchable: false,
+                    render: function(data, type, full, meta) {
+                        var output = ''
+                        if(!full.is_replaced){
+                            output += "<a href='javascript:void(0)' data-id='"+full.id+"' data-store='"+full.store_id+"' data-type='damages' class='btn btn-primary btn-sm editDamageOrder mt-1' data-clientid='"+full.client_id+"'  data-val='"+full.products+"'>Approve </a> ";
+                            output += "<a href='javascript:void(0)' data-id='"+full.id+"'  data-clientid='"+full.client_id+"' class='btn btn-danger btn-sm editDisapproveDamage mt-1'>Decline</a>";
+                        } else {
+                            output = 'NA';
+                        }
+                       return  output
+                    }
+                },
             ]
         });
+
+        // var historyTable = $('#historyTable').DataTable({
+        //     processing: true,
+        //     serverSide: true,
+        //     paging    : false,
+        //     ajax: "{{ url('history') }}",
+        //     columns: [
+        //         // {data: 'DT_RowIndex', name: 'DT_RowIndex'},
+        //         // {data: 'id', name: 'id'},
+        //         // {
+        //         //     data: 'fullname', name: 'fullname',
+        //         //     "render": function(data, type, full, meta){
+        //         //         return data.fullname
+        //         //     }
+        //         // },
+        //         // {data: 'name', name: 'name'},
+        //         // {   
+        //         //     data: 'product_image', name: 'product_image',
+        //         //     "render": function (data, type, full, meta) {
+        //         //         return "<a data-fancybox='' href='{{ URL('img/product') }}/"+ data +"'><img src='{{ URL('img/product') }}/"+ data +"' height='20'></a>";
+        //         //     },
+        //         // },
+        //         // {
+        //         //     data: 'quantity_ordered', name: 'quantity_ordered',
+        //         //     "render": function(data, type, full, meta){
+        //         //         return data + " pcs"
+        //         //     }
+        //         // },
+        //         // {
+        //         //     data: 'ordered_total_price', name: 'ordered_total_price',
+        //         //     "render": function(data, type, full, meta){
+        //         //         return "&#x20b1; " + data
+        //         //     }
+        //         // },
+        //         // {
+        //         //     data: 'created_at', name: 'created_at',
+        //         //     "render": function (data, type, full, meta) {
+        //         //         return moment(data).format('MMMM D YYYY');
+        //         //     },
+        //         // },
+        //         // {
+        //         //     data: 'delivery_date', name: 'delivery_date',
+        //         //     "render": function (data, type, full, meta) {
+        //         //         let output = '';
+        //         //         if(data === '1010-10-10'){
+        //         //             output = '<span class="text-info font-weight-bold">(Not set)</span>'
+        //         //         }else{
+        //         //             if(full.is_cancelled == 1){
+        //         //                 output = '<span class="text-danger font-weight-bold">(To be reschedule)</span>'
+        //         //             }else{
+        //         //                 output = moment(data).format('MMMM D YYYY');
+        //         //             }
+        //         //         }
+
+
+        //         //         return output
+        //         //     },
+        //         // },
+        //         {data: 'id', name: 'id'},
+        //         {data: 'invoice_no', name: 'invoice_no'},
+        //         {
+        //             data: 'fullname', name: 'fullname',
+        //             "render": function(data, type, full, meta){
+        //                 return full.fullname
+        //             }
+        //         },
+        //         {data: 'total_price', name: 'total_price'},
+        //         {
+        //             data: 'date_ordered', name: 'date_ordered',
+        //             "render": function (data, type, full, meta) {
+        //                 return moment(data).format('MMMM D YYYY');
+        //             },
+        //         },
+        //         {
+        //             data: 'delivery_date', name: 'delivery_date',
+        //             "render": function (data, type, full, meta) {
+        //                 let output = '';
+        //                 if(full.delivery_date == null){
+        //                     output = '<span class="text-info font-weight-bold">(Not set)</span>'
+        //                 }else{
+        //                     output = moment(data).format('MMMM D YYYY');
+        //                 }
+
+        //                 return output
+        //             },
+        //         },
+        //         {
+        //             data: 'attempt', name: 'attempt',
+        //             render: function(data, type, full, meta){
+                        
+        //                 let output = parseInt(data) + 1
+        //                 let times = output > 1 ? "times" : "time"
+
+        //                 return output + " " + times
+        //             }
+        //         },
+                
+                
+        //         {
+        //             data: 'reason', name: 'reason',
+        //             render: function(data, type, full, meta){
+        //                 let output = ''
+        //                 if(data != ""){
+        //                     output = "<a href='#' class='btnDisplayReason' data-reason='"+data+"'>View</a>"
+        //                 }
+        //                 return output
+        //             }
+        //         },
+        //         {
+        //             data: 'is_completed', name: 'is_completed',
+        //             render: function(data, type, full, meta){
+        //                 let output = ''
+        //                 // let output = full.is_approved == 1 ? '<span class="text-info font-weight-bold">Approved</span><br/>' : '<span class="text-danger font-weight-bold">Pending</span><br/>';
+
+        //                 if(full.is_completed == 1){
+        //                     output += '<span class="text-success font-weight-bold">Completed</span>'
+        //                 }
+        //                 if(full.is_cancelled == 1){
+        //                     output += '<span class="text-danger font-weight-bold">Cancelled</span>'
+        //                 }
+        //                 if(full.is_rescheduled == 1){
+        //                     output += '<span class="text-info font-weight-bold">Rescheduled</span>'
+        //                 }
+
+        //                 return output
+        //             }
+        //         },
+        //         {data: 'action', name: 'action', orderable: false, searchable: false},
+        //     ]
+        // });
 
         //when reason dot is clicked
         $(document).on('click', '.btnDisplayReason', function(){
@@ -1928,7 +2013,7 @@
             undeliverTable.draw()
             replacementTable.draw()
             damageTable.draw();
-            // historyTable.draw()
+            historyTable.draw()
         }
 
         $(document).on('click', '.refresh_table', function(e){
@@ -1947,9 +2032,9 @@
                 case 'order-damage':
                     damageTable.draw();
                 break;
-                // case 'order-tab-tran-his':
-                //     historyTable.draw()
-                // break;
+                case 'order-tab-tran-his':
+                    historyTable.draw()
+                break;
             }
 
             var uri = window.location.toString(); 

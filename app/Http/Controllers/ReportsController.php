@@ -31,8 +31,8 @@ class ReportsController extends Controller
     public function getOrders(Request $request){
         $response = DB::table('order_invoice')
                 ->join('orders', 'orders.invoice_id', '=', 'order_invoice.id')
-                ->join('users', 'orders.client_id', '=', 'users.id')
-                ->join('stores', 'stores.id', '=', 'orders.store_id')
+                ->leftJoin('users', 'orders.client_id', '=', 'users.id')
+                ->leftJoin('stores', 'stores.id', '=', 'orders.store_id')
                 ->selectRaw("order_invoice.id, order_invoice.created_at as date_ordered,orders.delivery_date, 
                     order_invoice.invoice_no, 
                     SUM(orders.ordered_total_price) as total_price, CONCAT(users.fname, ' ', users.lname) as fullname, 
@@ -44,18 +44,33 @@ class ReportsController extends Controller
                     switch ($request->filter_status) {
                         case 'PENDING':
                             return $sql->where('orders.is_approved', 0)
-                                    ->where('orders.is_completed', 0);
+                                    ->where('orders.is_completed', 0)
+                                    ->where('orders.is_damages', 0);
                         break;
                         case 'FOR DELIVERY':
                             return $sql->where('orders.is_approved', 1)
-                                    ->where('orders.is_completed', 0);
+                                    ->where('orders.is_completed', 0)
+                                    ->where('orders.is_damages', 0);
                         break;
                         case 'UNDELIVERED':
                             return $sql->where('orders.is_cancelled', 1)
-                                    ->where('orders.order_cancel', 0);
+                                    ->where('orders.order_cancel', 0)
+                                    ->where('orders.is_damages', 0);
+                        break;
+                        case 'REPLACEMENT':
+                            return $sql->where('orders.is_completed', 1)
+                                        ->where('orders.is_replacement', 1)
+                                        ->where('orders.is_damages', 0);
+                        break;
+                        case 'DAMAGES':
+                            return $sql->where('orders.is_completed', 0)
+                                        ->where('orders.is_replacement', 1)
+                                        ->where('orders.is_damages', 1);
                         break;
                         case 'COMPLETED':
-                            return $sql->where('orders.is_completed', 1);
+                            return $sql->where('orders.is_completed', 1)
+                                        ->where('orders.is_replacement', 0)
+                                        ->where('orders.is_damages', 0);
                         break;
                     }
                 })

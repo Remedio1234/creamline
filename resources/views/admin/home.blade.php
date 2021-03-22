@@ -13,45 +13,45 @@
                         <div class="col-sm-3">
                             <div class="card text-white bg-success mb-3" style="max-width: 28rem;">
                                 <div class="card-body">
-                                    <h5 class="card-title">Order(s) to Deliver:</h5>
-                                    <h1 id="lbl-display-order-to-deliver">...</h1>
+                                    <h5 class="card-title">Today(s) <br> Delivery:</h5>
+                                    <h1 id="lbl-display-order-to-deliver">0</h1>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="card text-white bg-info mb-3" style="max-width: 28rem;">
                                 <div class="card-body">
-                                    <h5 class="card-title">Order(s) to Approve:</h5>
-                                    <h1 id="lbl-display-order-to-approve">...</h1>
+                                    <h5 class="card-title">Order(s) <br> to Approve:</h5>
+                                    <h1 id="lbl-display-order-to-approve">0</h1>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="card text-white bg-danger mb-3" style="max-width: 28rem;">
                                 <div class="card-body">
-                                    <h5 class="card-title">Out of stocks Product(s):</h5>
-                                    <h1 id="lbl-display-out-of-stock-product">...</h1>
+                                    <h5 class="card-title">Out of <br>stocks Product(s):</h5>
+                                    <h1 id="lbl-display-out-of-stock-product">0</h1>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="card text-black-50 bg-warning mb-3" style="max-width: 28rem;">
                                 <div class="card-body">
-                                    <h5 class="card-title">Low of stocks Product(s):</h5>
-                                    <h1 id="lbl-low-stocks-product">...</h1>
+                                    <h5 class="card-title">Low of <br>stocks Product(s):</h5>
+                                    <h1 id="lbl-low-stocks-product">0</h1>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <!-- <div class="col-sm-4">
                             <div class="card text-black-50 border-primary mb-3" style="max-width: 50rem;">
                                 <div class="card-body">
                                     <h5 class="card-title">Sales & Loss Report:</h5>
                                     <canvas id="salesChart" width="459" height="415"></canvas>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-sm-8">
-                            <div class="card text-black-50 border-primary mb-3" style="max-width: 50rem;">
+                        </div> -->
+                        <div class="col-sm-12">
+                            <div class="card text-black-50 border-primary mb-3" style="width:100%;">
                                 <div class="card-body">
                                     <h5 class="card-title">Weekly Sales:</h5>
                                     <canvas id="weeklySalesChart" width="1000" height="400"></canvas>
@@ -67,11 +67,11 @@
                                 </div>
                             </div>
                         </div> -->
-                        <div class="col-sm-4">
+                        <!-- <div class="col-sm-4">
                             <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
                                 <a data-fancybox='' href="{{ asset('img/product/default.jpg') }}" id="a-product-of-the-month-1"><img style="max-height: 14rem;" class="card-img-top" src="{{ asset('img/product/default.jpg') }}"  id="img-product-of-the-month-1"></a>
                                 <div class="card-body">
-                                    <h4 class="card-title">Product of the Month:</h4>
+                                    <h4 class="card-title">Top Products:</h4>
                                     <h5 id="lbl-product-of-the-month-1">....</h5>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                             <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
                                 <a data-fancybox='' href="{{ asset('img/product/default.jpg') }}" id="a-product-of-the-month-2"><img style="max-height: 14rem;" class="card-img-top" src="{{ asset('img/product/default.jpg') }}"  id="img-product-of-the-month-2"></a>
                                 <div class="card-body">
-                                    <h4 class="card-title">Product of the Month:</h4>
+                                    <h4 class="card-title">Top Products:</h4>
                                     <h5 id="lbl-product-of-the-month-2">....</h5>
                                 </div>
                             </div>
@@ -89,12 +89,14 @@
                             <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
                                 <a data-fancybox='' href="{{ asset('img/product/default.jpg') }}" id="a-product-of-the-month-3"><img style="max-height: 14rem;" class="card-img-top" src="{{ asset('img/product/default.jpg') }}"  id="img-product-of-the-month-3"></a>
                                 <div class="card-body">
-                                    <h4 class="card-title">Product of the Month:</h4>
+                                    <h4 class="card-title">Top Products:</h4>
                                     <h5 id="lbl-product-of-the-month-3">....</h5>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
+                    <div class="row top_product_div">
+                        </div>
                     @endif
                     
                     
@@ -144,7 +146,7 @@
                                 <div class="card text-white bg-success mb-3" style="max-width: 28rem;">
                                     <div class="card-body">
                                         <h5 class="card-title">Order(s) to Receive:</h5>
-                                        <h1 id="lbl-display-order-to-receive-client">...</h1>
+                                        <a href="/transaction_history#approved"><h1 id="lbl-display-order-to-receive-client">0</h1></a>
                                     </div>
                                 </div>
                             </div>
@@ -152,37 +154,13 @@
                                 <div class="card text-black-50 bg-warning mb-3" style="max-width: 28rem;">
                                     <div class="card-body">
                                         <h5 class="card-title">Order(s) to be Approved:</h5>
-                                        <h1 id="lbl-display-order-to-approve-client">...</h1>
+                                        <a href="/transaction_history#pending"><h1 id="lbl-display-order-to-approve-client">0</h1></a>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
-                                <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
-                                    <a data-fancybox='' href="{{ asset('img/product/default.jpg') }}" id="a-product-of-the-month-1"><img style="max-height: 14rem;" class="card-img-top" src="{{ asset('img/product/default.jpg') }}"  id="img-product-of-the-month-1"></a>
-                                    <div class="card-body">
-                                        <h4 class="card-title">Product of the Month:</h4>
-                                        <h5 id="lbl-product-of-the-month-1">....</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
-                                    <a data-fancybox='' href="{{ asset('img/product/default.jpg') }}" id="a-product-of-the-month-2"><img style="max-height: 14rem;" class="card-img-top" src="{{ asset('img/product/default.jpg') }}"  id="img-product-of-the-month-2"></a>
-                                    <div class="card-body">
-                                        <h4 class="card-title">Product of the Month:</h4>
-                                        <h5 id="lbl-product-of-the-month-2">....</h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
-                                    <a data-fancybox='' href="{{ asset('img/product/default.jpg') }}" id="a-product-of-the-month-3"><img style="max-height: 14rem;" class="card-img-top" src="{{ asset('img/product/default.jpg') }}"  id="img-product-of-the-month-3"></a>
-                                    <div class="card-body">
-                                        <h4 class="card-title">Product of the Month:</h4>
-                                        <h5 id="lbl-product-of-the-month-3">....</h5>
-                                    </div>
-                                </div>
-                            </div>
+                            
+                        </div>
+                        <div class="row top_product_div">
                         </div>
                     @endif
                 </div>
@@ -194,7 +172,7 @@
 <script>
     // ------------------------------------- CLIENT SCRIPTS --------------------------------//
     @if(Auth::user()->user_role == 2)
-        $("#exampleModalCenter").modal("show")
+        // $("#exampleModalCenter").modal("show")
 
         //call the function for populating the order to receive
         populate_order_to_receive_count_client();
@@ -208,7 +186,7 @@
                 success: function(response){
                     console.log(response)
                     //return the response to the DOM
-                    $("#lbl-display-order-to-receive-client").html(response.count.data)
+                    $("#lbl-display-order-to-receive-client").html(response.count)
                 },
                 error: function(err){
                     console.log(err)
@@ -228,7 +206,7 @@
                 success: function(response){
                     console.log(response)
                     //return the response to the DOM
-                    $("#lbl-display-order-to-approve-client").html(response.count.data)
+                    $("#lbl-display-order-to-approve-client").html(response.count)
                 },
                 error: function(err){
                     console.log(err)
@@ -236,6 +214,9 @@
             })
         }
 
+    @endif
+
+        
         //call the function that will display the best 3 product of the month
         populate_best_3_product_of_the_month()
 
@@ -246,35 +227,49 @@
                 method: "GET",
                 data: {},
                 success: function(response){
+                    $(".top_product_div").html("")
                     // console.log(response)
                     //return the response to the DOM
-                    $("#lbl-product-of-the-month-1").html(response.data1.name)
-                    $("#lbl-product-of-the-month-2").html(response.data2.name)
-                    $("#lbl-product-of-the-month-3").html(response.data3.name)
-                    var img1 = response.img1 == "default.jpg" ? response.img1 : response.img1.product_image;
-                    var img2 = response.img2 == "default.jpg" ? response.img2 : response.img2.product_image;
-                    var img3 = response.img3 == "default.jpg" ? response.img3 : response.img3.product_image;
-                    $("#a-product-of-the-month-1").attr("href", "{{ asset('img/product/') }}" + "/" + img1)
-                    $("#a-product-of-the-month-2").attr("href", "{{ asset('img/product/') }}" + "/" + img2)
-                    $("#a-product-of-the-month-3").attr("href", "{{ asset('img/product/') }}" + "/" + img3)
-                    $("#img-product-of-the-month-1").attr("src", "{{ asset('img/product/') }}" + "/" + img1)
-                    $("#img-product-of-the-month-2").attr("src", "{{ asset('img/product/') }}" + "/" + img2)
-                    $("#img-product-of-the-month-3").attr("src", "{{ asset('img/product/') }}" + "/" + img3)
+                    // $("#lbl-product-of-the-month-1").html(response.data1.name)
+                    // $("#lbl-product-of-the-month-2").html(response.data2.name)
+                    // $("#lbl-product-of-the-month-3").html(response.data3.name)
+                    // var img1 = response.img1 == "default.jpg" ? response.img1 : response.img1.product_image;
+                    // var img2 = response.img2 == "default.jpg" ? response.img2 : response.img2.product_image;
+                    // var img3 = response.img3 == "default.jpg" ? response.img3 : response.img3.product_image;
+                    // $("#a-product-of-the-month-1").attr("href", "{{ asset('img/product/') }}" + "/" + img1)
+                    // $("#a-product-of-the-month-2").attr("href", "{{ asset('img/product/') }}" + "/" + img2)
+                    // $("#a-product-of-the-month-3").attr("href", "{{ asset('img/product/') }}" + "/" + img3)
+                    // $("#img-product-of-the-month-1").attr("src", "{{ asset('img/product/') }}" + "/" + img1)
+                    // $("#img-product-of-the-month-2").attr("src", "{{ asset('img/product/') }}" + "/" + img2)
+                    // $("#img-product-of-the-month-3").attr("src", "{{ asset('img/product/') }}" + "/" + img3)
+
+                    var htmlData = '';
+                    $.each(response, function(key, row){
+                        var imgHTML = "{{ asset('img/product/') }}" + "/" + row.product_image 
+                        htmlData += `<div class="col-sm-4">
+                                    <div class="card text-white bg-secondary mb-3" style="max-width: 18rem;">
+                                        <a data-fancybox='' href="{{ asset('img/product/') }}/${row.product_image}" id="a-product-of-the-month-1">
+                                            <img style="max-height: 14rem;" class="card-img-top" src="{{ asset('img/product/') }}/${row.product_image}"  id="img-product-of-the-month-1"></a>
+                                        <div class="card-body">
+                                            <h4 class="card-title">Top Products</h4>
+                                            <h5 id="lbl-product-of-the-month-1">${row.product_name}</h5>
+                                        </div>
+                                    </div>
+                                </div>`
+                    })
+                    $(".top_product_div").append(htmlData)
                 },
                 error: function(err){
                     console.log(err)
                 }
             })
         }
-    @endif
-
-
 
     // ------------------------------------- ADMIN SCRIPTS --------------------------------//
     @if(Auth::user()->user_role == 99)
 
         var ctx = document.getElementById('weeklySalesChart').getContext('2d');
-        var ctxSales = document.getElementById('salesChart').getContext('2d');
+        // var ctxSales = document.getElementById('salesChart').getContext('2d');
         
         const backgroundColor = [
             'rgba(255, 99, 132, 0.2)',
@@ -308,7 +303,8 @@
                 success: function(response){
                     // console.log(response)
                     //return the response to the DOM
-                    $("#lbl-display-order-to-deliver").html((response.count == null ? 0 : response.count.data))
+                    $("#lbl-display-order-to-deliver").html((response.count == null ? 0 : response.count))
+                    // $("#lbl-display-order-to-deliver").html(100)
                 },
                 error: function(err){
                     console.log(err)
@@ -346,7 +342,7 @@
                 success: function(response){
                     // console.log(response)
                     //return the response to the DOM
-                    $("#lbl-display-order-to-approve").html(response.count.data)
+                    $("#lbl-display-order-to-approve").html(response.count)
                 },
                 error: function(err){
                     console.log(err)
@@ -366,7 +362,7 @@
                 success: function(response){
                     // console.log(response)
                     //return the response to the DOM
-                    $("#lbl-display-out-of-stock-product").html(response.count.data)
+                    $("#lbl-display-out-of-stock-product").html(response.count)
                 },
                 error: function(err){
                     console.log(err)
@@ -397,46 +393,45 @@
         // }
 
         //call the function that will display the best 3 product of the month
-        populate_best_3_product_of_the_month()
+        // populate_best_3_product_of_the_month()
 
         //create a function that will populate the product of the month
-        function populate_best_3_product_of_the_month(){
-            $.ajax({
-                url: "{{ url('display_3_best_product_of_the_month') }}",
-                method: "GET",
-                data: {},
-                success: function(response){
-                    // console.log(response)
-                    //return the response to the DOM
-                    $("#lbl-product-of-the-month-1").html(response.data1.name)
-                    $("#lbl-product-of-the-month-2").html(response.data2.name)
-                    $("#lbl-product-of-the-month-3").html(response.data3.name)
-                    var img1 = response.img1 == "default.jpg" ? response.img1 : response.img1.product_image;
-                    var img2 = response.img2 == "default.jpg" ? response.img2 : response.img2.product_image;
-                    var img3 = response.img3 == "default.jpg" ? response.img3 : response.img3.product_image;
+        // function populate_best_3_product_of_the_month(){
+        //     $.ajax({
+        //         url: "{{ url('display_3_best_product_of_the_month') }}",
+        //         method: "GET",
+        //         data: {},
+        //         success: function(response){
+        //             // console.log(response)
+        //             //return the response to the DOM
+        //             $("#lbl-product-of-the-month-1").html(response.data1.name)
+        //             $("#lbl-product-of-the-month-2").html(response.data2.name)
+        //             $("#lbl-product-of-the-month-3").html(response.data3.name)
+        //             var img1 = response.img1 == "default.jpg" ? response.img1 : response.img1.product_image;
+        //             var img2 = response.img2 == "default.jpg" ? response.img2 : response.img2.product_image;
+        //             var img3 = response.img3 == "default.jpg" ? response.img3 : response.img3.product_image;
 
-                    $("#a-product-of-the-month-1").attr("href", "{{ asset('img/product/') }}" + "/" + img1)
-                    $("#a-product-of-the-month-2").attr("href", "{{ asset('img/product/') }}" + "/" + img2)
-                    $("#a-product-of-the-month-3").attr("href", "{{ asset('img/product/') }}" + "/" + img3)
-                    $("#img-product-of-the-month-1").attr("src", "{{ asset('img/product/') }}" + "/" + img1)
-                    $("#img-product-of-the-month-2").attr("src", "{{ asset('img/product/') }}" + "/" + img2)
-                    $("#img-product-of-the-month-3").attr("src", "{{ asset('img/product/') }}" + "/" + img3)
-                },
-                error: function(err){
-                    console.log(err)
-                }
-            })
-        }
+        //             $("#a-product-of-the-month-1").attr("href", "{{ asset('img/product/') }}" + "/" + img1)
+        //             $("#a-product-of-the-month-2").attr("href", "{{ asset('img/product/') }}" + "/" + img2)
+        //             $("#a-product-of-the-month-3").attr("href", "{{ asset('img/product/') }}" + "/" + img3)
+        //             $("#img-product-of-the-month-1").attr("src", "{{ asset('img/product/') }}" + "/" + img1)
+        //             $("#img-product-of-the-month-2").attr("src", "{{ asset('img/product/') }}" + "/" + img2)
+        //             $("#img-product-of-the-month-3").attr("src", "{{ asset('img/product/') }}" + "/" + img3)
+        //         },
+        //         error: function(err){
+        //             console.log(err)
+        //         }
+        //     })
+        // }
 
         //call the function that will display the product of the month
         populate_weekly_sales_data().then(res => {
-            
             var weeklySalesChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: returnDateAndDay(),
                     datasets: [{
-                        label: 'Days',
+                        label: 'Sales',
                         data: res ? res : [1, 2, 3, 4, 5, 6, 7],
                         backgroundColor: backgroundColor,
                         borderColor: borderColor,
@@ -540,33 +535,33 @@
 
 
         //call the function that will display the product of the month
-        populate_sales_data().then(res => {
+        // populate_sales_data().then(res => {
 
-            console.log("then promise", res)
+        //     console.log("then promise", res)
             
-            var weeklySalesChart = new Chart(ctxSales, {
-                type: 'pie',
-                data: {
-                    labels: ["Sales", "Loss"],
-                    datasets: [{
-                        label: 'Total Sales',
-                        data: [res.sales, res.loss],
-                        backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
-                        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            }
-                        }]
-                    }
-                }
-            });
-        })
+        //     var weeklySalesChart = new Chart(ctxSales, {
+        //         type: 'pie',
+        //         data: {
+        //             labels: ["Sales", "Loss"],
+        //             datasets: [{
+        //                 label: 'Total Sales',
+        //                 data: [res.sales, res.loss],
+        //                 backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
+        //                 borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
+        //                 borderWidth: 1
+        //             }]
+        //         },
+        //         options: {
+        //             scales: {
+        //                 yAxes: [{
+        //                     ticks: {
+        //                         beginAtZero: true
+        //                     }
+        //                 }]
+        //             }
+        //         }
+        //     });
+        // })
 
         //create a function that will populate the sales data
         async function populate_sales_data(){

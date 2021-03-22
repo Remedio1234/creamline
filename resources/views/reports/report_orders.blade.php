@@ -13,12 +13,15 @@
                     <option value="PENDING">PENDING</option>
                     <option value="FOR DELIVERY">FOR DELIVERY</option>
                     <option value="UNDELIVERED">UNDELIVERED</option>
+                    <option value="REPLACEMENT">REPLACEMENT</option>
+                    <option value="DAMAGES">DAMAGES</option>
                     <option value="COMPLETED">COMPLETED</option>
                 </select>
             </div>
             <div class="col-md-6" style="padding:0px;">
-                <button class="btn btn-success ml-auto float-right" onclick="printData();" id="print_data">Print</button> &nbsp;
-                <button class="btn btn-primary ml-auto float-right mr-2" onclick="exportEx('xls');" id="export_data">Export</button>
+                <button class="btn btn-info ml-auto float-right" onclick="printData();" id="print_data">Print</button> &nbsp;
+                <!-- <button class="btn btn-danger ml-auto float-right mr-2" id="pdf">PDF</button> -->
+                <button class="btn btn-success ml-auto float-right mr-2" onclick="exportEx('xls');" id="export_data">XLS</button>
             </div>
         </div>
     </div>
@@ -44,8 +47,17 @@
         </tbody>
     </table>
 </div>
-
+<script src="{{ asset('js/jspdf.min.js') }}"></script>
+<script src="{{ asset('js/jspdf.plugin.autotable.min.js') }}"></script>
+<script src="{{ asset('js/tableHTMLExport.js') }}"></script>
 <script type="text/javascript">
+    $('#pdf').on('click',function(){
+        $("#salesReportTableReport").tableHTMLExport({
+            type:'pdf',
+            filename:'top_product.pdf',
+            orientation:'p'
+        });
+    })
     function printData()
     {
         var divToPrint=document.getElementById("order_list_html");
@@ -92,10 +104,10 @@
                 $.each(data, function( index, row ) {
                     htmlData += `<tr>
                         <td>${row.invoice_no}</td>
-                        <td>${row.fullname}</td>
-                        <td>${row.email}</td>
-                        <td>${row.contact_num}</td>
-                        <td>${row.store_name}</td>
+                        <td>${row.fullname ?  row.fullname : 'NA'}</td>
+                        <td>${row.email ? row.email: 'NA'}</td>
+                        <td>${row.contact_num ? row.contact_num: 'NA'}</td>
+                        <td>${row.store_name ? row.store_name : 'NA'}</td>
                         <td>${parseFloat(row.total_price).toFixed(2)}</td>
                         <td>${row.date_ordered}</td>
                         <td>${row.delivery_date}</td>

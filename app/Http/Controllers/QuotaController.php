@@ -64,6 +64,28 @@ class QuotaController extends Controller
         return view('quota/quota', compact('quota'));
     }
 
+    public function getQuota(Request $request){
+        $year =  Quota::where('year',$request->filter_status)->first();
+        return [
+           'list' => [
+                'January'   => $year ? $year->jan  : 0,
+                'February'  => $year ? $year->feb  : 0,
+                'March'     => $year ? $year->mar  : 0,
+                'April'     => $year ? $year->apr  : 0,
+                'May'       => $year ? $year->may  : 0,
+                'June'      => $year ? $year->jun  : 0,
+                'July'      => $year ? $year->jul  : 0,
+                'August'    => $year ? $year->aug  : 0,
+                'September' => $year ? $year->sep  : 0,
+                'October'   => $year ? $year->oct  : 0,
+                'November'  => $year ? $year->nov  : 0,
+                'December'  => $year ? $year->dev  : 0,
+           ],
+            'id'            => $year ? $year->id   : 0,
+            'is_deleted'    => $year ? $year->is_deleted : 0
+        ];
+    }
+
     /**
      * Store a newly created resource in storage.
      *

@@ -63,6 +63,7 @@ Route::resource('order_replacement',                                    'OrderRe
 Route::resource('order_damage',                                         'ProductDamagesController');
 Route::resource('ads',                                                  'AdController');
 Route::resource('quota',                                                'QuotaController');
+Route::get('get/quota/{filter_status}',                            'QuotaController@getQuota');
 
 #client store
 Route::get('client/{id}/stores',                                        'ClientController@storeList');
@@ -137,3 +138,4 @@ Route::get('product/edit/{id}',                                         'Product
 //reports here
 Route::get('report/orders',                                             'ReportsController@index');
 Route::get('order/reports/json/{filter_status}',                        'ReportsController@getOrders');
+Route::get('statistic_reports/{year}',                                  'HomeController@getYearStatistics');

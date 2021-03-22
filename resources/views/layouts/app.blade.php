@@ -212,12 +212,12 @@
                             </a>
                             <a class="nav-link" href="{{ route('sales.index') }}">
                                 <span data-feather="pie-chart"></span>
-                                Sales Report
+                                Statistic Report
                             </a>
-                            <a class="nav-link" href="{{ route('loss.index') }}">
+                            <!-- <a class="nav-link" href="{{ route('loss.index') }}">
                                 <span data-feather="bar-chart-2"></span>
                                 Loss Report
-                            </a>
+                            </a> -->
                             <a class="nav-link" href="{{ route('quota.index') }}">
                                 <span data-feather="pie-chart"></span>
                                 Yearly Quota
@@ -320,7 +320,7 @@
                         </li>
 
                         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-                            <span>Issues</span>
+                            <span>File Issues</span>
                         </h6>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('file_replacement.index') }}">

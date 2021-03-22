@@ -121,7 +121,7 @@ class StaffDashboardController extends Controller
                     }
 
                     if (!$row->is_completed) {
-                        return '<span class="text-info font-weight-bold">Pending</span>';
+                        return '<span class="text-info font-weight-bold">For Delivery</span>';
                     }
                 })
                 ->addColumn('action', function ($row) use($area) {
