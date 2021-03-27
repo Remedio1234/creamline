@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\{Store,UserFridge};
+use App\{Store,UserFridge, User};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DataTables;
@@ -27,7 +27,15 @@ class StoreController extends Controller
     public function index(Request $request)
     {
         $store = Store::join('areas', ['areas.id' => 'stores.area_id'])
-                        ->selectRaw('stores.*, areas.area_name')->where("user_id", Auth::user()->id)->latest()->get();
+                ->selectRaw('stores.*, areas.area_name')
+                    ->where("user_id", Auth::user()->id)->latest()
+                        ->get()->map(function($item){
+                            $item->fullname = 'NA';
+                            if($user = User::where(['area_id' => $item->area_id, 'user_role' => 1])->first()){
+                                $item->fullname = $user->fname . ' ' .  $user->lname;
+                            }
+                            return $item;
+                        });;
 
         if ($request->ajax()) {
             return Datatables::of($store)

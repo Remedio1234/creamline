@@ -17,6 +17,7 @@
             <th>Store Name</th>
             <th>Store Address</th>
             <th>Area</th>
+            <th>Staff Assigned</th>
             <th>Status</th>
             <th>Action</th>
         </tr>
@@ -56,9 +57,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="area_id" class="col-md-12 col-form-label">Designated Location:</label>
-
-                        <div class="col-md-12">
+                        <label for="area_id" class="col-sm-12 control-label">Designated Location</label>
+                        <div class="col-sm-12">
                             <select class="form-control" id="area_id" name="area_id">
                                 @foreach($areas->all() as $area)
                                   <option value="{{ $area->id }}">{{ $area->area_name." : ".$area->area_code }}</option>
@@ -124,6 +124,7 @@
                 {data: 'store_name', name: 'store_name'},
                 {data: 'store_address', name: 'store_address'},
                 {data: 'area_name', name: 'area_name'},
+                {data: 'fullname', name: 'fullname'},
                 {
                     data: 'is_deleted', name: 'is_deleted',
                     "render": function (data, type, full, meta) {

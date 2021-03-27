@@ -313,12 +313,12 @@
                 $('#modelHeading').html("Edit Staff");
                 $('#saveBtn').html('Update');
                 $('#ajaxModel').modal('show');
-                $('#staff_id').val(data.id);
-                $('#fname').val(data.fname);
-                $('#mname').val(data.mname);
-                $('#lname').val(data.lname);
-                $('#email').val(data.email);
-                $('#contact_num').val(data.contact_num);
+                $('#staff_id').val(data.staff.id);
+                $('#fname').val(data.staff.fname);
+                $('#mname').val(data.staff.mname);
+                $('#lname').val(data.staff.lname);
+                $('#email').val(data.staff.email);
+                $('#contact_num').val(data.staff.contact_num);
                 $("#div_password").hide();
                 $("#action").val('update_staff_profile');
             })

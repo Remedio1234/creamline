@@ -414,28 +414,28 @@
                     url: "{{ url('notification') }}",
                     success: function (data) {
                         notificationCount = data.length;
-
+                        $(".badge-here").text(notificationCount)
                         //check if the count has been added
-                        if(currentCount != 0 && notificationCount > currentCount){
-                            $(".badge-here").html(notificationCount - currentCount);
-                        }
+                        // if(currentCount != 0 && notificationCount > currentCount){
+                        //     $(".badge-here").html(notificationCount - currentCount);
+                        // }
 
                         let output = '';
                         if(data.length > 0){
                             for (var i=0; i < data.length; i++){
-                                output += `<a class="dropdown-item notifications notif_wrapper" href="#">
-                                        ${data[i].note_description}
-                                    </a>`
+                                output += `<div class="dropdown-item notifications notif_wrapper">
+                                        ${data[i].message}
+                                    </div>`
                             }
                         }else{
-                        output += `<a class="dropdown-item notifications" href="#">No notifications found.</a>`
+                            output = `<a class="dropdown-item notifications" href="#">No notifications found.</a>`
                         }
 
                         //return the output
                         $('#notification-main-div').html(output);
 
                         //refresh every 5 seconds
-                        setTimeout(displayNotifications, 2000);
+                        setTimeout(displayNotifications, 5000);
                     },
                     error: function (data) {
                         console.log('Error:', data);
@@ -443,7 +443,7 @@
                 });
 
                 //update the current count
-                currentCount = notificationCount;
+                // currentCount = notificationCount;
             }
 
         });

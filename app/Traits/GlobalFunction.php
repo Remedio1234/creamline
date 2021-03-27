@@ -1,11 +1,23 @@
 <?php
 
 namespace App\Traits;
-
+use App\SystemNotification;
 use App\Notification;
+use Exception;
 use Illuminate\Support\Carbon;
 
 trait GlobalFunction {
+    /**
+     * System Notifications Setup
+     */
+    public function notificationDispatch($data = array()){
+        try {
+            SystemNotification::create($data);
+        } catch(Exception $e) {
+            return $e->getMessage();
+        }
+    }
+    
 
     //##########################################################################
     // ITEXMO SEND SMS API - PHP - CURL-LESS METHOD

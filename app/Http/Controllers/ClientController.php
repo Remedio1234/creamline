@@ -79,7 +79,7 @@ class ClientController extends Controller
                     if($row->is_pending == 0){
                         $btn .= ' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteClient">'.$delete_status.'</a>';
                         $btn .=' <a href="/client/'.$row->id.'/stores" class="btn btn-warning btn-sm">'.'Store'.'</a>';
-                        $btn .=' <a href="javascript:void(0)"  class="btn btn-info btn-sm">Profile</a>';
+                        // $btn .=' <a href="javascript:void(0)"  class="btn btn-info btn-sm">Profile</a>';
                     }
                     if($row->is_pending == 1){
                         $btn .= '<div class="dropdown">
@@ -287,6 +287,7 @@ class ClientController extends Controller
     {
         $output = '';
         $user = User::find($request->client_id);     
+        $contact_number = $user->contact_num; 
         new MailDispatch('client_approval', trim($user->email), array(
             'subject'   => 'Creamline Registration Update',
             'title'     => 'Creamline Registration Update', 
@@ -297,35 +298,38 @@ class ClientController extends Controller
         if($request->status == 'accept'){
             User::where('id', $user->id)->update(["is_pending" => 0, "is_active" => 1]);
 
-            $text_message = 'Hi, '. $user->fname . `
-                \n\nWelcome to Creamline! We are glad
-                to inform you that you are now one of
-                our retailers. \n you can now login <a href="/login">here</a>. \n\n Best regards,\n
-                Charpling Square Enterprise\n
-                Creamline Authorized Distributor`;
+            $text_message = "Hi, ". $user->fname ."\nWelcome to Creamline! We are glad to inform you that you are now one of our retailers.
+                \nBest regards,\nCharpling Square Enterprise \nCreamline Authorized Distributor";
+
+            //notification setup
+            //staff
+            $this->notificationDispatch([
+                'user_id'   => $user->id,
+                'type'      => 'approved_client',
+                'area_id'   => $user->area_id,
+                'email_to'  => 'staff',
+                'message'   => '('.$user->id . ') '. $user->fname . ' '. $user->lname . ' is now added to your client’s list. Click <a href="/client_list">here</a> for details.',
+                'status'    => 'unread'
+            ]);   
+            //client 
+            $this->notificationDispatch([
+                'user_id'   => $user->id,
+                'type'      => 'approved_client',
+                'area_id'   => $user->area_id,
+                'email_to'  => 'client',
+                'message'   => 'Hi,'  . $user->fname . ' '. $user->lname . '. Welcome to creamline. You can now order <a href="/shop">here</a>.',
+                'status'    => 'unread'
+            ]);   
 
             $output = 'Successfully Accepted!';
         } else {
-
-            $text_message = 'Hi, '. $user->fname . `
-                \n\n We are sorry to inform you that you
-                did not passed the qualification as our
-                retailer based on the documents you
-                submitted. 
-                \n Please contact your sales
-                agent or the administration for more
-                details. 
-                \n 
-                You can still register in our
-                website once you finalized the
-                requirements we needed. \n\n Best regards,\n
-                Charpling Square Enterprise\n
-                Creamline Authorized Distributor`;
+            $text_message = "Hi, ". $user->fname . "\n\nWe are sorry to inform you that you did not passed the qualification as our retailer based on the documents you submitted.Please contact your sales agent or the administration for more details.You can still register in our website once you finalized the requirements we needed.
+                \nBest regards,\nCharpling Square Enterprise \nCreamline Authorized Distributor";
 
             $output = 'Successfully Declined!';            
         }
 
-        $this->global_itexmo($user->contact_num, $text_message." \n\n\n\n","ST-CREAM343228_LGZPB", '#5pcg2mpi]');
+        $this->global_itexmo($contact_number, $text_message, "ST-CREAM343228_F3PNT", '8)tg(84@$$');
         
         if($request->status != 'accept')
             User::where('id', $user->id)->delete();
@@ -333,7 +337,8 @@ class ClientController extends Controller
         return response()->json([
             'success', true,
             'message' => $output,
-            'user'  => $user
+            'user'  => $user,
+            $text_message
         ], 200);
     }
 
@@ -360,28 +365,45 @@ class ClientController extends Controller
         ));
         
         if($request->status == 'accept'){
-            $text_message = 'Hi, '. $user->fname . `
-                \n\nYour new store named ` .$store->store_name. ` located
-            in ` .$store->store_address. ` has been approved. 
-            <br>
-            Please visit your
-            account for more info.`;
+            $text_message = "Hi, ". $user->fname .
+                "\n\nYour new store named " .$store->store_name. " located in " .$store->store_address. " has been approved. Please visit your account for more info.
+                \nBest regards,\nCharpling Square Enterprise \nCreamline Authorized Distributor";
             $output = 'Successfully Accepted!';
+
+            //client approved store
+            $this->notificationDispatch([
+            'user_id'   => $user->id,
+            'type'      => 'approved_client_store',
+            'area_id'   => $user->area_id,
+            'email_to'  => 'client',
+            'message'   => 'Your new store named '.$store->store_name.' located in '.$store->store_address.' has been approved. Click <a href="/store">here</a> to see assigned sales agent. ',
+            'status'    => 'unread'
+            ]);   
+
         } else {
+            $text_message = "Hi, ". $user->fname .
+            "\n\nYour new store named " .$store->store_name. " located in has been declined. Please contact us or your sales agent to discuss the problem.Please visit your account for more info.
+            \nBest regards,\nCharpling Square Enterprise \nCreamline Authorized Distributor";
 
-            $text_message = 'Hi, '. $user->fname . `
-                \n\nYour new store named ` .$store->store_name. ` located
-            in ` .$store->store_address. ` has been declined. 
-            \n Please contact us or
-            your sales agent to discuss the problem. 
-            <br>
-            Please visit your
-            account for more info.`;
-
-            $output = 'Successfully Declined!';            
+            $output = 'Successfully Declined!';    
+            
+            //client disapproved store
+            $this->notificationDispatch([
+                'user_id'   => $user->id,
+                'type'      => 'disapproved_client_store',
+                'area_id'   => $user->area_id,
+                'email_to'  => 'client',
+                'message'   => 'Your new store named '.$store->store_name.' located
+                in '.$store->store_address.' has been declined. Click <a href="/store">here</a> to see
+                assigned sales agent. Please contact us or your
+                sales agent to discuss the problem.',
+                'status'    => 'unread'
+                ]);   
         }
 
-        $this->global_itexmo($user->contact_num, $text_message." \n\n\n\n","ST-CREAM343228_LGZPB", '#5pcg2mpi]');
+        //send it to customer
+        $this->global_itexmo($user->contact_num, $text_message, "ST-CREAM343228_F3PNT", '8)tg(84@$$');
+
         
         if($request->status != 'accept'){
             Store::where('id', $request->store_id)->delete();
@@ -410,10 +432,15 @@ class ClientController extends Controller
                 $where = ['stores.user_id' => $id];
             }
 
-            $stores = Store::leftJoin('users', ['users.area_id' => 'stores.area_id'])
-                            ->selectRaw("stores.*, CONCAT(users.fname, ' ', users.lname) as fullname")
+            $stores = Store::selectRaw("stores.*")
                                 ->where($where)
-                                    ->get();
+                                    ->get()->map(function($item){
+                                        $item->fullname = 'NA';
+                                        if($user = User::where(['area_id' => $item->area_id, 'user_role' => 1])->first()){
+                                            $item->fullname = $user->fname . ' ' .  $user->lname;
+                                        }
+                                        return $item;
+                                    });
 
             return Datatables::of($stores)
                 ->addIndexColumn()

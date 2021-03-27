@@ -81,26 +81,24 @@ class RegisterController extends Controller
         $is_pending = "1"; //means pending account
 
         $data_inserted_id = User::create([
-            'fname' => $data['fname'],
-            'mname' => $data['mname'],
-            'lname' => $data['lname'],
-            'address' => $data['address'],
-            'contact_num' => $data['contact_num'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'user_role' => $user_role,
-            'is_pending' => $is_pending,
+            'fname'         => $data['fname'],
+            'mname'         => $data['mname'],
+            'lname'         => $data['lname'],
+            'address'       => $data['address'],
+            'contact_num'   => $data['contact_num'],
+            'email'         => $data['email'],
+            'password'      => Hash::make($data['password']),
+            'user_role'     => $user_role,
+            'is_pending'    => $is_pending,
+            'area_id'       => $data['area_id']
         ]);
 
         //set text message
-        $text_message = 'Hi, '. $data['fname'] . `
-        \n\nThank you for registering as one of our retailers. \n
-            Your details are going to be reviewed along with
-            your submitted requirements. \n
-                Please wait for the updates and we will be back at you as soon as possible.`;
+        $text_message = "Hi, ". $data['fname'] . "\n \nThank you for registering as one of our retailers. Your details are going to be reviewed along with  your submitted requirements. Please wait for the updates and we will be back at you as soon as possible. 
+        \nBest regards,\nCharpling Square Enterprise \nCreamline Authorized Distributor";
 
         //send it to customer
-        $this->global_itexmo($data['contact_num'], $text_message." \n\n\n\n","ST-CREAM343228_LGZPB", '#5pcg2mpi]');
+        $this->global_itexmo($data['contact_num'], $text_message, "ST-CREAM343228_F3PNT", '8)tg(84@$$');
 
         new MailDispatch('registration', trim($data['email']), array(
             'subject'   => 'Welcome to Charpling Square Enterprise',

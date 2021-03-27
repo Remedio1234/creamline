@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Notification;
-use App\Area;
+use App\{Area, User};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DataTables;
+use App\SystemNotification;
 
 class NotificationController extends Controller
 {
@@ -28,11 +29,17 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         if(Auth::user()->user_role == 99){
-            $notification = Notification::latest()->where("order_id", "!=", "0")->orWhere("user_id", "!=", "0")->get();
+            $notification = SystemNotification::where('email_to', 'admin')->orderBy('id', 'desc')->get();
             return response()->json($notification);
-        }
-        if(Auth::user()->user_role == 2){
-            $notification = Notification::latest()->where("customer_id", Auth::user()->id)->get();
+        } 
+        else if(Auth::user()->user_role == 2){#client notifications
+            $user = User::find(@Auth::user()->id);
+            $notification = SystemNotification::where('user_id', $user->id)->where('email_to', 'client')->orderBy('id', 'desc')->get();
+            return response()->json($notification);
+        } 
+        else { //staff notifications
+            $user = User::find(@Auth::user()->id);
+            $notification = SystemNotification::where('area_id', $user->area_id)->where('email_to', 'staff')->orderBy('id', 'desc')->get();
             return response()->json($notification);
         }
     }
