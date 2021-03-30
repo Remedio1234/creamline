@@ -298,6 +298,7 @@
             })
             .then((isTrue) => {
                 if (isTrue) {
+                    $("#setup_client_"+client_id).text("Sending")
                     $.ajax({
                         type: "DELETE",
                         url: "{{ url('client') }}" + '/' + client_id,

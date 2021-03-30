@@ -77,7 +77,7 @@ class ClientController extends Controller
                     $btn = '<a href="javascript:void(0)"  data-id="'.$row->id.'" data-original-title="Edit" class="edit btn btn-primary btn-sm editClient">Edit</a>';
 
                     if($row->is_pending == 0){
-                        $btn .= ' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteClient">'.$delete_status.'</a>';
+                        $btn .= ' <a href="javascript:void(0)" data-stat="'.$status.'" data-toggle="tooltip" data-id="'.$row->id.'" data-original-title="Delete" class="btn '.$delete_btn.' btn-sm deleteClient" id="setup_client_'.$row->id.'">'.$delete_status.'</a>';
                         $btn .=' <a href="/client/'.$row->id.'/stores" class="btn btn-warning btn-sm">'.'Store'.'</a>';
                         // $btn .=' <a href="javascript:void(0)"  class="btn btn-info btn-sm">Profile</a>';
                     }
@@ -247,13 +247,37 @@ class ClientController extends Controller
     public function destroy(User $client)
     {
         $output = '';
-
+        $user = User::find($client->id);
         // $client->delete();
         if($client->is_active == 0){
-            User::where('id', $client->id)->update(["is_active" => 1]);
+            $user->update(["is_active" => 1]);
             $output = 'Successfully Activated!';
         }else{
-            User::where('id', $client->id)->update(["is_active" => 0]);
+            //staff reminder    
+            $this->notificationDispatch([
+                'user_id'   => $user->id,
+                'type'      => 'client_deactivation',
+                'area_id'   => $user->area_id,
+                'email_to'  => 'staff',
+                'message'   => "(" . $user->id . ") " . $user->fname. " ". $user->lname . "  is deactivated from the client’s list. ",
+                'status'    => 'unread'
+            ]);   
+
+            //set text message
+            $text_message = "Hi, ". $user->fname . "\n \nWe are sorry to inform you that you are now deactivated from our retailer’s list. You can no longer login to our website. If you wish to continue our business, please contact your sales agent or the administration to activate your account again.             
+            \nBest regards,\nCharpling Square Enterprise \nCreamline Authorized Distributor";
+
+            //send it to customer
+            $this->global_itexmo($user->contact_num, $text_message, "ST-CREAM343228_F3PNT", '8)tg(84@$$');
+
+            new MailDispatch('client_deactivation', trim($user->email), array(
+                'subject'   => 'Account Deactivated',
+                'title'     => 'Account Deactivated', 
+                "site"      => '',
+                "name"      => trim($user->fname)
+            ));
+
+            $user->update(["is_active" => 0]);
             $output = 'Successfully Deactivated!';
         }
 

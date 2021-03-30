@@ -45,6 +45,9 @@ class MailSetup extends Mailable
             case 'reminder':
                 $page = "emails.reminder";
             break;
+            case 'client_deactivation':
+                $page = "emails.client_deactivation";
+            break;
             case 'client_approval':
                 $page = "emails.client_approval";
             break;
