@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Notification;
-use App\{Area, User};
+use App\{Area, User, Product};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use DataTables;
@@ -56,6 +56,15 @@ class NotificationController extends Controller
                 'message'   => "(" . $value->id . ") " . $value->fname. " ". $value->lname . " will be deactivated in 7 days if there is still no transaction made. Please follow up client. ",
                 'status'    => 'unread'
             ]);   
+            //admin reminder
+            $this->notificationDispatch([
+                'user_id'   => $value->id,
+                'type'      => 'reminder_admin',
+                'area_id'   => $value->area_id,
+                'email_to'  => 'admin',
+                'message'   => "(" . $value->id . ") " . $value->fname. " ". $value->lname . " has not ordered for two months. He will be deactivated in 7 days. Please set date for refrigerator pull out.",
+                'status'    => 'unread'
+            ]);   
 
             //set text message
             $text_message = "Hi, ". $value->fname . "\n \nWe’ve noticed you don’t have any transactions with us for 2 months. Please be reminded that you will be deactivated in 7 days if the situation is still the same. 
@@ -76,7 +85,49 @@ class NotificationController extends Controller
 
 
         if(Auth::user()->user_role == 99){
-            $notification = SystemNotification::where('email_to', 'admin')->orderBy('id', 'desc')->get();
+            //product stocks
+            $stocks = Product::join('product_stocks', ['products.id' => 'product_stocks.product_id'])
+                            ->selectRaw('products.id, product_stocks.id as product_stock_id, products.name as product_name, product_stocks.size, product_stocks.quantity, product_stocks.threshold')
+                                ->where('product_stocks.status', 0)        
+                                ->get();
+                                
+            foreach ($stocks as $key => $stock) {
+                
+                if($stock->quantity == 0){
+                    //admin reminder
+                    $this->notificationDispatch([
+                        'user_id'           => 0,
+                        'type'              => 'out_of_stock',
+                        'area_id'           => 0,
+                        'product_id'        => $stock->id,
+                        'product_stock_id'  => $stock->product_stock_id,
+                        'email_to'          => 'admin',
+                        'message'           => $stock->product_name . " ". $stock->size. " is out of stock. Please re-stock as soon as possible.",
+                        'status'            => 'unread',
+                    ]);   
+                } elseif($stock->quantity != 0 && $stock->quantity <= $stock->threshold){
+                    //admin reminder
+                    $this->notificationDispatch([
+                        'user_id'           => 0,
+                        'type'              => 'running_out_stock',
+                        'area_id'           => 0,
+                        'product_id'        => $stock->id,
+                        'product_stock_id'  => $stock->product_stock_id,
+                        'email_to'          => 'admin',
+                        'message'           => $stock->product_name . " ". $stock->size. " has reached the stock threshold. Please re-stock as soon as possible.",
+                        'status'            => 'unread'
+                    ]);   
+                } 
+            }                    
+            //check todays registered
+            $users        = User::select('id')->whereRaw('Date(created_at) = CURDATE() AND user_role = 2')->get()->count(); 
+            $notification = SystemNotification::select('id','message')->where('email_to', 'admin')->orderBy('id', 'desc')->get();
+            if($users > 0){
+                $notification  = array_merge($notification->toArray(),array(
+                    ['id' => 0, 
+                    'message' => "There are ".$users." registrations for today. <a href='/client'>Click</a> to review details"]
+                ));
+            }
             return response()->json($notification);
         } 
         else if(Auth::user()->user_role == 2){#client notifications
@@ -91,67 +142,5 @@ class NotificationController extends Controller
         }
 
         $users = User::where('is_pending','0')->where('is_active','1')->get();
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        // Notification::updateOrCreate([
-        //     'id' => $request->notification_id
-        // ],[
-        //     'notification_name' => $request->notification_name,
-        //     'notification_code' => $request->notification_code
-        // ]);
-
-        // // return response
-        // $response = [
-        //     'success' => true,
-        //     'message' => 'Notification saved successfully.',
-        // ];
-        // return response()->json($response, 200);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Notification  $notification
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        // $notification = Notification::find($id);
-        // return response()->json($notification);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Notification  $notification
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Notification $notification)
-    {
-        // $output = '';
-
-        // // $notification->delete();
-        // if($notification->is_deleted == 0){
-        //     Notification::where('id', $notification->id)->update(["is_deleted" => 1]);
-        //     $output = 'Successfully Deactivated!';
-        // }else{
-        //     Notification::where('id', $notification->id)->update(["is_deleted" => 0]);
-        //     $output = 'Successfully Activated!';
-        // }
-
-        // // return response
-        // $response = [
-        //     'success', true,
-        //     'message' => $output,
-        // ];
-        // return response()->json($response, 200);
     }
 }

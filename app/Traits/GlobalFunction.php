@@ -12,7 +12,15 @@ trait GlobalFunction {
      */
     public function notificationDispatch($data = array()){
         try {
-            SystemNotification::create($data);
+            if($data['email_to'] == 'admin'){
+                if(isset($data['product_id']) && isset($data['product_stock_id'])){
+                    SystemNotification::updateOrCreate(['product_id' => $data['product_id'], 'product_stock_id' => $data['product_stock_id']], $data);
+                } else {
+                    SystemNotification::create($data);
+                }
+            } else {
+                SystemNotification::create($data);
+            }
         } catch(Exception $e) {
             return $e->getMessage();
         }

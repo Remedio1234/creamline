@@ -263,6 +263,16 @@ class ClientController extends Controller
                 'status'    => 'unread'
             ]);   
 
+            //admin reminder
+            $this->notificationDispatch([
+                'user_id'   => $user->id,
+                'type'      => 'reminder_admin_client_deactivate',
+                'area_id'   => $user->area_id,
+                'email_to'  => 'admin',
+                'message'   => "(" . $user->id . ") " . $user->fname. " ". $user->lname . "  did not order within the 7-day allowance. He is now added to inactive list.                ",
+                'status'    => 'unread'
+            ]);  
+
             //set text message
             $text_message = "Hi, ". $user->fname . "\n \nWe are sorry to inform you that you are now deactivated from our retailer’s list. You can no longer login to our website. If you wish to continue our business, please contact your sales agent or the administration to activate your account again.             
             \nBest regards,\nCharpling Square Enterprise \nCreamline Authorized Distributor";

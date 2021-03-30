@@ -30,13 +30,11 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $product = Product::join('stocks', ['stocks.product_id' => 'products.id'])
-                    ->selectRaw('products.*,stocks.quantity, stocks.threshold')
-                    ->when($request->filter_status != 'all', function($sql) use($request){
+        $product = Product::when($request->filter_status != 'all', function($sql) use($request){
                         return $sql->where('is_deleted', $request->filter_status);
                     })
-                        ->latest()
-                            ->get();
+                    ->latest()
+                        ->get();
         // if($request->filter_status != 'all'){
         //     if(in_array($request->filter_status, [0,1])){ //available
         //         $where = ['is_deleted' => $request->filter_status];
