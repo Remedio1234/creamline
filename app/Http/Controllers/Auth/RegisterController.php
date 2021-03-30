@@ -90,7 +90,8 @@ class RegisterController extends Controller
             'password'      => Hash::make($data['password']),
             'user_role'     => $user_role,
             'is_pending'    => $is_pending,
-            'area_id'       => $data['area_id']
+            'area_id'       => $data['area_id'],
+            'expiry'        => date('Y-m-d H:i:s', strtotime('+2 months'))
         ]);
 
         //set text message

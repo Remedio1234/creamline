@@ -257,16 +257,16 @@ class ClientController extends Controller
             $output = 'Successfully Deactivated!';
         }
 
-        if($client->is_pending == 1){
-            //set text message
-            $text_message = `Thank you for registering Creamline Products. You're account has been approved and you can now login to our official website. Enjoy!`;
+        // if($client->is_pending == 1){
+        //     //set text message
+        //     $text_message = `Thank you for registering Creamline Products. You're account has been approved and you can now login to our official website. Enjoy!`;
 
-            //send it to customer
-            $this->global_itexmo($client->contact_num, $text_message." \n\n\n\n","ST-CREAM343228_LGZPB", '#5pcg2mpi]');
+        //     //send it to customer
+        //     $this->global_itexmo($client->contact_num, $text_message." \n\n\n\n","ST-CREAM343228_LGZPB", '#5pcg2mpi]');
             
-            User::where('id', $client->id)->update(["is_pending" => 0, "is_active" => 1]);
-            $output = 'Successfully Approved!';
-        }
+        //     User::where('id', $client->id)->update(["is_pending" => 0, "is_active" => 1]);
+        //     $output = 'Successfully Approved!';
+        // }
 
         // return response
         $response = [
@@ -308,7 +308,7 @@ class ClientController extends Controller
                 'type'      => 'approved_client',
                 'area_id'   => $user->area_id,
                 'email_to'  => 'staff',
-                'message'   => '('.$user->id . ') '. $user->fname . ' '. $user->lname . ' is now added to your client’s list. Click <a href="/client_list">here</a> for details.',
+                'message'   => '('.$user->id . ') '. $user->fname . ' '. $user->lname . ' is now added to your client’s list.<br> Click <a href="/client_list">here</a> for details.',
                 'status'    => 'unread'
             ]);   
             //client 
@@ -317,7 +317,7 @@ class ClientController extends Controller
                 'type'      => 'approved_client',
                 'area_id'   => $user->area_id,
                 'email_to'  => 'client',
-                'message'   => 'Hi,'  . $user->fname . ' '. $user->lname . '. Welcome to creamline. You can now order <a href="/shop">here</a>.',
+                'message'   => 'Hi,'  . $user->fname . ' '. $user->lname . '. Welcome to creamline. <br>You can now order <a href="/shop">here</a>.',
                 'status'    => 'unread'
             ]);   
 
@@ -376,7 +376,7 @@ class ClientController extends Controller
             'type'      => 'approved_client_store',
             'area_id'   => $user->area_id,
             'email_to'  => 'client',
-            'message'   => 'Your new store named '.$store->store_name.' located in '.$store->store_address.' has been approved. Click <a href="/store">here</a> to see assigned sales agent. ',
+            'message'   => 'Your new store named '.$store->store_name.' located in '.$store->store_address.' has been approved.<br> Click <a href="/store">here</a> to see assigned sales agent.',
             'status'    => 'unread'
             ]);   
 
@@ -393,10 +393,7 @@ class ClientController extends Controller
                 'type'      => 'disapproved_client_store',
                 'area_id'   => $user->area_id,
                 'email_to'  => 'client',
-                'message'   => 'Your new store named '.$store->store_name.' located
-                in '.$store->store_address.' has been declined. Click <a href="/store">here</a> to see
-                assigned sales agent. Please contact us or your
-                sales agent to discuss the problem.',
+                'message'   => 'Your new store named '.$store->store_name.' located in '.$store->store_address.' has been declined.<br> Click <a href="/store">here</a> to see assigned sales agent. <br>Please contact us or your sales agent to discuss the problem.',
                 'status'    => 'unread'
                 ]);   
         }

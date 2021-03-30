@@ -401,7 +401,7 @@
             //when notificationDropdown is clicked
             $("#notificationDropdown").click(function(){
                 //remove the badge
-                $(".badge-here").html('');
+                $(".badge-here").html(0);
             });
 
             //call the function for displaying the notifications
