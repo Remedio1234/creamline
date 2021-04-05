@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\{Order,Stock, ProductStock};
+use App\{Order,Stock, ProductStock, User};
 use App\Traits\GlobalFunction;
 use DataTables;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\{DB, Auth, Session};
 
 class StaffDashboardController extends Controller
 {
@@ -383,15 +380,28 @@ class StaffDashboardController extends Controller
 
         //if not completed
         if($request->input("action") == "cancel"){
-
+            $staff          = auth()->user();
+            $order          = DB::table('order_invoice')->whereId($request->order_id)->first();
+            $client         = User::find($order->user_id);
+            $cancel_option  = ($request->cancel_option == 1 ? 'Client Cancel' : 'Delivery Cancel');
+            //admin reminder
+            $this->notificationDispatch([
+                'user_id'   => $staff->id,
+                'type'      => 'staff_cancel_order',
+                'area_id'   => $staff->area_id,
+                'email_to'  => 'admin',
+                'message'   => $staff->fname. " " . $staff->lname. " cancelled order " .$order->invoice_no. " of ".$client->fname. " " . $client->lname. " due to ".$cancel_option." (".$request->reason.").",
+                'status'    => 'unread'
+            ]);  
+            
             // if 1 cancelled by client, if 2 cancelled by staff
             $cancelled_by = $request->input("cancel_option");
 
-            if ($cancelled_by == 2) {
+            // if ($cancelled_by == 2) {
 
-                $text_message = 'We\'re sorry for the inconvenience. Your Order # '.$request->input("order_id").'cannot be delivered today to some technical difficulties';
-                $this->messageNotification(null , $request->input("order_id"), $text_message);
-            }
+            //     $text_message = 'We\'re sorry for the inconvenience. Your Order # '.$request->input("order_id").'cannot be delivered today to some technical difficulties';
+            //     $this->messageNotification(null , $request->input("order_id"), $text_message);
+            // }
 
             //update the order
             $attempt = DB::table('orders')->where('invoice_id', $request->input("order_id"))->get();
